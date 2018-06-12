@@ -1,0 +1,78 @@
+\section{\(\LaTeX\) is a programming language}
+\index{LaTeX}
+\par \LaTeX is basically a markup language. Another example of markup language that you encounter daily is HTML, but \LaTeX is far more powerfull (as it supports, e.g., macro-programming). When preparing a document using \LaTeX, you write a source file, and a special \LaTeX-compiler creates a neat PDF-document using your source (some years ago the standard output for \LaTeX was not PDF, but rather DVI or PS, but these latter formats are getting obsolete).
+
+\par \LaTeX is based on \TeX, a markup language designed by a legend of computer science \href{https://en.wikipedia.org/wiki/Donald_Knuth}{Donald Knuth}. In mathematics and sciences these two languages became a de-facto standard for writing research papers and conference slides, as they are practically unrivalled when it comes to power, tunability and portability. Even modern versions of Microsoft Word and Microsoft PowerPoint (starting with 2007) support inserting formulas using \LaTeX syntax. On the internet you may have heard of \href{https://en.wikipedia.org/wiki/MathJax}{MathJax}\index{MathJax} system that processed \LaTeX code on-the-fly to display math on discussion boards and elsewhere on the Internet. This system also powers the current lesson.
+
+\par As \LaTeX is not a \href{https://en.wikipedia.org/wiki/WYSIWYG}{WYSIWYG-system}, there is one obstacle: to use \LaTeX, you need first to devote some time to learning it. Yet to my experience, to be able to encode most of everyday math and to prepare some not-too-complex documents, one suffices to spend about 2-3 hours learning the basics, and then just keep a printed \href{https://wch.github.io/latexsheet/}{cheat-sheet} containing the most common features. While using \LaTeX in practice, you will then learn anything necessary for your work on the way without interrupting for special training.
+
+
+\section{Literal reproduction}
+\par Sometimes you may need to display a text without processing it with \LaTeX . In this case you will need \verb"\verb"\index{\verb} command, followed by the text. It is very useful, assuming that by default \LaTeX would otherwise make many substitutions to the text: for example, doubled “lower-than” symbols \verb"<<…>>"\index{quotes} would be converted into <<quotes>>, and \verb"---"\index{dash} --- into a dash. How would one then display quotes within \verb"\verb"? The answer is that you just need to use a different symbol for delimiting the content of verbatim output, e.g. \verb+\verb|quotation symbol: "|+. (Look at the source code to the right now!)\index{\verb=literal reproduction=verbatim}
+\par One should take special care with the following symbols: \verb"& { } $ % # _". For instance, the symbol \%, without preceding backslash, is considered as a start of a comment, which would be skipped during the  compilation, just like in any programming language.\index{comment}%See, for instance, this comment that was ommitted in the output on the left.
+
+
+\section{Paragraphs}
+\par It is a good practice to thoughtfully split the text into paragraphs. A new paragraph can be started with a command \verb"\par"\index{\par} or when \LaTeX encounters two consequitive newline characters in the text. The latter is not supported in the current lesson, though.\index{\par=start a new paragraph}
+
+
+\section{Emphasizing parts of the text}
+\par Чтобы выделять текст, используются команды \verb"\textbf"\index{\textbf=bold font} (\textbf{жирный} шрифт) и \verb"\textit"\index{\textit=italic font} (\textit{курсивный} шрифт), которые можно \textbf{комби\textit{нир}овать}. Также есть команда для подчёркивания \verb"\underline", но в большинстве современных руководств по оформлению печатных текстов рекомендуют не использовать подчёркивание для выделения текста, а потому эта команда не поддерживается настоящим интерактивным уроком;)
+
+\par Есть ещё одна замечательная команда \verb"\emph"\index{\emph=выделение текста}, которая старается сделать текст выделяющимся, независимо от того, какие шрифты используются вокруг: скажем, во фрагменте кода \verb"\textit{это было прошлым \emph{летом}, в середине \emph{января}}" слова <<января>> и <<летом>> выведутся обычным шрифтом, чтобы отличаться от окружающих их слов, набранных курсивом. Поэтому при отсутствии каких-либо специальных мотивов текст рекомендуется выделять именно с помощью \verb"\emph". Внимание: в данном уроке команда \verb"\emph" не так продвинута, и в полной красе её действие видно только в полноценном \LaTeX.
+
+\par Иногда нужно выделить не слово, а отдельную букву: чаще всего речь идёт об ударении. К счастью, в \LaTeX без труда можно <<навесить>> ударение над буквой с помощью сочетания \verb"\'{о}"\index{диакритические знаки,ударение} (вместо о может быть люб\'{а}я б\'{у}ква). Это частный случай использования диакритических знаков, полный список команд для них можно посмотреть по \href{https://en.wikibooks.org/wiki/LaTeX/Special_Characters#Escaped_codes}{ссылке}.
+
+\par Пока что это всё, что для начала нужно знать об оформлении текста. Главное всё-таки --- это формулы, о них и пойдёт речь в непосредственно следующих шагах.
+
+
+\section{Два основных режима: текстовый и математический}
+\par Хотя в \LaTeX вполне можно верстать книги, не содержащие ни одной формулы, чаще всего эту систему используют именно благодаря непревзойдённому качеству отображения математической нотации. Первое, что нужно знать о наборе в \LaTeX --- это наличие двух режимов: \textbf{обычного (текстового)} и \textbf{математического (формульного)}. Как правило, когда Вы пишете математический текст, Вы можете однозначно сказать про каждый символ, имеет ли он стандартное языковое значение или это математическое обозначение. Чтобы \LaTeX распознал, что именно Вы считаете формулой, нужно заключать формулу в доллары, например: $F=ma$ --- это формула, заключённая в доллары, и \LaTeX вывел её особым шрифтом, а F=ma --- формула, которую в доллары заключить забыли, и она выведена как обычный текст, тем же текстовым шрифтом. Вместо долларов \verb"$…$" можно использовать сочетание \verb"\(…\)", и результат будет точно таким же: \(F=ma.\) Рекомендуется пользоваться именно последним способом оформления, поскольку здесь явно видно начало формулы и её конец, в то время как <<открывающий>> и <<закрывающий>> доллар \LaTeX-у приходится угадывать самостоятельно. Однако, эта рекомендация не является строгой.
+
+
+\section{Два основных математических режима: inline и display}
+\par Как и в хорошо набранных книгах, в \LaTeX можно как располагать формулы внутри текста, так и делать их центром внимания, вынося на отдельную строчку (такие формулы называются \textit{выключными} или \textit{выносными}). Когда формула располагается в окружении текста, такой математический режим называется inline math, а когда формула располагается на отдельной строчке --- display math. Чтобы формула была вынесена на середину отдельной строки, её заключают в двойные доллары: \verb"$$…$$" в системе $\TeX$ и в квадратные <<бэкслэшнутые>> скобки \verb"\[…\]", --- в \LaTeX. Вот пример: \[F=ma.\]
+В отличие от чисто виртуального различия между записью \verb"$…$" и \verb"\(…\)" для inline math, разница записей \verb"$$…$$" и \verb"\[…\]" существенна: хотя часто разницы не видно, вполне может возникнуть ситуация, когда формула, оформленная двойными долларами, имеет отступы от окружающего текста не такие, как задумывалось.\index{дисплейный режим=display math}
+
+
+\section{Упражнение}
+\begin{staticpart}
+Наберите следующий текст, сохраняя разбиение на абзацы, шрифт текста и положение формул (для удобства неоформленный текст уже дан Вам в окне кода):
+\htmlblockquote{\par Совсем нетрудно набирать тексты, содержащие \textbf{жирный шрифт}, а иногда и \textit{курсив}, хотя выделять текст лучше всё же командой \verb"\emph".
+\par Разбивать текст на параграфы, ставить <<кавычки-ёлочки>> --- дело ТеХники! Но вот что лучше всего, так это набор формул. Ведь так приятно написать, что \(\showSourceOnClick A+B=B+A\) или даже заявить всему миру, что \[\showSourceOnClick C+D=D+C.\]}
+\end{staticpart}
+Совсем нетрудно набирать тексты, содержащие жирный шрифт, а иногда и курсив, хотя выделять текст лучше всё же командой emph. Разбивать текст на параграфы, ставить кавычки-ёлочки дело ТеХники! Но вот что лучше всего, так это набор формул. Ведь так приятно написать, что A+B=B+A или даже заявить всему миру, что C+D=D+C.
+
+
+\section{Списки}
+\par Помимо команд в \LaTeX есть ещё понятие \emph{окружений}.\index{окружение} Окружения задаются с помощью пары команд вида \verb"\begin{…}" и \verb"\end{…}". Позже мы познакомимся со многими полезными окружениями для красивого отображения сложных формул, а сейчас рассмотрим окружения для создания списков --- нумерованных и ненумерованных. Для нумерованных списков существует окружение \verb"enumerate". Каждый элемент списка должен предваряться командой \verb"\item". Пример:\index{enumerate=нумерованный список,itemize=ненумерованный список,\item}
+\begin{enumerate}
+\item Вот дом, который построил Джек.
+\item А это пшеница, которая в тёмном чулане хранится в доме, который построил Джек.
+\item А это синица, которая ловко ворует пшеницу. Синице по мере скудных возможностей мешают:
+    \begin{enumerate}
+    \item Кот.
+    \item Старый пёс без хвоста.
+    \item Корова безрогая.
+    \end{enumerate}
+\end{enumerate}
+Как видите, списки вполне могут вкладываться друг в друга.
+\par Для ненумерованных списков есть окружение \verb"itemize". Попробуйте его сами в следующем упражнении!
+
+
+\section{Упражнение}
+\begin{staticpart}
+Наберите следующий текст: \htmlblockquote{В числе прочего, философия языка программирования Python предполагает соблюдение следующих принципов:
+\begin{itemize}
+\item Красивое лучше, чем уродливое.
+\item Явное лучше, чем неявное.
+\item И ещё два связанных друг с другом принципа: \begin{enumerate}
+\item Простое лучше, чем сложное.
+\item Сложное лучше, чем запутанное.
+\end{enumerate}
+\end{itemize}}
+\end{staticpart}
+В числе прочего, философия языка программирования Python предполагает соблюдение следующих принципов:
+Красивое лучше, чем уродливое.
+Явное лучше, чем неявное.
+И ещё два связанных друг с другом принципа: Простое лучше, чем сложное. Сложное лучше, чем запутанное.

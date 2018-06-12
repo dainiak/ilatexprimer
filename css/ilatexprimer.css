@@ -1,0 +1,121 @@
+.social-share {
+    position: absolute;
+    vertical-align: top;
+    top: 0;
+    right: 0;
+    border: 0;
+    z-index: 10000;
+}
+
+.social-share .ribbon-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    overflow: hidden;
+    width: 140px;
+    height: 140px;
+}
+
+.social-share .btn-group {
+    position: absolute;
+    top: 0;
+    right: 140px;
+}
+
+.social-share .ribbon {
+    width: 200px;
+    text-align: center;
+    position: absolute;
+    background: gray;
+    border-top: black dashed 2px;
+    border-bottom: black dashed 2px;
+    color: whitesmoke;
+    top: 45px;
+    right: -45px;
+    z-index: 10000;
+    transform: rotate(45deg);
+}
+
+.social-share .ribbon a {
+    text-decoration: none;
+    color: whitesmoke;
+}
+
+ul.virtual {
+    list-style-type: none;
+}
+
+.tooltip-inner {
+    white-space: pre-wrap;
+    max-width: 100%;
+}
+
+.card-header {
+    cursor: default;
+}
+
+.card-header h4::before {
+    content: "\25bc";
+    margin-right: 0.2em;
+    float: left;
+    color: grey;
+    transition: transform 0.4s ease-in-out;
+}
+
+.card-header.collapsed h4::before {
+    transform: rotate(-90deg);
+    transition: transform 0.4s ease-in-out;
+}
+
+blockquote {
+    font-size: inherit;
+    border-left: double gray 5px;
+    padding-left: 1em;
+}
+
+.highlighted-blinking {
+    border-color: firebrick;
+    border-width: thick;
+}
+
+
+/* CSS for displaying latex-generated lists */
+div > ol {
+    list-style-type: none;
+    counter-reset: enumeratei;
+}
+
+div > ol > li > ol {
+    list-style-type: none;
+    counter-reset: enumerateii;
+}
+
+div > ol > li > ol > li > ol {
+    list-style-type: none;
+    counter-reset: enumerateiii;
+}
+
+div > ol > li:before {
+    counter-increment: enumeratei;
+    content: counter(enumeratei) ". ";
+}
+
+div > ol > li > ol > li:before {
+    counter-increment: enumerateii;
+    content: counter(enumeratei) "." counter(enumerateii) ". ";
+}
+
+div > ol > li > ol > li > ol > li:before {
+    counter-increment: enumerateiii;
+    content: counter(enumeratei) "." counter(enumerateii) "." counter(enumerateiii) ". ";
+}
+
+div.card-body a, div.card-body a:visited, div.card-body a:active, div.card-body a:hover {
+    color: inherit;
+    border-bottom: 2px cadetblue dotted;
+    text-decoration: inherit;
+}
+
+div.card-body a:hover {
+    background-color: lightgray;
+}
