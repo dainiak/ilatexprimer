@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="author" content="Alex Dainiak @ Moscow Institute of Physics and Technology">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/css/bootstrap.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+
+<link rel="stylesheet" href="css/ilatexprimer.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/ext-static_highlight.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/mode-latex.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.3/theme-chrome.js"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/contrib/auto-render.min.js"></script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    skipStartupTypeset: true,
+    messageStyle: 'none',
+	showMathMenu: false,
+	showMathMenuMSIE: false,
+	showProcessingMessages: false,
+    extensions: ['tex2jax.js'],
+	jax: ['input/TeX', 'output/CommonHTML'],
+    tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        displayMath: [['$$','$$'], ['\\[','\\]']],
+        skipTags: ['script','noscript','style','code','pre'],
+        ignoreClass: 'latex-source-area',
+        processEnvironments: true,
+        processEscapes: true,
+        processRefs: true,
+        preview: 'none'
+    },
+    TeX: {
+        equationNumbers: {
+            autoNumber: 'AMS',
+            useLabelIds: false
+        },
+        extensions: [
+            'AMSmath.js',
+            'AMSsymbols.js',
+            'HTML.js',
+            'noUndefined.js',
+            'begingroup.js',
+        ],
+        noUndefined: {
+            attributes: {
+                mathcolor: 'red',
+                mathbackground: '#FFEEEE',
+                mathsize: '90%'
+            }
+        },
+        Macros: {
+			par: '',
+			showSourceOnClick: '',
+			hrf: ['{\\href{#1}{#2}}', 2],           // need this to bypass pre-mathjax \href command processing
+			ttp: ['{\\href{[tooltip]#1}{#2}}', 2]   // display jQuery tooltip for element
+		}
+	}
+});
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js"></script>
+
+<script type="text/javascript" charset="utf-8" src="js/ilatexprimer.js"></script>
+
+<title>Interactive Introduction to LaTeX</title>
+</head>
+
+<script type="text/javascript" src="js/i18n.js"></script>
+
+<script type="text/javascript">
+    var language = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
+
+    $(function(){
+        document.title = I18N_STRINGS['document.title'] ? I18N_STRINGS['document.title'] : document.title;
+        for(var paramId in I18N_STRINGS){
+            if(paramId.indexOf('.') < 0){
+                $('#' + paramId).html(I18N_STRINGS[paramId]);
+            }
+        }
+    });
+
+</script>
+
+<body>
+<div class="container">
+    <div class="alert alert-info font-weight-bold" role="alert" id="loadingToast">Loading…</div>
+    <div class="card mt-3">
+        <div class="social-share">
+    <div class="btn-group">
+    <a class="btn btn-outline-secondary" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-facebook"></i></a>
+    <a class="btn btn-outline-secondary" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F&title=Interactive%20LaTeX%20Primer"><i class="fa fa-linkedin"></i></a>
+    <a class="btn btn-outline-secondary" href="https://twitter.com/home?status=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-twitter"></i></a>
+    <a class="btn btn-outline-secondary" href="http://vk.com/share.php?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-vk"></i></a>
+    <a class="btn btn-outline-secondary" href="https://plus.google.com/share?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-google-plus"></i></a>
+    </div>
+
+    <div class="ribbon-container"><div class="ribbon"><a href="https://github.com/dainiak/ilatexprimer" id="githubForkLink">Fork me on GitHub</a></div></div>
+</div>
+
+        <div class="card-body">
+            <h1 class="card-title" id="mainTitle">Interactive Introduction to \( \LaTeX \)</h1>
+            <h5 class="card-title" id="headerAbout">About</h5>
+            <div class="card-text" id="contentAbout"><p>This interactive lesson is created by <a rel="author" href="http://www.dainiak.com">Alex Dainiak</a>, an associate professor at <a href="https://mipt.ru/en/">MIPT</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href="https://www.mathjax.org/">MathJax</a>, <a href="https://khan.github.io/KaTeX/">KaTeX</a>, <a href="https://ace.c9.io">ACE Editor</a>, <a href="http://getbootstrap.com/">Bootstrap</a>, <a href="https://jquery.com/">jQuery</a>. While preparing this lesson, the author benefited much from <a href="http://stackoverflow.com/">Stack Overflow</a> and <a href="http://tex.stackexchange.com/">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href="https://www.jetbrains.com/pycharm/">PyCharm</a> IDE and <a href="https://www.google.com/chrome/">Chrome</a> developer tools. This project is hosted on <a href="https://github.com/dainiak/ilatexprimer">GitHub</a>.</p></div>
+
+            <h5 class="card-title" id="collapseExpandSteps">Collapse/expand all steps</h5>
+            <div class="card-text"><p><div class="btn-group">
+                <button id="btnCollapseAll" class="btn btn-outline-secondary">Collapse all steps</button>
+                <button id="btnExpandAll" class="btn btn-outline-secondary">Expand all steps</button>
+            </div></p></div>
+
+            <h5 class="card-title" id="headerKeywordSearch">Smart Search</h5>
+            <form id="searchForm" class="form-inline" role="search" action="">
+                <input type="text" id="searchInput" class="form-control" autocomplete="off">
+                <span class="input-group-btn"><button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button></span>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-header h3 manual-collapse collapsed" data-toggle="collapse" data-target="#optionsPanel"><h4 class="h4" id="headerOptions">Options</h4></div>
+
+        <div id="optionsPanel" class="card-body card-text collapse manual-collapse">
+            <h5 class="card-title" id="headerMathEngine">Math display engine</h5>
+            <div class="card-text">
+                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="mathRenderer" value="MathJax" checked> <span id="optionMathEngineMathJax">MathJax (not that fast, but better compatibility)</span></label></div>
+                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="mathRenderer" value="KaTeX"> <span id="optionMathEngineKaTeX">KaTeX (very fast, but supports smaller LaTeX command set)</span></label></div>
+            </div>
+
+            <h5 class="card-title" id="headerInteractivityMode">When to process the LaTeX source code</h5>
+            <div class="card-text">
+                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="autoTypeset" value="onHotkey" checked> <span id="optionInteractivityLow">Only when <code>Ctrl+Enter</code> is pressed in the source code editor</span></label></div>
+                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="autoTypeset" value="onChange"> <span id="optionInteractivityHigh">On any update of the source code</span></label></div>
+            </div>
+
+            <h5 class="card-title" id="headerEditorInstances">Number of source code editor instances</h5>
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="singleAceInstance" value="false" checked> <span id="optionEditorMultiple">Separate editor per each step (more convenient)</span></label></div>
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="singleAceInstance" value="true"> <span id="optionEditorSingle">Single editor instance (lower memory load)</span></label></div>
+
+            <h5 class="card-title" id="headerSourceResultRatio"></h5>
+            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="8"> 1:2</label></div>
+            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="7"> 5:7</label></div>
+            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="6"> 1:1</label></div>
+            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="5" checked> 7:5</label></div>
+            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="4"> 2:1</label></div>
+            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="0"> <span id="optionNoSourseCode">no sourse code</span></label></div>
+        </div>
+    </div>
+
+
+<section class="main-content" lang="en">
+    <script type="text/latexlesson" data-src="intro.tex"></script>
+
+    <h2 class="h2 mt-4">What is $\LaTeX$?</h2>
+    <script type="text/latexlesson" data-src="text-basics.tex"></script>
+
+    <h2 class="h2 mt-4">Basic formulas</h2>
+    <script type="text/latexlesson" data-src="formulae-basics.tex"></script>
+
+    <h2 class="h2 mt-4">Some more advanced stuff</h2>
+    <script type="text/latexlesson" data-src="formulae-advanced.tex"></script>
+
+    <h2 class="h2 mt-4">Where to look next</h2>
+    <script type="text/latexlesson" data-src="what-next.tex"></script>
+</section>
+
+<section class="main-content" lang="ru">
+    <script type="text/latexlesson" data-src="intro.tex"></script>
+
+    <h2 class="h2 mt-4">Что такое $\LaTeX$?</h2>
+    <script type="text/latexlesson" data-src="text-basics.tex"></script>
+
+    <h2 class="h2 mt-4">Как набирать формулы?</h2>
+    <script type="text/latexlesson" data-src="formulae-basics.tex"></script>
+
+    <h2 class="h2 mt-4">Формулы: набор выключных формул</h2>
+    <script type="text/latexlesson" data-src="formulae-advanced.tex"></script>
+
+    <h2 class="h2 mt-4">Что дальше?</h2>
+    <script type="text/latexlesson" data-src="what-next.tex"></script>
+</section>
+
+
+</div>
+
+</body>
+</html>
