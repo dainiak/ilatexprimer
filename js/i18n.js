@@ -30,7 +30,7 @@ var I18N_STRINGS_ALL = {
 
         "msg.UnbalancedParenthesis": "((Несбалансированные скобки!))",
         "msg.KatexUnableToDisplayFormula": "(KaTeX не смог отобразить эту формулу)",
-        "msg.ProcessingMathOnPage": "Идёт отрисовка формул. На медленном компьютере может зянять десятки секунд…",
+        "msg.ProcessingMathOnPage": "Идёт отрисовка формул. На медленном компьютере может занять десятки секунд…",
         "msg.LoadingSection": "Загружается раздел",
         "msg.ProcessingSection": "Обрабатывается раздел",
         "msg.UnableToLoadThisStep": "Не удалось загрузить этот шаг",
