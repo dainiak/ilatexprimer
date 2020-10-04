@@ -1,7 +1,8 @@
 $(function() {
     let startCollapsed = true;
+    let highlightIntro = false;
     let mathRenderer = 'KaTeX';
-    let typesetOnChange = false;
+    let typesetOnChange = true;
     let singleAceInstance = false;
     let keywordIndex = {};
     let aceHighlighter = ace.require('ace/ext/static_highlight');
@@ -129,30 +130,31 @@ $(function() {
 
     $('input[type=radio][name=autoTypeset]').change(function () {
         typesetOnChange = (this.value === 'onChange');
-        if (this.value === 'onChange' && mathRenderer === 'MathJax' && confirm(confirmationSwitchToKaTeX) === true) {
-            $('input[type=radio][name=mathRenderer][value="KaTeX"]')[0].checked = true;
-            mathRenderer = 'KaTeX';
-        }
+        // if (this.value === 'onChange' && mathRenderer === 'MathJax' && confirm(confirmationSwitchToKaTeX) === true) {
+        //     $('input[type=radio][name=mathRenderer][value="KaTeX"]')[0].checked = true;
+        //     mathRenderer = 'KaTeX';
+        // }
     });
 
     $('input[type=radio][name=mathRenderer]').change(function () {
-        if (this.value === 'MathJax' && typesetOnChange) {
-            mathRenderer = this.value;
-            if (confirm(confirmationCtrlEnter) === true) {
-                $('input[type=radio][name=autoTypeset][value="onChange"]')[0].checked = false;
-                $('input[type=radio][name=autoTypeset][value="onHotkey"]')[0].checked = true;
-                typesetOnChange = false;
-            }
-        }
-        else if (this.value === 'KaTeX' && !typesetOnChange) {
-            if (confirm(confirmationKaTeXLowerCompatibility) === true) {
-                mathRenderer = this.value;
-            }
-            else {
-                $('input[type=radio][name=mathRenderer][value="MathJax"]')[0].checked = true;
-            }
-        }
-        else {
+        // if (this.value === 'MathJax' && typesetOnChange) {
+        //     mathRenderer = this.value;
+        //     // if (confirm(confirmationCtrlEnter) === true) {
+        //         $('input[type=radio][name=autoTypeset][value="onChange"]')[0].checked = false;
+        //         $('input[type=radio][name=autoTypeset][value="onHotkey"]')[0].checked = true;
+        //         typesetOnChange = false;
+        //     // }
+        // }
+        // else if (this.value === 'KaTeX' && !typesetOnChange) {
+        //     //if (confirm(confirmationKaTeXLowerCompatibility) === true) {
+        //         mathRenderer = this.value;
+        //     // }
+        //     // else {
+        //     //     $('input[type=radio][name=mathRenderer][value="MathJax"]')[0].checked = true;
+        //     // }
+        // }
+        // else
+            {
             mathRenderer = this.value;
         }
     });
@@ -165,6 +167,7 @@ $(function() {
                 .removeClass('col-md-6')
                 .removeClass('col-md-7')
                 .removeClass('col-md-8')
+                .removeClass('col-md-12')
                 .addClass('col-md-' + (this.value).toString())
                 .show()
                 .trigger('resize');
@@ -174,6 +177,7 @@ $(function() {
                 .removeClass('col-md-6')
                 .removeClass('col-md-7')
                 .removeClass('col-md-8')
+                .removeClass('col-md-12')
                 .addClass('col-md-' + (12 - parseInt(this.value)).toString());
         }
         else {
@@ -194,6 +198,11 @@ $(function() {
         }
     });
 
+    $('input[type=radio][name=displayLanguage]').change(function () {
+        setUILanguage((this.value).toString());
+        masterReload();
+    });
+
     $('#btnCollapseAll').click(function () {
         $('[data-toggle="collapse"]').not('.manual-collapse').addClass('collapsed');
         $('.step-body.collapse').not('.manual-collapse').removeClass('show');
@@ -212,65 +221,18 @@ $(function() {
         return false;
     });
 
-
-    if(mathRenderer === 'MathJax'){
-        MathJax.Hub.Register.MessageHook("New Math", function (message) {
-            let latexSource = MathJax.Hub.getJaxFor(message[1]).originalText.trim();
-            let $frame = $('#' + message[1] + '-Frame');
-
-            if (latexSource.startsWith('\\showSourceOnClick')) {
-                latexSource = latexSource.replace(/^\\showSourceOnClick\s*/, '').trim();
-                $frame.popover({
-                    content: $('<code></code>').text(latexSource),
-                    html: true,
-                    placement: 'bottom',
-                    trigger: 'click'
-                }).css('cursor', 'default').attr('data-has-tooltip', true);
-            }
-            else {
-                $frame.popover({
-                    content: $('<code></code>').text(latexSource),
-                    html: true,
-                    placement: 'bottom',
-                    trigger: 'hover'
-                }).css('cursor', 'default').attr('data-has-tooltip', true);
-            }
-
-            $frame.find('a').each(function (index, element) {
-                if (element.getAttribute('href').includes(/^#step\d/)) {
-                    let href = element.getAttribute('href').replace('#step', '#stepheading');
-                    element.removeAttribute('href');
-                    $(element).on('click', function () {
-                        $(href)[0].scrollIntoView();
-                    });
-                }
-                else if (element.getAttribute('href').startsWith('[tooltip]')) {
-                    let tooltipText = element.getAttribute('href').substring('[tooltip]'.length);
-                    element.removeAttribute('href');
-                    $(element).popover({
-                        content: tooltipText,
-                        placement: 'bottom',
-                        trigger: 'click'
-                    }).css('cursor', 'default').css('color', 'red').attr('data-has-tooltip', true);
-                }
-            });
-        });
-    }
-
-
-
     function highlighKeywordEverywhere(keyword) {
         if(!(keyword in keywordIndex))
             return;
 
         function highlightKeywordInFormulas(element, keyword) {
             if(mathRenderer === 'MathJax'){
-                let formulas = MathJax.Hub.getAllJax(element);
-                for (let j = 0; j < formulas.length; ++j) {
-                    if (formulas[j].originalText.includes(RegExp(keyword.replace(/[\\$^[{}()?.*|]/g, function($0){return '\\'+$0}),'gi'))) {
-                        $('#' + formulas[j].inputID + '-Frame').addClass('highlighted-blinking');
+                $(element).find('annotation[encoding="application/x-tex"]').each(function (i, e) {
+                    let $e = $(e);
+                    if ($e.text().includes(keyword)) {
+                        $e.parent().addClass('highlighted-blinking');
                     }
-                }
+                });
             }
             else {
                 $(element).find('.katex-html').each(function (i, e) {
@@ -620,7 +582,7 @@ $(function() {
     function mathRendererFactory(element, performPostprocessing, callback) {
         performPostprocessing = (performPostprocessing !== false);
 
-        function processWithKaTeX(element) {
+        function processWithRenderer(element) {
             for (let i = 0; i < element.childNodes.length; ++i) {
                 let node = element.childNodes[i];
                 if (node.nodeType === 3) {
@@ -628,18 +590,20 @@ $(function() {
                     if (tokens.length <= 1) {
                         continue;
                     }
+
                     let container = document.createElement('span');
                     element.replaceChild(container, node);
 
                     for (let j = 0; j < tokens.length; ++j) {
                         let token = tokens[j];
-                        if (['\\(', '$', '$$', '\\['].indexOf(token) >= 0) {
+                        if (['\\(', '$', '$$', '\\['].includes(token)) {
                             j += 1;
                             if (j >= tokens.length) {
                                 break;
                             }
-                            let displayMode = ['$$', '\\['].indexOf(token) >= 0;
+                            let displayMode = ['$$', '\\['].includes(token);
                             let originalSource = tokens[j].trim();
+
 
                             let showTooltipOnClick = false;
                             if (originalSource.startsWith('\\showSourceOnClick')) {
@@ -658,19 +622,43 @@ $(function() {
                                 container.appendChild(document.createTextNode(msgUnbalancedParenthesis + token));
                                 continue;
                             }
-                            let preparedSource = originalSource.replace(/\\operatorname/g, '\\mathrm');
+                            let preparedSource = originalSource;
+                            if(mathRenderer === 'KaTeX'){
+                                preparedSource = preparedSource.replace(/\\operatorname/g, '\\mathrm');
+                            }
+
                             let span = document.createElement('span');
                             container.appendChild(span);
-                            try {
-                                katex.render(preparedSource, span, {
-                                    displayMode: displayMode,
-                                    throwOnError: false
-                                });
+
+                            if(mathRenderer === 'MathJax') {
+                                let options = MathJax.getMetricsFor(span, displayMode);
+                                options.display = displayMode;
+                                let mjElement = MathJax.tex2svg(
+                                    preparedSource,
+                                    options
+                                ).firstChild;
+
+                                let annotation = document.createElement('annotation');
+                                annotation.setAttribute('encoding', 'application/x-tex');
+                                annotation.style.display = 'none';
+                                annotation.innerText = originalSource;
+                                mjElement.appendChild(annotation);
+                                span.appendChild(mjElement);
                             }
-                            catch (e) {
-                                $(span).css('color', 'red').text(msgKatexUnableToDisplayFormula);
+                            else{
+                                try {
+                                    katex.render(preparedSource, span, {
+                                        displayMode: displayMode,
+                                        throwOnError: false
+                                    });
+                                    $(span).find('annotation[encoding="application/x-tex"]').text(originalSource);
+                                }
+                                catch (e) {
+                                    $(span).css('color', 'red').text(msgKatexUnableToDisplayFormula);
+                                }
                             }
-                            $(span).popover({
+                            let $tooltipHost = mathRenderer === 'KaTeX' ? $(span).find('span.katex') : $(span).find('svg');
+                            $tooltipHost.popover({
                                 content: $('<code></code>').text(originalSource),
                                 html: true,
                                 placement: 'bottom',
@@ -683,47 +671,18 @@ $(function() {
                     }
                 }
                 else if (node.nodeType === 1 && !['code', 'pre'].includes(node.nodeName.toLowerCase())) {
-                    processWithKaTeX(node);
+                    processWithRenderer(node);
                 }
             }
         }
 
-        if (mathRenderer === 'MathJax') {
+        return function () {
+            processWithRenderer(element);
             if (performPostprocessing) {
-                return function () {
-                    if(MathJax.InputJax && MathJax.InputJax.TeX) {
-                        MathJax.InputJax.TeX.resetEquationNumbers();
-                    }
-                    MathJax.Hub.Queue(function () {
-                        MathJax.Hub.Typeset(element, function () {
-                            processLaTeXTextInElement(element);
-                            if (callback) {
-                                callback.call();
-                            }
-                        })
-                    });
-                }
+                processLaTeXTextInElement(element);
             }
-            else {
-                return function () {
-                    if(MathJax.InputJax && MathJax.InputJax.TeX) {
-                        MathJax.InputJax.TeX.resetEquationNumbers();
-                    }
-                    MathJax.Hub.Queue(function () {
-                        MathJax.Hub.Typeset(element, callback)
-                    });
-                }
-            }
-        }
-        else {
-            return function () {
-                processWithKaTeX(element);
-                if (performPostprocessing) {
-                    processLaTeXTextInElement(element);
-                }
-                if (callback) {
-                    callback.call();
-                }
+            if (callback) {
+                callback.call();
             }
         }
     }
@@ -859,16 +818,15 @@ $(function() {
     }
 
     function loadExternalScriptsAndFinalize(finalizer) {
-        $('section.main-content').css('display', 'none');
-        $('section.main-content[lang="' + browserLanguage + '"]').css('display', 'block');
-
-        let externalScript = document.querySelector('section[lang="' + browserLanguage +  '"] > script[type="text/latexlesson"][data-src]');
+        let externalScript = document.querySelector('section[lang="' + window.lessonLanguage +  '"] > script[type="text/latexlesson"][data-src][toload]');
         if(!externalScript) {
             return finalizer.call();
         }
 
-        let src = 'content/' + browserLanguage + '/tex/' + externalScript.dataset['src'];
+        let src = 'content/' + window.lessonLanguage + '/tex/' + externalScript.dataset['src'];
         externalScript.removeAttribute('data-src');
+        externalScript.removeAttribute('toload');
+        externalScript.setAttribute('toprocess', 'true');
 
         setLoadingStatus(msgLoadingSection + ' “' + src + '”…');
 
@@ -888,16 +846,12 @@ $(function() {
         });
     }
 
-    loadExternalScriptsAndFinalize(function() {
-        $('script[type="text/latexlesson"]').each(function (index, element) {
+    function finalizer() {
+        $('script[type="text/latexlesson"][toprocess]').each(function (index, element) {
+            element.removeAttribute('toprocess');
             setLoadingStatus(msgProcessingSection + ' ' + index + '…');
             processLessonContainer(element, (index + 1).toString());
         });
-
-        if(mathRenderer === 'MathJax')
-            MathJax.Hub.Config({
-                elements: document.querySelectorAll(".result-display-area, .static-part-area, h1, h2, h3, h4")
-            });
 
         setLoadingStatus(msgProcessingMathOnPage);
 
@@ -907,7 +861,9 @@ $(function() {
 
         if (!window.location.hash && startCollapsed) {
             let $intro = $('.step-header[data-target="#step1-1"]');
-            $intro.addClass('highlighted-blinking');
+            if(highlightIntro)
+                $intro.addClass('highlighted-blinking');
+
             $(document.body).on('click', function () {
                 $intro.removeClass('highlighted-blinking').fadeTo(0, 1);
                 $('.fa.fa-search').removeClass('highlighted-blinking').fadeTo(0, 1);
@@ -986,5 +942,16 @@ $(function() {
         $('.step-body').on('click', function () {
             $(this).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1);
         });
-    });
+    }
+
+    function masterReload(){
+        $('section.main-content').css('display', 'none');
+        $('section.main-content[lang="' + window.lessonLanguage + '"]').css('display', 'block');
+        for(let s of document.querySelectorAll('section[lang="' + window.lessonLanguage +  '"] > script[type="text/latexlesson"][data-src]')){
+            s.setAttribute('toload', 'true');
+        }
+        loadExternalScriptsAndFinalize(finalizer);
+    }
+
+    masterReload();
 });
