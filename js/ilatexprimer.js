@@ -636,7 +636,7 @@ $(function() {
                                 let mjElement = MathJax.tex2svg(
                                     preparedSource,
                                     options
-                                ).firstChild;
+                                );
 
                                 let annotation = document.createElement('annotation');
                                 annotation.setAttribute('encoding', 'application/x-tex');
