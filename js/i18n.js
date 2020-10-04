@@ -1,4 +1,4 @@
-var I18N_STRINGS_ALL = {
+let I18N_STRINGS_ALL = {
     "ru": {
         "document.title": "Интерактивное введение в LaTeX",
 
@@ -41,17 +41,17 @@ var I18N_STRINGS_ALL = {
     }
 };
 
-var browserLanguage = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
+let browserLanguage = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
 
-var I18N_STRINGS = I18N_STRINGS_ALL[browserLanguage];
+let I18N_STRINGS = I18N_STRINGS_ALL[browserLanguage];
 
-var confirmationSwitchToKaTeX = I18N_STRINGS["confirmation.SwitchToKaTeX"] || "It is recommended to use KaTeX for math display in this case. Do you want to switch to KaTeX?";
-var confirmationCtrlEnter = I18N_STRINGS["confirmation.CtrlEnter"] || "It is recommended to switch to “Crtl+Enter only” update mode. Make the switch?";
-var confirmationKaTeXLowerCompatibility = I18N_STRINGS["confirmation.KaTeXLowerCompatibility"] || "KaTeX supports a smaller subset of LaTeX commands. Are you sure you want to switch?";
-var msgUnbalancedParenthesis = I18N_STRINGS["msg.UnbalancedParenthesis"] || "((Unbalanced parenthesis))";
-var msgKatexUnableToDisplayFormula = I18N_STRINGS["msg.KatexUnableToDisplayFormula"] || "(KaTeX was unable to process the formula)";
-var msgProcessingMathOnPage = I18N_STRINGS["msg.ProcessingMathOnPage"] || "Processing math of page. On slow computer this may take a while…";
-var msgLoadingSection = I18N_STRINGS["msg.LoadingSection"] || "Loading section";
-var msgProcessingSection = I18N_STRINGS["msg.ProcessingSection"] || "Processing section";
-var msgUnableToLoadThisStep = I18N_STRINGS["msg.UnableToLoadThisStep"] || "Unable to load this step";
-var msgFinishedLoading = I18N_STRINGS["msg.FinishedLoading"] || "Finished loading. Have fun!";
+let confirmationSwitchToKaTeX = I18N_STRINGS["confirmation.SwitchToKaTeX"] || "It is recommended to use KaTeX for math display in this case. Do you want to switch to KaTeX?";
+let confirmationCtrlEnter = I18N_STRINGS["confirmation.CtrlEnter"] || "It is recommended to switch to “Crtl+Enter only” update mode. Make the switch?";
+let confirmationKaTeXLowerCompatibility = I18N_STRINGS["confirmation.KaTeXLowerCompatibility"] || "KaTeX supports a smaller subset of LaTeX commands. Are you sure you want to switch?";
+let msgUnbalancedParenthesis = I18N_STRINGS["msg.UnbalancedParenthesis"] || "((Unbalanced parenthesis))";
+let msgKatexUnableToDisplayFormula = I18N_STRINGS["msg.KatexUnableToDisplayFormula"] || "(KaTeX was unable to process the formula)";
+let msgProcessingMathOnPage = I18N_STRINGS["msg.ProcessingMathOnPage"] || "Processing math of page. On slow computer this may take a while…";
+let msgLoadingSection = I18N_STRINGS["msg.LoadingSection"] || "Loading section";
+let msgProcessingSection = I18N_STRINGS["msg.ProcessingSection"] || "Processing section";
+let msgUnableToLoadThisStep = I18N_STRINGS["msg.UnableToLoadThisStep"] || "Unable to load this step";
+let msgFinishedLoading = I18N_STRINGS["msg.FinishedLoading"] || "Finished loading. Have fun!";
