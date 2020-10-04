@@ -657,7 +657,8 @@ $(function() {
                                     $(span).css('color', 'red').text(msgKatexUnableToDisplayFormula);
                                 }
                             }
-                            let $tooltipHost = mathRenderer === 'KaTeX' ? $(span).find('span.katex') : $(span).find('svg');
+                            let $span = $(span);
+                            let $tooltipHost = $span.find(mathRenderer === 'KaTeX' ? '.katex-html' : 'svg');
                             $tooltipHost.popover({
                                 content: $('<code></code>').text(originalSource),
                                 html: true,

@@ -84,6 +84,7 @@ let I18N_STRINGS_ALL = {
 };
 
 function setUILanguage(language=null){
+    language = 'ru';
     if(!language)
         language = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
 
