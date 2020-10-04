@@ -89,20 +89,24 @@
         <div class="card-body">
             <h1 class="card-title" id="mainTitle">Interactive Introduction to \( \LaTeX \)</h1>
 
-            <h5 class="card-title manual-collapse collapsed" data-toggle="collapse" data-target="#contentAbout" id="headerAbout">About</h5>
+            <div class="form-group">
+                <h5 class="card-title" id="headerKeywordSearch">Smart Search</h5>
+                <form id="searchForm" class="form-inline" role="search" action="">
+                    <input type="text" id="searchInput" class="form-control" autocomplete="off">
+                    <span class="input-group-btn"><button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button></span>
+                </form>
+            </div>
+
+            <div class="form-group">
+                <h5 class="card-title" style="display: none;" id="collapseExpandSteps">Collapse/expand all steps</h5>
+                <div class="card-text"><div class="btn-group">
+                    <button id="btnCollapseAll" class="btn btn-outline-secondary">Collapse all steps</button>
+                    <button id="btnExpandAll" class="btn btn-outline-secondary">Expand all steps</button>
+                </div></div>
+            </div>
+
+            <h5 class="card-title manual-collapse collapsed" data-toggle="collapse" data-target="#contentAbout" id="headerAbout"><a href="#">About</a></h5>
             <div class="card-text card-text collapse manual-collapse" id="contentAbout"><p>This interactive lesson is created by <a rel="author" href="http://www.dainiak.com">Alex Dainiak</a>, associate professor at <a href="https://mipt.ru/en/">MIPT</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href="https://www.mathjax.org/">MathJax</a>, <a href="https://khan.github.io/KaTeX/">KaTeX</a>, <a href="https://ace.c9.io">ACE Editor</a>, <a href="http://getbootstrap.com/">Bootstrap</a>, <a href="https://jquery.com/">jQuery</a>. While preparing this lesson, the author benefited much from <a href="http://stackoverflow.com/">Stack Overflow</a> and <a href="http://tex.stackexchange.com/">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href="https://www.jetbrains.com/pycharm/">PyCharm</a> IDE and <a href="https://www.google.com/chrome/">Chrome</a> developer tools. This project is hosted on <a href="https://github.com/dainiak/ilatexprimer">GitHub</a>.</p></div>
-
-            <h5 class="card-title" id="collapseExpandSteps">Collapse/expand all steps</h5>
-            <div class="card-text"><div class="btn-group">
-                <button id="btnCollapseAll" class="btn btn-outline-secondary">Collapse all steps</button>
-                <button id="btnExpandAll" class="btn btn-outline-secondary">Expand all steps</button>
-            </div></div>
-
-            <h5 class="card-title" id="headerKeywordSearch">Smart Search</h5>
-            <form id="searchForm" class="form-inline" role="search" action="">
-                <input type="text" id="searchInput" class="form-control" autocomplete="off">
-                <span class="input-group-btn"><button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button></span>
-            </form>
         </div>
     </div>
 
