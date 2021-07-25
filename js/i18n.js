@@ -22,7 +22,7 @@ let I18N_STRINGS_ALL = {
         "optionEditorMultiple": "По одному редактору для каждого шага (удобнее)",
         "optionEditorSingle": "Редактор только для активного шага (меньшая нагрузка на браузер)",
         "headerSourceResultRatio": "Отношение ширин окон с текстом и исходным кодом (на широком экране)",
-        "optionNoSourseCode": "без кода",
+        "optionNoSourceCode": "без кода",
 
         "headerDisplayLanguage": "Язык отображения",
         "optionLanguageRU": "русский",
@@ -63,14 +63,14 @@ let I18N_STRINGS_ALL = {
         "optionEditorMultiple": "Separate editor per each step (more convenient)",
         "optionEditorSingle": "Single editor instance (lower memory load)",
         "headerSourceResultRatio": "Result/source code window ratio",
-        "optionNoSourseCode": "no source code",
+        "optionNoSourceCode": "no source code",
 
         "headerDisplayLanguage": "Language",
         "optionLanguageRU": "Russian",
         "optionLanguageEN": "English",
 
         "confirmation.SwitchToKaTeX": "It is recommended to use KaTeX for math display in this case. Do you want to switch to KaTeX?",
-        "confirmation.CtrlEnter": "It is recommended to switch to “Crtl+Enter only” update mode. Make the switch?",
+        "confirmation.CtrlEnter": "It is recommended to switch to “Ctrl+Enter only” update mode. Make the switch?",
         "confirmation.KaTeXLowerCompatibility": "KaTeX supports a smaller subset of LaTeX commands. Are you sure you want to switch?",
 
         "msg.UnbalancedParenthesis": "((Несбалансированные скобки!))",
