@@ -130,33 +130,10 @@ $(function() {
 
     $('input[type=radio][name=autoTypeset]').change(function () {
         typesetOnChange = (this.value === 'onChange');
-        // if (this.value === 'onChange' && mathRenderer === 'MathJax' && confirm(confirmationSwitchToKaTeX) === true) {
-        //     $('input[type=radio][name=mathRenderer][value="KaTeX"]')[0].checked = true;
-        //     mathRenderer = 'KaTeX';
-        // }
     });
 
     $('input[type=radio][name=mathRenderer]').change(function () {
-        // if (this.value === 'MathJax' && typesetOnChange) {
-        //     mathRenderer = this.value;
-        //     // if (confirm(confirmationCtrlEnter) === true) {
-        //         $('input[type=radio][name=autoTypeset][value="onChange"]')[0].checked = false;
-        //         $('input[type=radio][name=autoTypeset][value="onHotkey"]')[0].checked = true;
-        //         typesetOnChange = false;
-        //     // }
-        // }
-        // else if (this.value === 'KaTeX' && !typesetOnChange) {
-        //     //if (confirm(confirmationKaTeXLowerCompatibility) === true) {
-        //         mathRenderer = this.value;
-        //     // }
-        //     // else {
-        //     //     $('input[type=radio][name=mathRenderer][value="MathJax"]')[0].checked = true;
-        //     // }
-        // }
-        // else
-            {
-            mathRenderer = this.value;
-        }
+        mathRenderer = this.value;
     });
 
     $('input[type=radio][name=areaWidthRatio]').change(function () {
