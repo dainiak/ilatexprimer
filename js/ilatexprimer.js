@@ -52,6 +52,9 @@ $(function() {
             $(rda).find('[data-has-tooltip]').popover('dispose');
             rda.textContent = editor.getValue().trim().replace(/^\\par\s+/, '');
             preprocessLaTeX(rda);
+            if(mathRenderer === 'MathJax') {
+                MathJax.texReset();
+            }
             mathRendererFactory(rda)();
         }
 
@@ -550,10 +553,54 @@ $(function() {
             return;
         }
 
-        $element.text(text
-                .replace(/\\TeX(?!\$)/g, mathRenderer === 'MathJax' ? '\\(\\TeX\\)' : 'TeX')
-                .replace(/\\LaTeX(?!\$)/g, mathRenderer === 'MathJax' ? '\\(\\LaTeX\\)' : 'LaTeX')
-        );
+        text = text.replace(
+            /\\TeX(?!\$)/g,
+            mathRenderer === 'MathJax' ? '\\(\\TeX\\)' : 'TeX'
+        ).replace(
+            /\\LaTeX(?!\$)/g,
+            mathRenderer === 'MathJax' ? '\\(\\LaTeX\\)' : 'LaTeX'
+        )
+        text = text.replace(
+            '\\begin{equation',
+            '\\[\\begin{equation'
+        ).replace(
+            '\\end{equation}',
+            '\\end{equation}\\]'
+        ).replace(
+            '\\end{equation*}',
+            '\\end{equation*}\\]'
+        ).replace(
+            '\\begin{gather',
+            '\\[\\begin{gather'
+        ).replace(
+            '\\end{gather}',
+            '\\end{gather}\\]'
+        ).replace(
+            '\\end{gather*}',
+            '\\end{gather*}\\]'
+        ).replace(
+            '\\begin{align',
+            '\\[\\begin{align'
+        ).replace(
+            '\\end{align}',
+            '\\end{align}\\]'
+        ).replace(
+            '\\end{align*}',
+            '\\end{align*}\\]'
+        )
+        if(mathRenderer === 'MathJax'){
+            text = text.replace(
+                '\\begin{multline',
+                '\\[\\begin{multline'
+            ).replace(
+                '\\end{multline}',
+                '\\end{multline}\\]'
+            ).replace(
+                '\\end{multline*}',
+                '\\end{multline*}\\]'
+            )
+        }
+        $element.text(text);
     }
 
     function mathRendererFactory(element, performPostprocessing, callback) {
@@ -600,10 +647,6 @@ $(function() {
                                 continue;
                             }
                             let preparedSource = originalSource;
-                            if(mathRenderer === 'KaTeX'){
-                                preparedSource = preparedSource.replace(/\\operatorname/g, '\\mathrm');
-                            }
-
                             let span = document.createElement('span');
                             container.appendChild(span);
 
