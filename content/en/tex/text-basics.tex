@@ -27,52 +27,49 @@
 
 
 \section{Two main modes: text mode and math mode}
-\par Although \LaTeX is surely suitable for typesetting books containing no math at all, the essense of \LaTeX lies in scientific texts. The first thing one should mind about \LaTeX is the presense of two distinct modes: \textbf{normal (ordinary text)} mode and \textbf{math (formulae)} mode. Usually whet typesetting a paper one knows what symbols have standard language meaning and what symbols belong to mathematical notation. For \LaTeX to get this distinction we should enclose pieces of text having mathematical meaning in dollars or in \verb"\(" \verb"\)" delimiters: e.g. $F=ma$ is a fomula enclosed in dollars, so \LaTeX recognized it and used special font and formatting rules to display it, whereas F=ma is the same formula which was forgotten to be enclosed in dollars and so it is output using standard text font and formatting, making it look awkward compared to the first one. Instead of using \verb"$…$" one can use \verb"\(…\)" bringing the same result: \(F=ma.\) It is recommended (though not strongly) to use the \verb"\(…\)" pair of delimiters instead of \verb"$…$", as in the former pair it is obvious which delimiter is the “opening” and which is the “closing”, whereas for \verb"$…$" pair \LaTeX has to make a guess about it.
+\par Although \LaTeX is surely suitable for typesetting books containing no math at all, the essence of \LaTeX lies in scientific texts. The first thing one should mind about \LaTeX is the presence of two distinct modes: \textbf{normal (ordinary text)} mode and \textbf{math (formulae)} mode. Usually whet typesetting a paper one knows what symbols have standard language meaning and what symbols belong to mathematical notation. For \LaTeX to get this distinction we should enclose pieces of text having mathematical meaning in dollars or in \verb"\(" \verb"\)" delimiters: e.g. $F=ma$ is a formula enclosed in dollars, so \LaTeX recognized it and used special font and formatting rules to display it, whereas F=ma is the same formula which was forgotten to be enclosed in dollars and so it is output using standard text font and formatting, making it look awkward compared to the first one. Instead of using \verb"$…$" one can use \verb"\(…\)" bringing the same result: \(F=ma.\) It is recommended (though not strongly) to use the \verb"\(…\)" pair of delimiters instead of \verb"$…$", as in the former pair it is obvious which delimiter is the “opening” and which is the “closing”, whereas for \verb"$…$" pair \LaTeX has to make a guess about it.
 
 
 \section{Two math output modes: inline and display}
-\par Как и в хорошо набранных книгах, в \LaTeX можно как располагать формулы внутри текста, так и делать их центром внимания, вынося на отдельную строчку (такие формулы называются \textit{выключными} или \textit{выносными}). Когда формула располагается в окружении текста, такой математический режим называется inline math, а когда формула располагается на отдельной строчке --- display math. Чтобы формула была вынесена на середину отдельной строки, её заключают в двойные доллары: \verb"$$…$$" в системе $\TeX$ и в квадратные <<бэкслэшнутые>> скобки \verb"\[…\]", --- в \LaTeX. Вот пример: \[F=ma.\]
-В отличие от чисто виртуального различия между записью \verb"$…$" и \verb"\(…\)" для inline math, разница записей \verb"$$…$$" и \verb"\[…\]" существенна: хотя часто разницы не видно, вполне может возникнуть ситуация, когда формула, оформленная двойными долларами, имеет отступы от окружающего текста не такие, как задумывалось.\index{дисплейный режим=display math}
-
+\par As in well-typeset papers and books, \LaTeX can both place a formula inside the text or putting it into attention by placing it on a separate line (such formulas are called \emph{display} formulas). When a formula is located in a text environment, this mathematical mode is called \emph{inline math}, and when the formula is on a separate line -- a \emph{display math}. To put the formula in the middle of a single line, it is enclosed in double dollars: \verb"$$...$$" in the \TeX system and in the square ``backslash'' parentheses \verb"[...]", -- in \LaTeX. Here’s an example: \[F=ma.\]
+Unlike the purely virtual difference between \verb"$...$" and \verb"\(...\)" for inline math, the difference between \verb"$...$" and \verb"\[...\]" is important: although sometimes the difference is not visible, there may well be a situation when the formula, being surrounded with double dollars, has spacing with respect to from the surrounding text that is not intended.\index{display math}
 
 \section{Exercise}
 \begin{staticpart}
-Наберите следующий текст, сохраняя разбиение на абзацы, шрифт текста и положение формул (для удобства неоформленный текст уже дан Вам в окне кода):
-\htmlblockquote{\par Совсем нетрудно набирать тексты, содержащие \textbf{жирный шрифт}, а иногда и \textit{курсив}, хотя выделять текст лучше всё же командой \verb"\emph".
-\par Разбивать текст на параграфы, ставить <<кавычки-ёлочки>> --- дело ТеХники! Но вот что лучше всего, так это набор формул. Ведь так приятно написать, что \(\showSourceOnClick A+B=B+A\) или даже заявить всему миру, что \[\showSourceOnClick C+D=D+C.\]}
+Typeset the following text, keeping the paragraphs, font face, and the types of formulas (diaplay or inline). For your convenience, the unformatted text is already pasted in the input field:
+\htmlblockquote{\par It is really easy to typeset any text that contains \textbf{bold font}, and sometimes even \textit{italicised font}, although it is generally better to emphasize portions of the text with \verb"\emph" command.
+\par Splitting text into paragraphs and typesetting ``nice quotes'' --- that is easy! But the greatest thing is the typesetting of formulas, as you can communicate beautifully to the world that \(\showSourceOnClick A+B=B+A\) or even shout out that \[\showSourceOnClick C+D=D+C.\]}
 \end{staticpart}
-Совсем нетрудно набирать тексты, содержащие жирный шрифт, а иногда и курсив, хотя выделять текст лучше всё же командой emph. Разбивать текст на параграфы, ставить кавычки-ёлочки дело ТеХники! Но вот что лучше всего, так это набор формул. Ведь так приятно написать, что A+B=B+A или даже заявить всему миру, что C+D=D+C.
+It is really easy to typeset any text that contains bold font, and sometimes even italicised font, although it is generally better to emphasize portions of the text with emph command. Splitting text into paragraphs and typesetting nice quotes --- that is easy! But the greatest thing is the typesetting of formulas, as you can communicate beautifully to the world that A+B=B+A or even shout out that C+D=D+C.
 
 
 \section{Lists}
-\par Помимо команд в \LaTeX есть ещё понятие \emph{окружений}.\index{окружение} Окружения задаются с помощью пары команд вида \verb"\begin{…}" и \verb"\end{…}". Позже мы познакомимся со многими полезными окружениями для красивого отображения сложных формул, а сейчас рассмотрим окружения для создания списков --- нумерованных и ненумерованных. Для нумерованных списков существует окружение \verb"enumerate". Каждый элемент списка должен предваряться командой \verb"\item". Пример:\index{enumerate=нумерованный список,itemize=ненумерованный список,\item}
+\par Besides the commands in \LaTeX there are also  \emph{environments}.\index{environment} Environments should be created with \verb"\begin{…}" and \verb"\end{…}". We will later learn some useful environments for beautiful typeset of complex formulas, and right now we will consider a case for using environments in ordinary text typesetting --- to typeset numbered and unnumbered lists. To create a numbered list we use \verb"enumerate" environment. Each element of the list must start with \verb"\item". Here is an example:\index{enumerate=numbered list=ordered list,itemize=unnumbered list=unordered list,\item}
 \begin{enumerate}
-\item Вот дом, который построил Джек.
-\item А это пшеница, которая в тёмном чулане хранится в доме, который построил Джек.
-\item А это синица, которая ловко ворует пшеницу. Синице по мере скудных возможностей мешают:
+\item Mercury,
+\item Venus,
+\item Earth,
+\item Mars,
     \begin{enumerate}
-    \item Кот.
-    \item Старый пёс без хвоста.
-    \item Корова безрогая.
+    \item Phobos,
+    \item Deimos.
     \end{enumerate}
 \end{enumerate}
-Как видите, списки вполне могут вкладываться друг в друга.
-\par Для ненумерованных списков есть окружение \verb"itemize". Попробуйте его сами в следующем упражнении!
+As you can see, the lists can be nested.
+\par To typeset unnumbered lists we use \verb"itemize" environment. You will have chance to use it in the next exercise.
 
 
 \section{Exercise}
 \begin{staticpart}
-Наберите следующий текст: \htmlblockquote{В числе прочего, философия языка программирования Python предполагает соблюдение следующих принципов:
+Typeset the following: \htmlblockquote{Among others, the so-called ``Zen of Python'' by Tim Peters lists the following aphorisms:
 \begin{itemize}
-\item Красивое лучше, чем уродливое.
-\item Явное лучше, чем неявное.
-\item И ещё два связанных друг с другом принципа: \begin{enumerate}
-\item Простое лучше, чем сложное.
-\item Сложное лучше, чем запутанное.
+\item Beautiful is better than ugly.
+\item Explicit is better than implicit.
+\item And two more somewhat related principles: \begin{enumerate}
+\item Simple is better than complex.
+\item Complex is better than complicated.
 \end{enumerate}
 \end{itemize}}
 \end{staticpart}
-В числе прочего, философия языка программирования Python предполагает соблюдение следующих принципов:
-Красивое лучше, чем уродливое.
-Явное лучше, чем неявное.
-И ещё два связанных друг с другом принципа: Простое лучше, чем сложное. Сложное лучше, чем запутанное.
+
+Among others, the so-called Zen of Python by Tim Peters lists the following aphorisms: Beautiful is better than ugly.  Explicit is better than implicit. And two more somewhat related principles: Simple is better than complex. Complex is better than complicated.

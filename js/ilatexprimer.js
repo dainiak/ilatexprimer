@@ -41,7 +41,7 @@ $(function() {
         let editor = ace.edit(div);
         sourceArea.editorInstance = editor;
 
-        editor.$blockScrolling = Infinity; // To disable annoying ACE warning
+        editor.$blockScrolling = Infinity;
         editor.setOptions(aceEditorOptions);
         editor.commands.removeCommands(["gotoline", "find"]);
         editor.resize();
@@ -184,6 +184,7 @@ $(function() {
     });
 
     $('#btnCollapseAll').click(function () {
+        $(document.body).find('[data-has-tooltip]').popover('hide');
         $('[data-toggle="collapse"]').not('.manual-collapse').addClass('collapsed');
         $('.step-body.collapse').not('.manual-collapse').removeClass('show');
     });
@@ -228,6 +229,7 @@ $(function() {
         $('.collapse').each(function (index, element) {
             $(element).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(0, 1);
             if (element.id && element.id.toString().match(/^step\d/) && !stepList.includes(element.id.toString().replace(/^step/, ''))) {
+                $(element).find('[data-has-tooltip]').popover('hide');
                 $(element).collapse('hide');
             }
         });
@@ -378,9 +380,9 @@ $(function() {
         let value = '';
 
         for (let i = 0; i < text.length; ++i) {
-            let currentSymbol = text.substr(i, 1);
-            if (text.substr(0, 1) === '\\' && command === '' && !currentSymbol.match(/[a-zA-Z]/) && i > 0) {
-                command = text.substr(0, i);
+            let currentSymbol = text.charAt(i);
+            if (text.charAt(0) === '\\' && command === '' && !currentSymbol.match(/[a-zA-Z]/) && i > 0) {
+                command = text.substring(0, i);
                 valuePos = i + 1;
 
                 if (currentSymbol !== '{') {
@@ -400,12 +402,9 @@ $(function() {
                     closingBrace = '}';
                 }
             }
-            if (currentSymbol === '{' && (i === 0 || text.substr(i - 1, 1) !== '\\')) {
-                ++balancer;
-            }
-            if (currentSymbol === '}' && (i === 0 || text.substr(i - 1, 1) !== '\\')) {
-                --balancer;
-            }
+            if ((currentSymbol === '{' || currentSymbol === '}') && (i === 0 || text.charAt(i - 1) !== '\\'))
+                balancer += currentSymbol === '{' ? 1 : -1;
+
             if (balancer === 0 && currentSymbol === closingBrace) {
                 value = text.substring(valuePos, i);
                 remainder = text.substring(i + 1);
@@ -478,12 +477,12 @@ $(function() {
         pos = text.search(/\\verb[^a-zA-Z]/);
         if (pos >= 0) {
             let prefix = text.substring(0, pos);
-            let verbDelimiter = text.substr(pos + '\\verb'.length, 1);
+            let verbDelimiter = text.charAt(pos + '\\verb'.length);
             text = text.substring(pos + '\\verb"'.length);
             pos = text.indexOf(verbDelimiter);
             let verbText = text.substring(0, pos);
             let postfix = text.substring(pos + 1);
-            let remainderNoBrake = postfix.substr(0, 1);
+            let remainderNoBrake = postfix.charAt(0);
             if (remainderNoBrake === '.' || remainderNoBrake === ',') {
                 postfix = postfix.substring(1);
             }
@@ -587,30 +586,55 @@ $(function() {
         ).replace(
             '\\end{align*}',
             '\\end{align*}\\]'
+        ).replace( // multline is not supported by KaTeX yet
+            '\\begin{multline',
+            '\\[\\begin{multline'
+        ).replace(
+            '\\end{multline}',
+            '\\end{multline}\\]'
+        ).replace(
+            '\\end{multline*}',
+            '\\end{multline*}\\]'
         )
-        if(mathRenderer === 'MathJax'){
-            text = text.replace(
-                '\\begin{multline',
-                '\\[\\begin{multline'
-            ).replace(
-                '\\end{multline}',
-                '\\end{multline}\\]'
-            ).replace(
-                '\\end{multline*}',
-                '\\end{multline*}\\]'
-            )
-        }
+
         $element.text(text);
     }
 
     function mathRendererFactory(element, performPostprocessing, callback) {
         performPostprocessing = (performPostprocessing !== false);
 
+        function findClosingToken(tokens, start){
+            let stack = [];
+            for(let i = start; i < tokens.length; ++i){
+                let token = tokens[i];
+                if (token === '\\(' || token === '\\['){
+                    stack.push(token);
+                    continue;
+                } else if (token === '\\)' || token === '\\]'){
+                    if(stack.length === 0)
+                        return null;
+                
+                    let prevToken = stack.pop();
+                    if (!(prevToken === '\\(' && token === '\\)' || prevToken === '\\[' && token === '\\]'))
+                        return null;
+                } else if(token == '$' || token == '$$'){
+                    if(stack.length === 0 || stack[stack.length - 1] !== token)
+                        stack.push(token);
+                    else 
+                        stack.pop();
+                }
+                if(stack.length === 0)
+                    return i;
+            }
+            return null;
+        }
+
         function processWithRenderer(element) {
             for (let i = 0; i < element.childNodes.length; ++i) {
                 let node = element.childNodes[i];
                 if (node.nodeType === 3) {
                     let tokens = node.textContent.split(/(\${1,2}|\\\[|\\]|\\\(|\\\))/);
+
                     if (tokens.length <= 1) {
                         continue;
                     }
@@ -621,13 +645,15 @@ $(function() {
                     for (let j = 0; j < tokens.length; ++j) {
                         let token = tokens[j];
                         if (['\\(', '$', '$$', '\\['].includes(token)) {
-                            j += 1;
-                            if (j >= tokens.length) {
+                            let jClosing = findClosingToken(tokens, j);
+                            if(jClosing === null){
+                                container.appendChild(document.createTextNode(msgUnbalancedParenthesis + token));
                                 break;
                             }
-                            let displayMode = ['$$', '\\['].includes(token);
-                            let originalSource = tokens[j].trim();
 
+                            let displayMode = ['$$', '\\['].includes(token);
+                            let originalSource = tokens.slice(j+1, jClosing).join('');
+                            j = jClosing;
 
                             let showTooltipOnClick = false;
                             if (originalSource.startsWith('\\showSourceOnClick')) {
@@ -635,17 +661,6 @@ $(function() {
                                 showTooltipOnClick = true;
                             }
 
-                            ++j;
-                            if (j >= tokens.length || tokens[j] !== {
-                                        '$': '$',
-                                        '$$': '$$',
-                                        '\\[': '\\]',
-                                        '\\(': '\\)'
-                                    }[token]) {
-                                token = (j >= tokens.length ? '' : tokens[j]);
-                                container.appendChild(document.createTextNode(msgUnbalancedParenthesis + token));
-                                continue;
-                            }
                             let preparedSource = originalSource;
                             let span = document.createElement('span');
                             container.appendChild(span);
@@ -768,7 +783,9 @@ $(function() {
                     .attr('data-toggle', 'collapse')
                     .attr('data-target', '#step' + stepIdString)
                     .addClass(startCollapsed ? 'collapsed' : '')
-                    .append($('<h4 class="h4"></h4>').text(headerText))
+                    .append(
+                        $('<h4 class="h4"></h4>').text(headerText)
+                    )
             );
 
             let $stepCardBody = $('<div class="card-body step-body collapse"></div>')
@@ -904,7 +921,7 @@ $(function() {
                 window.location.hash = '#stepheading' + stepId;
             }
             else {
-                let kw = window.location.hash.substr(1);
+                let kw = window.location.hash.substring(1);
                 if ((kw in keywordIndex) || (('\\' + kw) in keywordIndex)) {
                     if (!(kw in keywordIndex)) {
                         kw = '\\' + kw;
@@ -962,6 +979,9 @@ $(function() {
         });
         $('.step-body').on('click', function () {
             $(this).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1);
+        });
+        $('.collapse').on('hide.bs.collapse', function () {
+            $(this).find('[data-has-tooltip]').popover('hide');
         });
     }
 

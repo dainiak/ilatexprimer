@@ -7,7 +7,7 @@ let I18N_STRINGS_ALL = {
         "collapseExpandSteps": "Свернуть/развернуть все шаги урока",
         "mainTitle": "Интерактивное введение в \\( \\LaTeX \\)",
         "headerAbout": "<a href=\"#\">Об уроке…</a>",
-        "contentAbout": "<p>Урок задуман, свёрстан и запрограммирован <a rel=\"author\" href=\"http://www.dainiak.com\">Александром Дайняком</a>, доцентом <a href=\"https://mipt.ru/\">МФТИ</a>. Почтовый адрес для связи: <code>dainiak@gmail.com</code></p><p>Урок создан с использованием <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://katex.org/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. В перечисленных инструментах и в тонкостях использования \\(\\LaTeX\\) автору помогали разбираться форумы <a href=\"http://stackoverflow.com/\">Stack Overflow</a> и <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Сильно облегчали написание и тестирование кода редактор <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> и панель разработчика в <a href=\"https://www.google.com/chrome/\">Chrome</a>. Хостинг проекта осуществляется на <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
+        "contentAbout": "<p>Урок задуман, свёрстан и запрограммирован <a rel=\"author\" href=\"http://www.dainiak.com\">Александром Дайняком</a>. Почтовый адрес для связи: <code>dainiak@gmail.com</code></p><p>Урок создан с использованием <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://katex.org/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. В перечисленных инструментах и в тонкостях использования \\(\\LaTeX\\) автору помогали разбираться форумы <a href=\"http://stackoverflow.com/\">Stack Overflow</a> и <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Сильно облегчали написание и тестирование кода редактор <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> и панель разработчика в <a href=\"https://www.google.com/chrome/\">Chrome</a>. Хостинг проекта осуществляется на <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
         "btnCollapseAll": "Свернуть все шаги",
         "btnExpandAll": "Развернуть все шаги",
         "headerKeywordSearch": "Поиск по ключевым словам",
@@ -84,7 +84,7 @@ let I18N_STRINGS_ALL = {
 };
 
 function setUILanguage(language=null){
-    language = 'ru';
+    // language = 'ru';
     if(!language)
         language = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
 
@@ -111,4 +111,5 @@ function setUILanguage(language=null){
         $languageSelector[0].checked = true;
 
     window.lessonLanguage = language;
+    console.log(window.lessonLanguage)
 }
