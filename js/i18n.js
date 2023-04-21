@@ -111,5 +111,4 @@ function setUILanguage(language=null){
         $languageSelector[0].checked = true;
 
     window.lessonLanguage = language;
-    console.log(window.lessonLanguage)
 }

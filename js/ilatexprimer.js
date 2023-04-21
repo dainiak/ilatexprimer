@@ -1,7 +1,7 @@
 $(function() {
     let startCollapsed = true;
     let highlightIntro = false;
-    let mathRenderer = 'KaTeX';
+    let mathRenderer = 'MathJax';
     let typesetOnChange = true;
     let singleAceInstance = false;
     let keywordIndex = {};
@@ -86,7 +86,22 @@ $(function() {
                 editor.renderer = null;
                 editor = null;
                 sourceArea.textContent = value;
+                ace.config.set('fontSize', '90%');
+                ace.config.set('fontFamily', 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace');
                 aceHighlighter(sourceArea, aceEditorOptions);
+                if(!window.aceStaticStyle) {
+					window.aceStaticStyle = document.querySelector('style#ace_highlight');
+					window.aceStaticStyle.innerHTML = aceStaticStyle.innerHTML.replace(
+                        /\bfont-size:[^;]+;/, 'font-size: 90%;'
+                    ).replace(
+                        /\bfont-family:[^;]+;/, 
+                        'font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;'
+                    )
+                    .replace(
+                        '.ace_line {',
+                        '.ace_line { line-height: 1.2em;'
+                    );
+				}
             }
         };
         editor.on('blur', editor.customDestroyer);
@@ -95,7 +110,7 @@ $(function() {
     }
 
     setInterval(function () {
-        $('.highlighted-blinking').each(function (index, element) {
+        $('.highlighted-blinking').each(function(index, element) {
             let $e = $(element);
             let opacity = parseFloat($e.css('opacity'));
             opacity = opacity <= 0.3 ? opacity : 1;
@@ -597,6 +612,14 @@ $(function() {
             '\\end{multline*}\\]'
         )
 
+        text = text.replace(
+            /\\ref\{([^}]+)\}(?!\$)/g,
+            '\\(\\ref{$1}\\)'
+        ).replace(
+            /\\eqref\{([^}]+)\}(?!\$)/g,
+            '\\(\\eqref{$1}\\)'
+        )
+
         $element.text(text);
     }
 
@@ -666,9 +689,9 @@ $(function() {
                             container.appendChild(span);
 
                             if(mathRenderer === 'MathJax') {
-                                let options = MathJax.getMetricsFor(span, displayMode);
+                                let options = MathJax.getMetricsFor(document.body, displayMode);
                                 options.display = displayMode;
-                                let mjElement = MathJax.tex2svg(
+                                let mjElement = (MathJax.tex2svg || MathJax.tex2chtml)(
                                     preparedSource,
                                     options
                                 );
@@ -693,7 +716,10 @@ $(function() {
                                 }
                             }
                             let $span = $(span);
-                            let $tooltipHost = $span.find(mathRenderer === 'KaTeX' ? '.katex-html' : 'svg');
+                            let $tooltipHost = $span.find(
+                                mathRenderer === 'KaTeX' ? '.katex-html' 
+                                    : MathJax && MathJax.tex2svg ? 'svg' : 'mjx-container'
+                            );
                             $tooltipHost.popover({
                                 content: $('<code></code>').text(originalSource),
                                 html: true,
@@ -713,9 +739,16 @@ $(function() {
         }
 
         return function () {
+            if(mathRenderer === 'MathJax') {
+                MathJax.texReset();
+            }
             processWithRenderer(element);
             if (performPostprocessing) {
                 processLaTeXTextInElement(element);
+            }
+            if(mathRenderer === 'MathJax' && MathJax.tex2chtml){
+                MathJax.startup.document.clear();
+                MathJax.startup.document.updateDocument();
             }
             if (callback) {
                 callback.call();
