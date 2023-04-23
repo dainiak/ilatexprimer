@@ -1,16 +1,19 @@
 $(function() {
+    let displayLanguage = localStorage.getItem('displayLanguage') || (navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en');
+    let displayTheme = localStorage.getItem('theme') || (
+        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+    );
     let startCollapsed = true;
     let highlightIntro = false;
-    let mathRenderer = 'MathJax';
-    let typesetOnChange = true;
-    let singleAceInstance = false;
+    let mathRenderer = localStorage.getItem('mathRenderer') !== 'KaTeX' ? 'MathJax' : 'KaTeX';
+    let typesetOnChange = localStorage.getItem('typesetOnChange') !== null ? localStorage.getItem('typesetOnChange') === 'true' : true;
+    let singleAceInstance = localStorage.getItem('singleAceInstance') === 'true' || false;
     let keywordIndex = {};
     let aceHighlighter = ace.require('ace/ext/static_highlight');
 
     function setLoadingStatus(text) {
         $('#loadingToast').text(text);
     }
-
 
     let aceEditorOptions = {
         theme: 'ace/theme/chrome',
@@ -50,7 +53,9 @@ $(function() {
         function typesetEditorContent() {
             let rda = editor.container.parentNode.rda;
             $(rda).find('[data-has-tooltip]').popover('dispose');
-            rda.textContent = editor.getValue().trim().replace(/^\\par\s+/, '');
+            let value = editor.getValue().trim();
+            localStorage.setItem(displayLanguage + '-' + rda.id.replace('rda', ''), value);
+            rda.textContent = value.replace(/^\\par\s+/, '');
             preprocessLaTeX(rda);
             if(mathRenderer === 'MathJax') {
                 MathJax.texReset();
@@ -73,9 +78,7 @@ $(function() {
             let value = editor.getValue().trim();
             sourceArea.originalText = value;
             if (typesetOnChange) {
-                sourceArea.rda.textContent = value;
-                preprocessLaTeX(sourceArea.rda);
-                mathRendererFactory(sourceArea.rda)();
+                typesetEditorContent();
             }
             if (singleAceInstance) {
                 sourceArea.editorInstance = null;
@@ -118,44 +121,38 @@ $(function() {
         });
     }, 300);
 
-    if (mathRenderer === 'MathJax')
-        $('input[type=radio][name=mathRenderer][value="MathJax"]')[0].checked = true;
-    else
-        $('input[type=radio][name=mathRenderer][value="KaTeX"]')[0].checked = true;
+    $('input[type=radio][name=mathRenderer][value="' + mathRenderer + '"]')[0].checked = true;
+    $('input[type=radio][name=typesetOnChange][value="' + typesetOnChange.toString() + '"]')[0].checked = true;
+    $('input[type=radio][name=singleAceInstance][value="' + singleAceInstance.toString() + '"]')[0].checked = true;
+    $('input[type=radio][name=theme][value="' + displayTheme + '"]')[0].checked = true;
 
-    if (typesetOnChange)
-        $('input[type=radio][name=autoTypeset][value="onChange"]')[0].checked = true;
-    else
-        $('input[type=radio][name=autoTypeset][value="onHotkey"]')[0].checked = true;
-
-    if (singleAceInstance)
-        $('input[type=radio][name=singleAceInstance][value="true"]')[0].checked = true;
-    else
-        $('input[type=radio][name=singleAceInstance][value="false"]')[0].checked = true;
-
+    if (localStorage.getItem('areaWidthRatio') !== null){
+        $('input[type=radio][name=areaWidthRatio][value="' + localStorage.getItem('areaWidthRatio') +'"]')[0].checked = true;
+    }
 
     $('input[type=radio][name=singleAceInstance]').change(function () {
         singleAceInstance = (this.value === 'true');
+        localStorage.setItem('singleAceInstance', singleAceInstance);
         $('.latex-source-area').each(function(index, element) {
-            if(singleAceInstance){
+            if(singleAceInstance)
                 element.editorInstance.customDestroyer.call();
-            }
-            else {
+            else
                 attachAce(element);
-            }
         });
     });
 
-    $('input[type=radio][name=autoTypeset]').change(function () {
-        typesetOnChange = (this.value === 'onChange');
+    $('input[type=radio][name=typesetOnChange]').change(function () {
+        typesetOnChange = (this.value === 'true');
+        localStorage.setItem('typesetOnChange', typesetOnChange);
     });
 
     $('input[type=radio][name=mathRenderer]').change(function () {
         mathRenderer = this.value;
+        localStorage.setItem('mathRenderer', mathRenderer);
     });
 
-    $('input[type=radio][name=areaWidthRatio]').change(function () {
-        if ((this.value).toString() !== '0') {
+    function setAreaWidthRatio(ratioCode) {
+        if (ratioCode !== '0') {
             $('.latex-source-area')
                 .removeClass('col-md-4')
                 .removeClass('col-md-5')
@@ -163,7 +160,7 @@ $(function() {
                 .removeClass('col-md-7')
                 .removeClass('col-md-8')
                 .removeClass('col-md-12')
-                .addClass('col-md-' + (this.value).toString())
+                .addClass('col-md-' + ratioCode)
                 .show()
                 .trigger('resize');
             $('.result-display-area')
@@ -173,7 +170,7 @@ $(function() {
                 .removeClass('col-md-7')
                 .removeClass('col-md-8')
                 .removeClass('col-md-12')
-                .addClass('col-md-' + (12 - parseInt(this.value)).toString());
+                .addClass('col-md-' + (12 - parseInt(ratioCode)).toString());
         }
         else {
             $('.latex-source-area').not('.force-source-visibility .latex-source-area')
@@ -191,10 +188,20 @@ $(function() {
                 .removeClass('col-md-8')
                 .addClass('col-md-12');
         }
+    }
+
+    if(localStorage.getItem('areaWidthRatio') !== null)
+        setAreaWidthRatio(localStorage.getItem('areaWidthRatio'));
+
+    $('input[type=radio][name=areaWidthRatio]').change(function(){
+        localStorage.setItem('areaWidthRatio', this.value.toString());
+        setAreaWidthRatio(this.value.toString());
     });
 
     $('input[type=radio][name=displayLanguage]').change(function () {
-        setUILanguage((this.value).toString());
+        displayLanguage = (this.value).toString();
+        setUILanguage(displayLanguage);
+        localStorage.setItem('displayLanguage', displayLanguage);
         masterReload();
     });
 
@@ -206,6 +213,11 @@ $(function() {
     $('#btnExpandAll').click(function () {
         $('[data-toggle="collapse"]').not('.manual-collapse').removeClass('collapsed');
         $('.step-body.collapse').not('.manual-collapse').addClass('show');
+    });
+
+    $('#btnResetLocalStorage').click(function () {
+        localStorage.clear();
+        location.reload();
     });
 
     $('.social-share a').click(function () {
@@ -613,10 +625,10 @@ $(function() {
         )
 
         text = text.replace(
-            /\\ref\{([^}]+)\}(?!\$)/g,
+            /\\ref\{([^}]+)}(?!\$)/g,
             '\\(\\ref{$1}\\)'
         ).replace(
-            /\\eqref\{([^}]+)\}(?!\$)/g,
+            /\\eqref\{([^}]+)}(?!\$)/g,
             '\\(\\eqref{$1}\\)'
         )
 
@@ -640,7 +652,7 @@ $(function() {
                     let prevToken = stack.pop();
                     if (!(prevToken === '\\(' && token === '\\)' || prevToken === '\\[' && token === '\\]'))
                         return null;
-                } else if(token == '$' || token == '$$'){
+                } else if(token === '$' || token === '$$'){
                     if(stack.length === 0 || stack[stack.length - 1] !== token)
                         stack.push(token);
                     else 
@@ -835,6 +847,10 @@ $(function() {
                     .append($staticPartArea);
             }
 
+            let savedSource = localStorage.getItem(displayLanguage + '-' + stepIdString);
+            if(savedSource)
+                bodyText = savedSource;
+
             let $sourceArea = $('<div class="card-text latex-source-area col-md-5"></div>')
                 .attr('id', 'lsa' + stepIdString)
                 .text(bodyText);
@@ -842,8 +858,6 @@ $(function() {
             let $resultDisplayArea = $('<div class="card-text result-display-area col-md-7"></div>')
                 .attr('id', 'rda' + stepIdString)
                 .text(bodyText);
-
-
 
             preprocessLaTeX($resultDisplayArea[0]);
 
@@ -872,29 +886,26 @@ $(function() {
 
             $sourceArea.click(function(){
                 let newEditor = attachAce(this);
-                if(newEditor) {
+                if(newEditor)
                     newEditor.focus();
-                }
             });
 
             $sourceArea[0].originalText = $sourceArea[0].textContent;
             $sourceArea[0].rda = $resultDisplayArea[0];
-            if(singleAceInstance) {
+            if(singleAceInstance)
                 aceHighlighter($sourceArea[0], aceEditorOptions);
-            }
-            else {
+            else
                 attachAce($sourceArea[0]);
-            }
         }
     }
 
     function loadExternalScriptsAndFinalize(finalizer) {
-        let externalScript = document.querySelector('section[lang="' + window.lessonLanguage +  '"] > script[type="text/latexlesson"][data-src][toload]');
+        let externalScript = document.querySelector('section[lang="' + displayLanguage +  '"] > script[type="text/latexlesson"][data-src][toload]');
         if(!externalScript) {
             return finalizer.call();
         }
 
-        let src = 'content/' + window.lessonLanguage + '/tex/' + externalScript.dataset['src'];
+        let src = 'content/' + displayLanguage + '/tex/' + externalScript.dataset['src'];
         externalScript.removeAttribute('data-src');
         externalScript.removeAttribute('toload');
         externalScript.setAttribute('toprocess', 'true');
@@ -1016,16 +1027,106 @@ $(function() {
         $('.collapse').on('hide.bs.collapse', function () {
             $(this).find('[data-has-tooltip]').popover('hide');
         });
+
+        // Build table of contents
+        let tocHtml = '<ul>';
+        let prevLevel = -1;
+        $('section.main-content[style*="block"] h2, section.main-content[style*="block"] div.card-header').each(function(){
+            if(this.tagName.toLowerCase() === 'div'){
+                let target = this.getAttribute('data-target').replace('#step', '');
+                let heading = this.querySelector('h4').innerHTML;
+                if(prevLevel === 0)
+                    tocHtml += '<ul>';
+                tocHtml += '<li><a class="toc-link" data-target="' + target + '">' + heading + '</a></li>';
+                if(prevLevel === -1)
+                    prevLevel = 0;
+                else
+                    prevLevel = 1;
+            }
+            else {
+                if(prevLevel === 1)
+                    tocHtml += '</ul></li>';
+                
+                tocHtml += '<li><strong>' + this.innerHTML + '</strong>';
+                prevLevel = 0;
+            }
+        });
+        if(prevLevel === 1)
+            tocHtml += '</ul></li>';
+        tocHtml += '</ul>';
+        $('#tableofcontents').html(tocHtml);
+        document.querySelectorAll('a.toc-link').forEach(function(element){
+            let stepId = element.getAttribute('data-target');
+            element.addEventListener('click', function(){
+                $('#step' + stepId + '.collapse').collapse('show');
+                window.location.hash = '';
+                window.location.hash = '#stepheading' + stepId;
+            })
+        });
     }
 
     function masterReload(){
         $('section.main-content').css('display', 'none');
-        $('section.main-content[lang="' + window.lessonLanguage + '"]').css('display', 'block');
-        for(let s of document.querySelectorAll('section[lang="' + window.lessonLanguage +  '"] > script[type="text/latexlesson"][data-src]')){
+        $('section.main-content[lang="' + displayLanguage + '"]').css('display', 'block');
+        for(let s of document.querySelectorAll('section[lang="' + displayLanguage +  '"] > script[type="text/latexlesson"][data-src]')){
             s.setAttribute('toload', 'true');
         }
         loadExternalScriptsAndFinalize(finalizer);
     }
 
-    masterReload();
+    function initializeDarkThemeSwitch(){
+        // Adapted from https://www.cssscript.com/dark-mode-switcher-bootstrap/
+        let themeChangeHandlers = [];
+        function applyTheme(theme){
+            document.body.setAttribute('data-theme', theme);
+            for(let handler of themeChangeHandlers)
+                handler(theme);
+
+            aceEditorOptions.theme = theme === 'dark' ? 'ace/theme/clouds_midnight' : 'ace/theme/chrome';
+            $('.latex-source-area').each(function(index, element) {
+                if(element.editorInstance){
+                    element.editorInstance.setOption(
+                        'theme', 
+                        aceEditorOptions.theme
+                    );
+                }
+            });
+        }
+
+        function getTheme(){
+            return displayTheme;
+        }
+
+        function setTheme(theme){
+            displayTheme = theme;
+            localStorage.setItem('theme', displayTheme);
+            $('input[type=radio][name=theme][value="' + displayTheme + '"]')[0].checked = true;
+            applyTheme(theme);
+        }
+
+        function initTheme() {
+            applyTheme(getTheme());
+        }
+
+        initTheme();
+
+        let darkSwitch = document.getElementById('darkSwitch');
+        darkSwitch.checked = getTheme() === 'dark';
+        darkSwitch.onchange = function(){
+            setTheme(darkSwitch.checked ? 'dark' : 'light');
+        };
+        $('input[type=radio][name=theme]').change(function () {
+            setTheme(this.value.toString());
+        });
+
+        themeChangeHandlers.push(
+            theme => darkSwitch.checked = theme === 'dark'
+        );
+    }
+
+    $(function(){
+        initializeDarkThemeSwitch();
+        setUILanguage('ru');
+        masterReload();
+    });
 });

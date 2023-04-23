@@ -119,3 +119,7 @@ div.card-body a, div.card-body a:visited, div.card-body a:active, div.card-body 
 div.card-body a:hover {
     background-color: lightgray;
 }
+
+[data-theme=dark] div.card-body a:hover {
+    background-color: #333;
+}

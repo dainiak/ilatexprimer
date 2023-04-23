@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="">
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Alex Dainiak">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/darktheme.css"/>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.6/katex.min.css">
 
@@ -26,13 +28,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml-full.min.js"></script>
 
     <script type="text/javascript" src="js/i18n.js"></script>
-    <script type="text/javascript">
-        setUILanguage();
-        $(function(){
-            setUILanguage();
-        });
-    </script>
-
+    
     <script type="text/javascript" charset="utf-8" src="js/ilatexprimer.js"></script>
 
     <title>Interactive Introduction to LaTeX</title>
@@ -40,88 +36,113 @@
 
 <body>
 <div class="container">
-    <div class="alert alert-info font-weight-bold" role="alert" id="loadingToast">Loading…</div>
-    <div class="card mt-3">
-        <div class="social-share">
-    <div class="btn-group">
-    <a class="btn btn-outline-secondary" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-facebook"></i></a>
-    <a class="btn btn-outline-secondary" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F&title=Interactive%20LaTeX%20Primer"><i class="fa fa-linkedin"></i></a>
-    <a class="btn btn-outline-secondary" href="https://twitter.com/home?status=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-twitter"></i></a>
-    <a class="btn btn-outline-secondary" href="https://vk.com/share.php?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-vk"></i></a>
-    <a class="btn btn-outline-secondary" href="https://plus.google.com/share?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-google-plus"></i></a>
+
+<div class="alert alert-info font-weight-bold" role="alert" id="loadingToast">Loading…</div>
+<div class="card mt-3">
+    <div class="custom-control custom-switch">
+    <input type="checkbox" class="custom-control-input" id="darkSwitch">
+    <label class="custom-control-label" for="darkSwitch"><i class="fa fa-moon-o" aria-hidden="true"></i></label>
+</div>
+    <div class="social-share">
+        <div class="btn-group">
+            <a class="btn btn-outline-secondary" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-facebook"></i></a>
+            <a class="btn btn-outline-secondary" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F&title=Interactive%20LaTeX%20Primer"><i class="fa fa-linkedin"></i></a>
+            <a class="btn btn-outline-secondary" href="https://twitter.com/home?status=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-twitter"></i></a>
+            <a class="btn btn-outline-secondary" href="https://vk.com/share.php?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-vk"></i></a>
+            <a class="btn btn-outline-secondary" href="https://plus.google.com/share?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa fa-google-plus"></i></a>
+        </div>
+        <div class="ribbon-container">
+            <div class="ribbon"><a href="https://github.com/dainiak/ilatexprimer" id="githubForkLink">Fork me on GitHub</a></div>
+        </div>
     </div>
 
-    <div class="ribbon-container"><div class="ribbon"><a href="https://github.com/dainiak/ilatexprimer" id="githubForkLink">Fork me on GitHub</a></div></div>
+    <div class="card-body">
+        <h1 class="card-title" id="mainTitle">Interactive Introduction to \( \LaTeX \)</h1>
+
+        <div class="form-group">
+            <h5 class="card-title" id="headerKeywordSearch">Smart Search</h5>
+            <form id="searchForm" class="form-inline" role="search" action="">
+                <label><input type="text" id="searchInput" class="form-control" autocomplete="off">
+                    <span class="input-group-btn"><button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button></span></label>
+            </form>
+        </div>
+
+        <div class="form-group">
+            <h5 class="card-title" style="display: none;" id="collapseExpandSteps">Collapse/expand all steps</h5>
+            <div class="card-text"><div class="btn-group">
+                <button id="btnCollapseAll" class="btn btn-outline-secondary">Collapse all steps</button>
+                <button id="btnExpandAll" class="btn btn-outline-secondary">Expand all steps</button>
+            </div></div>
+        </div>
+
+        <h5 class="card-title manual-collapse collapsed" data-toggle="collapse" data-target="#contentAbout" id="headerAbout"><a href="#">About</a></h5>
+        <div class="card-text card-text collapse manual-collapse" id="contentAbout"><p>This interactive lesson is created by <a rel="author" href="https://www.dainiak.com">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href="https://www.mathjax.org/">MathJax</a>, <a href="https://khan.github.io/KaTeX/">KaTeX</a>, <a href="https://ace.c9.io">ACE Editor</a>, <a href="https://getbootstrap.com/">Bootstrap</a>, <a href="https://jquery.com/">jQuery</a>. While preparing this lesson, the author benefited much from <a href="https://stackoverflow.com/">Stack Overflow</a> and <a href="https://tex.stackexchange.com/">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href="https://www.jetbrains.com/pycharm/">PyCharm</a> IDE and <a href="https://www.google.com/chrome/">Chrome</a> developer tools. This project is hosted on <a href="https://github.com/dainiak/ilatexprimer">GitHub</a>.</p></div>
+
+        <h5 class="card-title manual-collapse" data-toggle="collapse" data-target="#tableofcontents" id="headerTOC"><a href="#">Table of Contents</a></h5>
+        <div class="card-text card-text collapse manual-collapse" id="tableofcontents"></div>
+    </div>
 </div>
 
-        <div class="card-body">
-            <h1 class="card-title" id="mainTitle">Interactive Introduction to \( \LaTeX \)</h1>
 
-            <div class="form-group">
-                <h5 class="card-title" id="headerKeywordSearch">Smart Search</h5>
-                <form id="searchForm" class="form-inline" role="search" action="">
-                    <input type="text" id="searchInput" class="form-control" autocomplete="off">
-                    <span class="input-group-btn"><button class="btn btn-outline-secondary" type="submit"><i class="fa fa-search"></i></button></span>
-                </form>
-            </div>
+<div class="card">
+    <div class="card-header h3 manual-collapse collapsed" data-toggle="collapse" data-target="#optionsPanel"><h4 class="h4" id="headerOptions">Options</h4></div>
 
-            <div class="form-group">
-                <h5 class="card-title" style="display: none;" id="collapseExpandSteps">Collapse/expand all steps</h5>
-                <div class="card-text"><div class="btn-group">
-                    <button id="btnCollapseAll" class="btn btn-outline-secondary">Collapse all steps</button>
-                    <button id="btnExpandAll" class="btn btn-outline-secondary">Expand all steps</button>
-                </div></div>
-            </div>
+    <div id="optionsPanel" class="card-body card-text collapse manual-collapse">
+        <div class="form-group">
+            <div class="card-text"><div class="btn-group">
+                <button id="btnResetLocalStorage" class="btn btn-outline-secondary">Reset progress and settings</button>
+            </div></div>
+        </div>
 
-            <h5 class="card-title manual-collapse collapsed" data-toggle="collapse" data-target="#contentAbout" id="headerAbout"><a href="#">About</a></h5>
-            <div class="card-text card-text collapse manual-collapse" id="contentAbout"><p>This interactive lesson is created by <a rel="author" href="https://www.dainiak.com">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href="https://www.mathjax.org/">MathJax</a>, <a href="https://khan.github.io/KaTeX/">KaTeX</a>, <a href="https://ace.c9.io">ACE Editor</a>, <a href="https://getbootstrap.com/">Bootstrap</a>, <a href="https://jquery.com/">jQuery</a>. While preparing this lesson, the author benefited much from <a href="https://stackoverflow.com/">Stack Overflow</a> and <a href="https://tex.stackexchange.com/">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href="https://www.jetbrains.com/pycharm/">PyCharm</a> IDE and <a href="https://www.google.com/chrome/">Chrome</a> developer tools. This project is hosted on <a href="https://github.com/dainiak/ilatexprimer">GitHub</a>.</p></div>
+        <div class="form-group">
+        <h5 class="card-title" id="headerTheme">Theme</h5>
+        <div class="card-text">
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="theme" value="light" checked> <span id="optionThemeLight">light</span></label></div>
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="theme" value="dark"> <span id="optionThemeDark">dark</span></label></div>
+        </div>
+        </div>
+
+        <div class="form-group">
+        <h5 class="card-title" id="headerDisplayLanguage">Language</h5>
+        <div class="card-text">
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="displayLanguage" value="ru"> <span id="optionLanguageRU">русский</span></label></div>
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="displayLanguage" value="en" checked> <span id="optionLanguageEN">english</span></label></div>
+        </div>
+        </div>
+
+        <div class="form-group">
+        <h5 class="card-title" id="headerMathEngine">Math display engine</h5>
+        <div class="card-text">
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="mathRenderer" value="MathJax"> <span id="optionMathEngineMathJax">MathJax (not that fast, but better compatibility)</span></label></div>
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="mathRenderer" value="KaTeX" checked> <span id="optionMathEngineKaTeX">KaTeX (very fast, but supports smaller LaTeX command set)</span></label></div>
+        </div>
+        </div>
+
+        <div class="form-group">
+        <h5 class="card-title" id="headerInteractivityMode">When to process the LaTeX source code</h5>
+        <div class="card-text">
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="typesetOnChange" value="true" checked> <span id="optionInteractivityHigh">On any update of the source code (more fun)</span></label></div>
+            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="typesetOnChange" value="false"> <span id="optionInteractivityLow">Only when <code>Ctrl+Enter</code> is pressed in the source code editor (more stable)</span></label></div>
+        </div>
+        </div>
+
+        <div class="form-group">
+        <h5 class="card-title" id="headerEditorInstances">Number of source code editor instances</h5>
+        <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="singleAceInstance" value="false" checked> <span id="optionEditorMultiple">Separate editor per each step (more convenient)</span></label></div>
+        <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="singleAceInstance" value="true"> <span id="optionEditorSingle">Single editor instance (lower memory load)</span></label></div>
+        </div>
+
+        <div class="form-group">
+        <h5 class="card-title" id="headerSourceResultRatio"></h5>
+        <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="8"> 1:2</label></div>
+        <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="7"> 5:7</label></div>
+        <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="6"> 1:1</label></div>
+        <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="5" checked> 7:5</label></div>
+        <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="4"> 2:1</label></div>
+        <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="0"> <span id="optionNoSourceCode">no source code</span></label></div>
         </div>
     </div>
-
-
-    <div class="card">
-        <div class="card-header h3 manual-collapse collapsed" data-toggle="collapse" data-target="#optionsPanel"><h4 class="h4" id="headerOptions">Options</h4></div>
-
-        <div id="optionsPanel" class="card-body card-text collapse manual-collapse">
-            <div class="form-group">
-            <h5 class="card-title" id="headerMathEngine">Math display engine</h5>
-            <div class="card-text">
-                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="mathRenderer" value="MathJax"> <span id="optionMathEngineMathJax">MathJax (not that fast, but better compatibility)</span></label></div>
-                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="mathRenderer" value="KaTeX" checked> <span id="optionMathEngineKaTeX">KaTeX (very fast, but supports smaller LaTeX command set)</span></label></div>
-            </div>
-            </div>
-
-            <div class="form-group">
-            <h5 class="card-title" id="headerInteractivityMode">When to process the LaTeX source code</h5>
-            <div class="card-text">
-                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="autoTypeset" value="onChange"> <span id="optionInteractivityHigh">On any update of the source code (more fun)</span></label></div>
-                <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="autoTypeset" value="onHotkey" checked> <span id="optionInteractivityLow">Only when <code>Ctrl+Enter</code> is pressed in the source code editor (more stable)</span></label></div>
-            </div>
-            </div>
-
-            <div class="form-group">
-            <h5 class="card-title" id="headerEditorInstances">Number of source code editor instances</h5>
-            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="singleAceInstance" value="false" checked> <span id="optionEditorMultiple">Separate editor per each step (more convenient)</span></label></div>
-            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="singleAceInstance" value="true"> <span id="optionEditorSingle">Single editor instance (lower memory load)</span></label></div>
-            </div>
-
-            <div class="form-group">
-            <h5 class="card-title" id="headerSourceResultRatio"></h5>
-            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="8"> 1:2</label></div>
-            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="7"> 5:7</label></div>
-            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="6"> 1:1</label></div>
-            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="5" checked> 7:5</label></div>
-            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="4"> 2:1</label></div>
-            <div class="form-check form-check-inline"><label class="form-check-label"><input class="form-check-input" type="radio" name="areaWidthRatio" value="0"> <span id="optionNoSourceCode">no source code</span></label></div>
-            </div>
-
-            <div class="form-group">
-            <h5 class="card-title" id="headerDisplayLanguage"></h5>
-            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="displayLanguage" value="ru"> <span id="optionLanguageRU">Russian</span></label></div>
-            <div class="form-check"><label class="form-check-label"><input class="form-check-input" type="radio" name="displayLanguage" value="en" checked> <span id="optionLanguageEN">English</span></label></div>
-            </div>
-        </div>
-    </div>
+</div>
 
 
 <section class="main-content" lang="en">
@@ -130,14 +151,14 @@
     <h2 class="h2 mt-4">What is $\LaTeX$?</h2>
     <script type="text/latexlesson" data-src="text-basics.tex"></script>
 
-    <h2 class="h2 mt-4">Basic formulas</h2>
+    <!-- <h2 class="h2 mt-4">Basic formulas</h2>
     <script type="text/latexlesson" data-src="formulae-basics.tex"></script>
 
     <h2 class="h2 mt-4">Some more advanced stuff</h2>
     <script type="text/latexlesson" data-src="formulae-advanced.tex"></script>
 
     <h2 class="h2 mt-4">Where to look next</h2>
-    <script type="text/latexlesson" data-src="what-next.tex"></script>
+    <script type="text/latexlesson" data-src="what-next.tex"></script> -->
 </section>
 
 <section class="main-content" lang="ru">
@@ -157,7 +178,4 @@
 </section>
 
 
-</div>
-
-</body>
-</html>
+</div></body></html>

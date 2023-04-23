@@ -6,10 +6,15 @@ let I18N_STRINGS_ALL = {
         "githubForkLink": "Проект на GitHub",
         "collapseExpandSteps": "Свернуть/развернуть все шаги урока",
         "mainTitle": "Интерактивное введение в \\( \\LaTeX \\)",
-        "headerAbout": "<a href=\"#\">Об уроке…</a>",
-        "contentAbout": "<p>Урок задуман, свёрстан и запрограммирован <a rel=\"author\" href=\"http://www.dainiak.com\">Александром Дайняком</a>. Почтовый адрес для связи: <code>dainiak@gmail.com</code></p><p>Урок создан с использованием <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://katex.org/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. В перечисленных инструментах и в тонкостях использования \\(\\LaTeX\\) автору помогали разбираться форумы <a href=\"http://stackoverflow.com/\">Stack Overflow</a> и <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Сильно облегчали написание и тестирование кода редактор <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> и панель разработчика в <a href=\"https://www.google.com/chrome/\">Chrome</a>. Хостинг проекта осуществляется на <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
+        "headerAbout": "<a href=\"#\">Об уроке</a>",
+        "headerTOC": "<a href=\"#\">Оглавление</a>",
+        "contentAbout": "<p>Урок задуман, свёрстан и запрограммирован <a rel=\"author\" href=\"https://www.dainiak.com\">Александром Дайняком</a>. Почтовый адрес для связи: <code>dainiak@gmail.com</code></p><p>Урок создан с использованием <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://katex.org/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. В перечисленных инструментах и в тонкостях использования \\(\\LaTeX\\) автору помогали разбираться форумы <a href=\"http://stackoverflow.com/\">Stack Overflow</a> и <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Сильно облегчали написание и тестирование кода редактор <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> и панель разработчика в <a href=\"https://www.google.com/chrome/\">Chrome</a>. Хостинг проекта осуществляется на <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
         "btnCollapseAll": "Свернуть все шаги",
         "btnExpandAll": "Развернуть все шаги",
+        "btnResetLocalStorage": "Сбросить прогресс и настройки",
+        "headerTheme": "Тема оформления",
+        "optionThemeLight": "светлая",
+        "optionThemeDark": "тёмная",
         "headerKeywordSearch": "Поиск по ключевым словам",
         "headerOptions": "Дополнительные настройки",
         "headerMathEngine": "Движок, используемый для отображения формул при редактировании кода",
@@ -26,7 +31,7 @@ let I18N_STRINGS_ALL = {
 
         "headerDisplayLanguage": "Язык отображения",
         "optionLanguageRU": "русский",
-        "optionLanguageEN": "английский",
+        "optionLanguageEN": "english",
 
         "confirmation.SwitchToKaTeX": "Рекомендуется в этом случае использовать для отображения формул KaTeX. Переключиться на KaTeX?",
         "confirmation.CtrlEnter": "Рекомендуется при этом переключиться в режим отображения только по Ctrl+Enter. Переключиться?",
@@ -48,9 +53,14 @@ let I18N_STRINGS_ALL = {
         "collapseExpandSteps": "Collapse/expand all steps",
         "mainTitle": "Interactive Introduction to \\( \\LaTeX \\)",
         "headerAbout": "<a href=\"#\">About</a>",
-        "contentAbout": "<p>This interactive lesson is created by <a rel=\"author\" href=\"http://www.dainiak.com\">Alex Dainiak</a>, an associate professor at <a href=\"https://mipt.ru/en/\">MIPT</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://khan.github.io/KaTeX/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. While preparing this lesson, the author benefited much from <a href=\"http://stackoverflow.com/\">Stack Overflow</a> and <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> IDE and <a href=\"https://www.google.com/chrome/\">Chrome</a> developer tools. This project is hosted on <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
+        "headerTOC": "<a href=\"#\">Table of Contents</a>",
+        "contentAbout": "<p>This interactive lesson is created by <a rel=\"author\" href=\"https://www.dainiak.com\">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://khan.github.io/KaTeX/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. While preparing this lesson, the author benefited much from <a href=\"http://stackoverflow.com/\">Stack Overflow</a> and <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> IDE and <a href=\"https://www.google.com/chrome/\">Chrome</a> developer tools. This project is hosted on <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
         "btnCollapseAll": "Collapse all",
         "btnExpandAll": "Expand all",
+        "btnResetLocalStorage": "Reset progress and settings",
+        "headerTheme": "Theme",
+        "optionThemeLight": "light",
+        "optionThemeDark": "dark",
         "headerKeywordSearch": "Smart search",
         "headerOptions": "Options",
         "headerMathEngine": "Math display engine",
@@ -66,8 +76,8 @@ let I18N_STRINGS_ALL = {
         "optionNoSourceCode": "no source code",
 
         "headerDisplayLanguage": "Language",
-        "optionLanguageRU": "Russian",
-        "optionLanguageEN": "English",
+        "optionLanguageRU": "русский",
+        "optionLanguageEN": "english",
 
         "confirmation.SwitchToKaTeX": "It is recommended to use KaTeX for math display in this case. Do you want to switch to KaTeX?",
         "confirmation.CtrlEnter": "It is recommended to switch to “Ctrl+Enter only” update mode. Make the switch?",
@@ -84,7 +94,6 @@ let I18N_STRINGS_ALL = {
 };
 
 function setUILanguage(language=null){
-    // language = 'ru';
     if(!language)
         language = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
 
@@ -109,6 +118,4 @@ function setUILanguage(language=null){
     let $languageSelector = $('input[type=radio][name=displayLanguage][value=' + language + ']');
     if($languageSelector[0])
         $languageSelector[0].checked = true;
-
-    window.lessonLanguage = language;
 }
