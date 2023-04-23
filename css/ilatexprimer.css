@@ -73,7 +73,29 @@ blockquote {
     padding-left: 1em;
 }
 
+div.card-body a, div.card-body a:visited, div.card-body a:active, div.card-body a:hover {
+    color: inherit;
+    border-bottom: 2px cadetblue dotted;
+    text-decoration: inherit;
+}
+
+div.card-body a:hover {
+    background-color: lightgray;
+}
+
+[data-theme=dark] div.card-body a:hover {
+    background-color: #333;
+}
+
+@keyframes blinking {
+    0%   {opacity: 0.3}
+    100% {opacity: 1.0}
+}
+
 .highlighted-blinking {
+    animation-name: blinking;
+    animation-duration: 0.3s;
+    animation-iteration-count: infinite;
     border-color: firebrick;
     border-width: thick;
 }
@@ -108,18 +130,4 @@ div > ol > li > ol > li:before {
 div > ol > li > ol > li > ol > li:before {
     counter-increment: enumerateiii;
     content: counter(enumeratei) "." counter(enumerateii) "." counter(enumerateiii) ". ";
-}
-
-div.card-body a, div.card-body a:visited, div.card-body a:active, div.card-body a:hover {
-    color: inherit;
-    border-bottom: 2px cadetblue dotted;
-    text-decoration: inherit;
-}
-
-div.card-body a:hover {
-    background-color: lightgray;
-}
-
-[data-theme=dark] div.card-body a:hover {
-    background-color: #333;
 }

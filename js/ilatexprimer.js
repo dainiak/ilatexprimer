@@ -112,15 +112,6 @@ $(function() {
         return editor;
     }
 
-    setInterval(function () {
-        $('.highlighted-blinking').each(function(index, element) {
-            let $e = $(element);
-            let opacity = parseFloat($e.css('opacity'));
-            opacity = opacity <= 0.3 ? opacity : 1;
-            $e.fadeTo(200, 1.2 - opacity);
-        });
-    }, 300);
-
     $('input[type=radio][name=mathRenderer][value="' + mathRenderer + '"]')[0].checked = true;
     $('input[type=radio][name=typesetOnChange][value="' + typesetOnChange.toString() + '"]')[0].checked = true;
     $('input[type=radio][name=singleAceInstance][value="' + singleAceInstance.toString() + '"]')[0].checked = true;
