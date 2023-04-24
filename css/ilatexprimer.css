@@ -81,6 +81,7 @@ div.card-body a, div.card-body a:visited, div.card-body a:active, div.card-body 
 
 div.card-body a:hover {
     background-color: lightgray;
+    cursor: pointer;
 }
 
 [data-theme=dark] div.card-body a:hover {
@@ -98,6 +99,17 @@ div.card-body a:hover {
     animation-iteration-count: infinite;
     border-color: firebrick;
     border-width: thick;
+}
+
+.language-flag {
+    top: 0;
+    right: 0;
+    display: inline;
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: 0.5em;
+    margin-top: 0;
+    cursor: pointer;
 }
 
 

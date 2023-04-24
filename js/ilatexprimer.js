@@ -189,12 +189,15 @@ $(function() {
         setAreaWidthRatio(this.value.toString());
     });
 
-    $('input[type=radio][name=displayLanguage]').change(function () {
-        displayLanguage = (this.value).toString();
+    function reloadWithLanguage(language) {
+        displayLanguage = language;
         setUILanguage(displayLanguage);
         localStorage.setItem('displayLanguage', displayLanguage);
         masterReload();
-    });
+    }
+
+    $('input[type=radio][name=displayLanguage]').change(function () {reloadWithLanguage((this.value).toString())});
+    $('.language-flag').click(function () {reloadWithLanguage(this.dataset['language'])});
 
     $('#btnCollapseAll').click(function () {
         $(document.body).find('[data-has-tooltip]').popover('hide');
@@ -604,6 +607,15 @@ $(function() {
         ).replace(
             '\\end{align*}',
             '\\end{align*}\\]'
+        ).replace(
+            '\\begin{alignat',
+            '\\[\\begin{alignat'
+        ).replace(
+            '\\end{alignat}',
+            '\\end{alignat}\\]'
+        ).replace(
+            '\\end{alignat*}',
+            '\\end{alignat*}\\]'
         ).replace( // multline is not supported by KaTeX yet
             '\\begin{multline',
             '\\[\\begin{multline'
