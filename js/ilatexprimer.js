@@ -1140,7 +1140,7 @@ $(function() {
 
     $(function(){
         initializeDarkThemeSwitch();
-        setUILanguage('ru');
+        setUILanguage();
         masterReload();
     });
 });

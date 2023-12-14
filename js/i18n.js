@@ -95,7 +95,7 @@ let I18N_STRINGS_ALL = {
 
 function setUILanguage(language=null){
     if(!language)
-        language = navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en';
+        language = localStorage.getItem('displayLanguage') || (navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en');
 
     window.I18N_STRINGS = I18N_STRINGS_ALL[language];
     window.confirmationSwitchToKaTeX = I18N_STRINGS["confirmation.SwitchToKaTeX"];
