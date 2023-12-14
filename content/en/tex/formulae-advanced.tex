@@ -1,24 +1,96 @@
 \section{Math environments in amsmath package}
-\begin{equation}\label{eq:one}
-\begin{split}
-  a & = b+c-d\\
-    & \quad +e-f\\
-    & =g+h\\
-    & =i
-\end{split}
-\end{equation}
+\section{Advanced Math Environments in LaTeX}
+\par In this section, we'll explore some of the advanced math environments provided by the \verb"amsmath" package in LaTeX. These environments are essential for formatting complex mathematical expressions, especially when dealing with multi-line equations.
 
+\subsection{The Equation and Split Environments}
+\par The \verb"equation" environment is used to create numbered equations. Within it, you can use the \verb"split" environment to split a long equation into multiple lines. For example:
+\begin{equation}\label{eq:one}
+    \begin{split}
+      a & = b+c-d\\
+        & \quad +e-f\\
+        & =g+h\\
+        & =i
+    \end{split}
+\end{equation}
+This code produces a single, numbered equation that is split over several lines for readability.
+
+\subsection{The Multline Environment}
+\par The \verb"multline" environment is used for equations that do not fit into a single line. It allows breaking the equation into multiple lines with automated choice of alignment (gradually moving text to the right line after line). For instance:
 \begin{multline}
-a+b+c+d+e+f\\
-+i+j+k+l+m+n
+    a+b+c+d+e+f\\
+    +i+j+k+l+m+n
 \end{multline}
 
-\begin{gather}
-a_1=b_1+c_1\\
-a_2=b_2+c_2-d_2+e_2
-\end{gather}
 
+\subsection{The Gather and Align Environments}
+\par The \verb"gather" environment is used to center multiple equations vertically without aligning them horizontally. For example:
+\begin{gather}
+    a_1=b_1+c_1\\
+    a_2=b_2+c_2-d_2+e_2
+\end{gather}
+On the other hand, \verb"align" is used for aligning multiple equations at a particular point (usually the equal sign). For example:
 \begin{align}
-a_1& =b_1+c_1\\
-a_2& =b_2+c_2-d_2+e_2
+    a_1& =b_1+c_1 & = r_1\\
+    a_2& =b_2+c_2-d_2+e_2 &= r_2
 \end{align}
+Both of these environments are essential for presenting sequences of related equations.
+
+\subsection{Environments without numbering}
+\par If you want to display an equation without numbering it, you can use the \verb"equation*" environment. For example:
+\begin{equation*}
+    a=b+c
+\end{equation*}
+There is not much gain in using \verb"equation*" instead of just \verb"\[…\]" though.
+
+Other \verb"amsmath" environments such as \verb"split", \verb"multline", \verb"gather", and \verb"align" also have their unnumbered versions: \verb"split*", \verb"multline*", \verb"gather*", and \verb"align*".
+
+\section{Exercise}
+\begin{staticpart}
+Type the formulas choosing the appropriate amsmath environments.
+\subsection{First}
+\begin{equation}
+  e=mc^2
+\end{equation}
+
+\subsection{Second}
+\begin{gather*}
+  d = \sqrt{ (x_2 - x_1)^2 + (y_2 - y_1)^2 } \\
+  \cos \alpha = \frac{b^2 + c^2 - a^2}{2bc}
+\end{gather*}
+
+\subsection{Third}
+\begin{multline*}
+    P(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots + \\
+    + a_n x^n = \sum_{k=0}^n a_k x^k
+\end{multline*}
+
+\subsection{Fourth}
+\begin{align}
+    \sin 2x &= 2 \sin x \cos x \\
+    1 &= \sin ^2 x + \cos ^2 x
+\end{align}
+
+\end{staticpart}
+
+First:
+\[
+  e=mc^2
+\]
+
+\par Second:
+\[
+  d = \sqrt{ (x_2 - x_1)^2 + (y_2 - y_1)^2 }
+  \cos \alpha = \frac{b^2 + c^2 - a^2}{2bc}
+\]
+
+\par Third:
+\[
+  P(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots +
+  + a_n x^n = \sum_{k=0}^n a_k x^k
+\]
+
+\par Fourth:
+\[
+  \sin 2x = 2 \sin x \cos x
+  1 = \sin ^2 x + \cos ^2 x
+\]

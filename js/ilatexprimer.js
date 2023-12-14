@@ -534,7 +534,7 @@ $(function() {
             return;
         }
 
-        pos = text.search(/\\(textit|textbf|href|emph){|\\par[^a-zA-Z]/);
+        pos = text.search(/\\(textit|textbf|subsection|href|emph){|\\par[^a-zA-Z]/);
         if (pos >= 0) {
             let prefix = text.substring(0, pos);
             let tokens = parseCommandArgs(text.substring(pos));
@@ -547,6 +547,12 @@ $(function() {
                         .append($('<' + tag + '></' + tag + '>')
                                 .append(document.createTextNode(tokens.value)));
                 $element.find('> ' + tag).each(function (i, e) {
+                    preprocessLaTeX(e)
+                });
+            }
+            else if (tokens.command === '\\subsection') {
+                $element.append($('<h5 class="mt-4"></h5>').append(document.createTextNode(tokens.value)));
+                $element.find('> h5').each(function (i, e) {
                     preprocessLaTeX(e)
                 });
             }
