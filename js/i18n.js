@@ -1,4 +1,4 @@
-let I18N_STRINGS_ALL = {
+const I18N_STRINGS_ALL = {
     "ru": {
         "document.title": "Интерактивное введение в LaTeX",
 
@@ -8,7 +8,7 @@ let I18N_STRINGS_ALL = {
         "mainTitle": "Интерактивное введение в \\( \\LaTeX \\)",
         "headerAbout": "<a href=\"#\">Об уроке</a>",
         "headerTOC": "<a href=\"#\">Оглавление</a>",
-        "contentAbout": "<p>Урок задуман, свёрстан и запрограммирован <a rel=\"author\" href=\"https://www.dainiak.com\">Александром Дайняком</a>. Почтовый адрес для связи: <code>dainiak@gmail.com</code></p><p>Урок создан с использованием <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://katex.org/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. В перечисленных инструментах и в тонкостях использования \\(\\LaTeX\\) автору помогали разбираться форумы <a href=\"http://stackoverflow.com/\">Stack Overflow</a> и <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Сильно облегчали написание и тестирование кода редактор <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> и панель разработчика в <a href=\"https://www.google.com/chrome/\">Chrome</a>. Хостинг проекта осуществляется на <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
+        "contentAbout": "<p>Урок задуман, свёрстан и запрограммирован <a rel=\"author\" href=\"https://www.dainiak.com\">Александром Дайняком</a>. Почтовый адрес для связи: <code>dainiak@gmail.com</code></p><p>Урок создан с использованием <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://katex.org/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"https://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. В перечисленных инструментах и в тонкостях использования \\(\\LaTeX\\) автору помогали разбираться форумы <a href=\"https://stackoverflow.com/\">Stack Overflow</a> и <a href=\"https://tex.stackexchange.com/\">LaTeX Stack Exchange</a>.</p>",
         "btnCollapseAll": "Свернуть все шаги",
         "btnExpandAll": "Развернуть все шаги",
         "btnResetLocalStorage": "Сбросить прогресс и настройки",
@@ -54,7 +54,7 @@ let I18N_STRINGS_ALL = {
         "mainTitle": "Interactive Introduction to \\( \\LaTeX \\)",
         "headerAbout": "<a href=\"#\">About</a>",
         "headerTOC": "<a href=\"#\">Table of Contents</a>",
-        "contentAbout": "<p>This interactive lesson is created by <a rel=\"author\" href=\"https://www.dainiak.com\">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://khan.github.io/KaTeX/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"http://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. While preparing this lesson, the author benefited much from <a href=\"http://stackoverflow.com/\">Stack Overflow</a> and <a href=\"http://tex.stackexchange.com/\">LaTeX Stack Exchange</a>. Programming this lesson was made fun by <a href=\"https://www.jetbrains.com/pycharm/\">PyCharm</a> IDE and <a href=\"https://www.google.com/chrome/\">Chrome</a> developer tools. This project is hosted on <a href=\"https://github.com/dainiak/ilatexprimer\">GitHub</a>.</p>",
+        "contentAbout": "<p>Developed by <a rel=\"author\" href=\"https://www.dainiak.com\">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://khan.github.io/KaTeX/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"https://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. While preparing this lesson, the author benefited much from <a href=\"https://stackoverflow.com/\">Stack Overflow</a> and <a href=\"https://tex.stackexchange.com/\">LaTeX Stack Exchange</a>.</p>",
         "btnCollapseAll": "Collapse all",
         "btnExpandAll": "Expand all",
         "btnResetLocalStorage": "Reset progress and settings",
@@ -110,12 +110,11 @@ function setUILanguage(language=null){
     window.msgFinishedLoading = I18N_STRINGS["msg.FinishedLoading"];
 
     document.title = I18N_STRINGS['document.title'] ? I18N_STRINGS['document.title'] : document.title;
+    
     for(let paramId in I18N_STRINGS){
-        if(paramId.indexOf('.') < 0){
-            $('#' + paramId).html(I18N_STRINGS[paramId]);
+        if(!paramId.includes('.')){
+            (document.getElementById(paramId) || {}).innerHTML = I18N_STRINGS[paramId];
         }
     }
-    let $languageSelector = $('input[type=radio][name=displayLanguage][value=' + language + ']');
-    if($languageSelector[0])
-        $languageSelector[0].checked = true;
+    (document.querySelector(`input[type=radio][name=displayLanguage][value=${language}]`) || {}).checked = true;
 }
