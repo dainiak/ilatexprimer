@@ -58,7 +58,7 @@ function main() {
             const rda = editor.container.parentNode.rda;
             $(rda).find('[data-has-tooltip]').popover('dispose');
             const value = editor.getValue().trim();
-            localStorage.setItem(displayLanguage + '-' + rda.id.replace('rda', ''), value);
+            localStorage.setItem(`${displayLanguage}-${rda.id.replace('rda', '')}`, value);
             rda.textContent = value.replace(/^\\par\s+/, '');
             preprocessLaTeX(rda);
             mathRenderer === 'MathJax' && MathJax.texReset();
@@ -168,7 +168,7 @@ function main() {
     }
 
     $('input[type=radio][name=displayLanguage]').on('change', (e) => reloadWithLanguage((e.target.value).toString()));
-    $('.language-flag').on('click', (e)=> reloadWithLanguage(e.target.dataset['language']));
+    $('.language-flag').on('click', (e)=> {reloadWithLanguage(e.target.dataset['language'])});
 
     $('#btnCollapseAll').on('click', ()=> {
         $(document.body).find('[data-has-tooltip]').popover('hide');
@@ -842,7 +842,7 @@ function main() {
                 $('.fa.fa-search').removeClass('highlighted-blinking').fadeTo(0, 1);
             });
             const $searchIcon = $('.fa.fa-search');
-            $searchInput.on('click', () => $searchIcon.removeClass('highlighted-blinking').fadeTo(0, 1));
+            $searchInput.on('click', () => {$searchIcon.removeClass('highlighted-blinking').fadeTo(0, 1)});
             $searchIcon.addClass('highlighted-blinking');
         }
 
@@ -890,8 +890,8 @@ function main() {
         $('.highlighted-blinking').on('focus', (e) => {
             $(e.target).removeClass('highlighted-blinking').fadeTo(0, 1);
         });
-        $('.step-body').on('click', (e) => $(e.target).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1));
-        $('.collapse').on('hide.bs.collapse', (e) => $(e.target).find('[data-has-tooltip]').popover('hide'));
+        $('.step-body').on('click', (e) => {$(e.target).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1)});
+        $('.collapse').on('hide.bs.collapse', (e) => {$(e.target).find('[data-has-tooltip]').popover('hide')});
 
         // Build table of contents
         let tocHtml = '<ul>';
