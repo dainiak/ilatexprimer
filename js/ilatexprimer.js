@@ -118,25 +118,6 @@ function main() {
         $(`input[type=radio][name=areaWidthRatio][value="${localStorage.getItem('areaWidthRatio')}"]`)[0].checked = true;
     }
 
-    $('input[type=radio][name=singleAceInstance]').on('change', (e) => {
-        singleAceInstance = (e.target.value === 'true');
-        localStorage.setItem('singleAceInstance', singleAceInstance);
-        if(singleAceInstance)
-            $('.latex-source-area').each((_, element) => element.editorInstance.customDestroyer.call());
-        else
-            $('.latex-source-area').each((_, element) => attachAce(element));
-    });
-
-    $('input[type=radio][name=typesetOnChange]').on('change', (e) => {
-        typesetOnChange = (e.target.value === 'true');
-        localStorage.setItem('typesetOnChange', typesetOnChange);
-    });
-
-    $('input[type=radio][name=mathRenderer]').on('change', (e) => {
-        mathRenderer = e.target.value;
-        localStorage.setItem('mathRenderer', mathRenderer);
-    });
-
     function setAreaWidthRatio(ratioCode) {
         ['.latex-source-area', '.result-display-area'].forEach(selector => {
             $(selector).removeClass((_, className) => (className.match(/(^|\s)col-md-\d+/g) || []).join(' '));
@@ -155,11 +136,6 @@ function main() {
     if(localStorage.getItem('areaWidthRatio') !== null)
         setAreaWidthRatio(localStorage.getItem('areaWidthRatio'));
 
-    $('input[type=radio][name=areaWidthRatio]').on('change', (e) => {
-        localStorage.setItem('areaWidthRatio', e.target.value.toString());
-        setAreaWidthRatio(e.target.value.toString());
-    });
-
     function reloadWithLanguage(language) {
         displayLanguage = language;
         setUILanguage(displayLanguage);
@@ -167,31 +143,57 @@ function main() {
         masterReload();
     }
 
-    $('input[type=radio][name=displayLanguage]').on('change', (e) => reloadWithLanguage((e.target.value).toString()));
-    $('.language-flag').on('click', (e)=> {reloadWithLanguage(e.target.dataset['language'])});
+    function setUIEventHandlers() {
+        $('input[type=radio][name=singleAceInstance]').on('change', (e) => {
+            singleAceInstance = (e.target.value === 'true');
+            localStorage.setItem('singleAceInstance', singleAceInstance);
+            if(singleAceInstance)
+                $('.latex-source-area').each((_, element) => element.editorInstance.customDestroyer.call());
+            else
+                $('.latex-source-area').each((_, element) => attachAce(element));
+        });
 
-    $('#btnCollapseAll').on('click', ()=> {
-        $(document.body).find('[data-has-tooltip]').popover('hide');
-        $('[data-toggle="collapse"]').not('.manual-collapse').addClass('collapsed');
-        $('.step-body.collapse').not('.manual-collapse').removeClass('show');
-    });
-    $('#btnExpandAll').on('click', () => {
-        $('[data-toggle="collapse"]').not('.manual-collapse').removeClass('collapsed');
-        $('.step-body.collapse').not('.manual-collapse').addClass('show');
-    });
+        $('input[type=radio][name=typesetOnChange]').on('change', (e) => {
+            typesetOnChange = (e.target.value === 'true');
+            localStorage.setItem('typesetOnChange', typesetOnChange);
+        });
 
-    $('#btnResetLocalStorage').on('click', () => {localStorage.clear(); location.reload();});
+        $('input[type=radio][name=mathRenderer]').on('change', (e) => {
+            mathRenderer = e.target.value;
+            localStorage.setItem('mathRenderer', mathRenderer);
+        });
 
-    $('.social-share a').on('click', (e) => {
-        window.open(
-            e.target.href,
-            '',
-            'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'
-        );
-        return false;
-    });
+        $('input[type=radio][name=areaWidthRatio]').on('change', (e) => {
+            localStorage.setItem('areaWidthRatio', e.target.value.toString());
+            setAreaWidthRatio(e.target.value.toString());
+        });
 
-    function highlighKeywordEverywhere(keyword) {
+        $('input[type=radio][name=displayLanguage]').on('change', (e) => reloadWithLanguage((e.target.value).toString()));
+        $('.language-flag').on('click', (e)=> {reloadWithLanguage(e.target.dataset['language'])});
+
+        $('#btnCollapseAll').on('click', ()=> {
+            $(document.body).find('[data-has-tooltip]').popover('hide');
+            $('[data-toggle="collapse"]').not('.manual-collapse').addClass('collapsed');
+            $('.step-body.collapse').not('.manual-collapse').removeClass('show');
+        });
+        $('#btnExpandAll').on('click', () => {
+            $('[data-toggle="collapse"]').not('.manual-collapse').removeClass('collapsed');
+            $('.step-body.collapse').not('.manual-collapse').addClass('show');
+        });
+
+        $('#btnResetLocalStorage').on('click', () => {localStorage.clear(); location.reload();});
+
+        $('.social-share a').on('click', (e) => {
+            window.open(
+                e.target.href,
+                '',
+                'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'
+            );
+            return false;
+        });
+    }
+
+    function highlightKeywordEverywhere(keyword) {
         if(!(keyword in keywordIndex))
             return;
 
@@ -775,7 +777,7 @@ function main() {
                 }
             });
 
-            $sourceArea.on('click', () => {
+            $sourceArea.off('click').on('click', () => {
                 const newEditor = attachAce($sourceArea[0]);
                 newEditor && newEditor.focus();
             });
@@ -818,6 +820,28 @@ function main() {
             });
     }
 
+    function handleLocationHash(){
+        if (!window.location.hash)
+            return;
+        let stepId = window.location.hash.replace(/^#(step|stepheading)?(?=\d)/, '');
+        if (document.getElementById(`stepheading${stepId}`)) {
+            $(`#step${stepId}.collapse`).collapse('show');
+            window.location.hash = '';
+            window.location.hash = `#stepheading${stepId}`;
+            document.getElementById(`step${stepId}`).scrollIntoView();
+        }
+        else {
+            let kw = window.location.hash.substring(1);
+            if ((kw in keywordIndex) || ((`\\${kw}`) in keywordIndex)) {
+                if (!(kw in keywordIndex)) {
+                    kw = `\\${kw}`;
+                }
+                $searchInput.val(kw);
+                highlightKeywordEverywhere(kw);
+            }
+        }
+    }
+
     function finalizer() {
         $('script[type="text/latexlesson"][toprocess]').each((index, element) => {
             element.removeAttribute('toprocess');
@@ -837,12 +861,12 @@ function main() {
             if(highlightIntro)
                 $intro.addClass('highlighted-blinking');
 
-            $(document.body).on('click', () => {
+            $(document.body).off('click').on('click', () => {
                 $intro.removeClass('highlighted-blinking').fadeTo(0, 1);
                 $('.fa.fa-search').removeClass('highlighted-blinking').fadeTo(0, 1);
             });
             const $searchIcon = $('.fa.fa-search');
-            $searchInput.on('click', () => {$searchIcon.removeClass('highlighted-blinking').fadeTo(0, 1)});
+            $searchInput.off('click').on('click', () => {$searchIcon.removeClass('highlighted-blinking').fadeTo(0, 1)});
             $searchIcon.addClass('highlighted-blinking');
         }
 
@@ -854,7 +878,7 @@ function main() {
         function typeaheadEventHandler() {
             const kw = $searchInput.typeahead('val');
             if ($searchInput.val() === kw) {
-                highlighKeywordEverywhere(kw);
+                highlightKeywordEverywhere(kw);
             }
         }
 
@@ -884,14 +908,6 @@ function main() {
                 })
             }
         ).on('typeahead:select', typeaheadEventHandler);
-
-        $('#searchForm').on('submit', () => {typeaheadEventHandler(); return false})
-
-        $('.highlighted-blinking').on('focus', (e) => {
-            $(e.target).removeClass('highlighted-blinking').fadeTo(0, 1);
-        });
-        $('.step-body').on('click', (e) => {$(e.target).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1)});
-        $('.collapse').on('hide.bs.collapse', (e) => {$(e.target).find('[data-has-tooltip]').popover('hide')});
 
         // Build table of contents
         let tocHtml = '<ul>';
@@ -934,6 +950,14 @@ function main() {
             })
         });
 
+        $('#searchForm').off('submit').on('submit', () => {typeaheadEventHandler(); return false});
+
+        $('.highlighted-blinking').off('focus').on('focus', (e) => {
+            $(e.target).removeClass('highlighted-blinking').fadeTo(0, 1);
+        });
+        $('.step-body').off('click').on('click', (e) => {$(e.target).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1)});
+        $('.collapse').on('hide.bs.collapse', (e) => {$(e.target).find('[data-has-tooltip]').popover('hide')});
+
         handleLocationHash();
     }
 
@@ -943,19 +967,21 @@ function main() {
         for(let s of document.querySelectorAll(`section[lang="${displayLanguage}"] > script[type="text/latexlesson"][data-src]`)){
             s.setAttribute('toload', 'true');
         }
+        keywordIndex = {};
         loadExternalScriptsAndFinalize(finalizer);
     }
 
     function initializeDarkThemeSwitch(){
         // Adapted from https://www.cssscript.com/dark-mode-switcher-bootstrap/
-        let themeChangeHandlers = [];
+        const darkSwitch = document.getElementById('darkSwitch');
+        darkSwitch.checked = (displayTheme === 'dark');
+
         function applyTheme(theme){
             document.body.setAttribute('data-theme', theme);
-            themeChangeHandlers.forEach(handler => handler(theme));
-
+            darkSwitch.checked = (theme === 'dark');
             aceEditorOptions.theme = theme === 'dark' ? 'ace/theme/clouds_midnight' : 'ace/theme/chrome';
-            $('.latex-source-area').each(
-                (_, element) => element.editorInstance && element.editorInstance.setOption('theme', aceEditorOptions.theme)
+            $('.latex-source-area').each((_, element) =>
+                element.editorInstance && element.editorInstance.setOption('theme', aceEditorOptions.theme)
             );
         }
 
@@ -967,17 +993,8 @@ function main() {
         }
 
         setTheme(displayTheme);
-
-        const darkSwitch = document.getElementById('darkSwitch');
-        darkSwitch.checked = (displayTheme === 'dark');
-        darkSwitch.onchange = () => {
-            setTheme(darkSwitch.checked ? 'dark' : 'light');
-        };
+        darkSwitch.onchange = () => {setTheme(darkSwitch.checked ? 'dark' : 'light');};
         $('input[type=radio][name=theme]').on('change', (e) => setTheme(e.target.value.toString()));
-
-        themeChangeHandlers.push(
-            theme => darkSwitch.checked = theme === 'dark'
-        );
     }
 
     function setScrollToTopButton(){
@@ -988,31 +1005,11 @@ function main() {
         btn.addEventListener('click', () => document.body.scrollTop = document.documentElement.scrollTop = 0);
     }
 
-    function handleLocationHash(){
-        if (!window.location.hash)
-            return;
-        let stepId = window.location.hash.replace(/^#(step|stepheading)?(?=\d)/, '');
-        if (document.getElementById(`stepheading${stepId}`)) {
-            $(`#step${stepId}.collapse`).collapse('show');
-            window.location.hash = '';
-            window.location.hash = `#stepheading${stepId}`;
-            document.getElementById(`step${stepId}`).scrollIntoView();
-        }
-        else {
-            let kw = window.location.hash.substring(1);
-            if ((kw in keywordIndex) || ((`\\${kw}`) in keywordIndex)) {
-                if (!(kw in keywordIndex)) {
-                    kw = `\\${kw}`;
-                }
-                $searchInput.val(kw);
-                highlighKeywordEverywhere(kw);
-            }
-        }
-    }
 
     initializeDarkThemeSwitch();
     setScrollToTopButton();
     setUILanguage();
+    setUIEventHandlers();
 
     document.readyState === "complete" ? masterReload() : window.addEventListener('load', masterReload);
 }
