@@ -114,12 +114,21 @@ div.card-body a:hover {
 .language-flag {
     top: 0;
     right: 0;
-    display: inline;
-    width: 1.5em;
+    width: 20px;
     height: 1.5em;
     margin-right: 0.5em;
-    margin-top: 0;
+    margin-top: -5px;
     cursor: pointer;
+}
+
+.dark-switch-container {
+    display: inline
+}
+
+.dark-switch-container i {
+    position: absolute;
+    top: 4px;
+    left: -2px;
 }
 
 
