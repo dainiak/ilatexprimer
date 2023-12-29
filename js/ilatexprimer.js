@@ -1,4 +1,4 @@
-function main() {
+const main = () => {
     const $ = window.$;
 
     let displayLanguage = localStorage.getItem('displayLanguage') || (navigator.languages.includes('ru') ? 'ru' : 'en');
@@ -13,10 +13,10 @@ function main() {
     let keywordIndex = {};
     const aceHighlighter = ace.require('ace/ext/static_highlight');
     const $searchInput = $('#searchInput');
-    const $loadingToast = $('#loadingToast');
+    const $loadingToastText = $('#loadingToastText');
 
     function setLoadingStatus(text) {
-        $loadingToast.text(text);
+        $loadingToastText.text(text);
     }
 
     const aceEditorOptions = {
@@ -853,7 +853,7 @@ function main() {
 
         mathRendererFactory(document.body, true, () => {
             setLoadingStatus(msgFinishedLoading);
-            $loadingToast.fadeOut(1000);
+            $('#loadingToast').fadeOut(1000);
         })();
 
         if (!window.location.hash && startCollapsed) {
