@@ -49,7 +49,7 @@ const I18N_STRINGS_ALL = {
         "confirmation.KaTeXLowerCompatibility": "KaTeX supports a smaller subset of LaTeX commands than MathJax. Are you sure you want to switch?",
         "confirmation.SwitchToKaTeX": "It is recommended to use KaTeX for math display in this case. Do you want to switch to KaTeX?",
         "contentAbout": "<p>Developed by <a rel=\"author\" href=\"https://www.dainiak.com\">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://khan.github.io/KaTeX/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"https://getbootstrap.com/\">Bootstrap</a>, <a href=\"https://jquery.com/\">jQuery</a>. While preparing this lesson, the author benefited much from <a href=\"https://stackoverflow.com/\">Stack Overflow</a> and <a href=\"https://tex.stackexchange.com/\">LaTeX Stack Exchange</a>.</p>",
-        "document.title": "Interactive Introduction to \\( \\LaTeX \\)",
+        "document.title": "Interactive Introduction to LaTeX",
         "githubForkLink": "Fork me on GitHub",
         "headerAbout": "<a href=\"#\">About</a>",
         "headerDisplayLanguage": "Language",
