@@ -29,6 +29,7 @@ const main = () => {
         wrap: true,
         showGutter: true,
         fadeFoldWidgets: false,
+        showFoldWidgets: false,
         showPrintMargin: false
     };
 
@@ -842,6 +843,48 @@ const main = () => {
         }
     }
 
+    function buildTableOfContents(){
+        let tocHtml = '<ul>';
+        let prevLevel = -1;
+        $('section.main-content[style*="block"] h2, section.main-content[style*="block"] div.card-header').each((_, e) => {
+            if(e.tagName.toLowerCase() === 'div'){
+                let target = e.getAttribute('data-target').replace('#step', '');
+                let heading = e.querySelector('h4').innerHTML;
+                if(prevLevel === 0)
+                    tocHtml += '<ul>';
+                tocHtml += `<li><a class="toc-link" data-target="${target}">${heading}</a></li>`;
+                if(prevLevel === -1)
+                    prevLevel = 0;
+                else
+                    prevLevel = 1;
+            }
+            else {
+                if(prevLevel === 1)
+                    tocHtml += '</ul></li>';
+
+                tocHtml += `<li><strong>${e.innerHTML}</strong>`;
+                prevLevel = 0;
+            }
+        });
+        if(prevLevel === 1)
+            tocHtml += '</ul></li>';
+        tocHtml += '</ul>';
+        $('#tableofcontents').html(tocHtml);
+        document.querySelectorAll('a.toc-link').forEach((element) => {
+            const stepId = element.getAttribute('data-target');
+            element.addEventListener('click', () => {
+                $(`#step${stepId}.collapse`).collapse('show');
+                window.location.hash = '';
+                window.location.hash = `#stepheading${stepId}`;
+                let offset = $(`#stepheading${stepId}`).offset();
+                $('html, body').animate({
+                    scrollTop: offset.top,
+                    scrollLeft: offset.left
+                });
+            })
+        });
+    }
+
     function finalizer() {
         $('script[type="text/latexlesson"][toprocess]').each((index, element) => {
             element.removeAttribute('toprocess');
@@ -909,46 +952,7 @@ const main = () => {
             }
         ).on('typeahead:select', typeaheadEventHandler);
 
-        // Build table of contents
-        let tocHtml = '<ul>';
-        let prevLevel = -1;
-        $('section.main-content[style*="block"] h2, section.main-content[style*="block"] div.card-header').each((_, e) => {
-            if(e.tagName.toLowerCase() === 'div'){
-                let target = e.getAttribute('data-target').replace('#step', '');
-                let heading = e.querySelector('h4').innerHTML;
-                if(prevLevel === 0)
-                    tocHtml += '<ul>';
-                tocHtml += `<li><a class="toc-link" data-target="${target}">${heading}</a></li>`;
-                if(prevLevel === -1)
-                    prevLevel = 0;
-                else
-                    prevLevel = 1;
-            }
-            else {
-                if(prevLevel === 1)
-                    tocHtml += '</ul></li>';
-
-                tocHtml += `<li><strong>${e.innerHTML}</strong>`;
-                prevLevel = 0;
-            }
-        });
-        if(prevLevel === 1)
-            tocHtml += '</ul></li>';
-        tocHtml += '</ul>';
-        $('#tableofcontents').html(tocHtml);
-        document.querySelectorAll('a.toc-link').forEach((element) => {
-            const stepId = element.getAttribute('data-target');
-            element.addEventListener('click', () => {
-                $(`#step${stepId}.collapse`).collapse('show');
-                window.location.hash = '';
-                window.location.hash = `#stepheading${stepId}`;
-                let offset = $(`#stepheading${stepId}`).offset();
-                $('html, body').animate({
-                    scrollTop: offset.top,
-                    scrollLeft: offset.left
-                });
-            })
-        });
+        buildTableOfContents();
 
         $('#searchForm').off('submit').on('submit', () => {typeaheadEventHandler(); return false});
 
@@ -981,7 +985,7 @@ const main = () => {
             darkSwitch.checked = (theme === 'dark');
             aceEditorOptions.theme = theme === 'dark' ? 'ace/theme/clouds_midnight' : 'ace/theme/chrome';
             $('.latex-source-area').each((_, element) =>
-                element.editorInstance && element.editorInstance.setOption('theme', aceEditorOptions.theme)
+                element.editorInstance && element.editorInstance.setTheme(aceEditorOptions.theme)
             );
         }
 
@@ -1004,7 +1008,6 @@ const main = () => {
         });
         btn.addEventListener('click', () => document.body.scrollTop = document.documentElement.scrollTop = 0);
     }
-
 
     initializeDarkThemeSwitch();
     setScrollToTopButton();
