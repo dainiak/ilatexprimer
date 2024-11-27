@@ -56,7 +56,7 @@ const I18N_STRINGS_ALL = {
         "headerEditorInstances": "Number of source code editor instances",
         "headerInteractivityMode": "When to process the LaTeX source code",
         "headerMathEngine": "Math display engine",
-        "headerOptions": "Options",
+        "headerOptions": "Settings",
         "headerSourceResultRatio": "Result/source code window ratio",
         "headerTOC": "<a href=\"#\">Table of Contents</a>",
         "headerTheme": "Theme",

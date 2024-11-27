@@ -13,7 +13,7 @@ and so on. The list of all the commands for Greek letter typesetting can be foun
 \section{Math mode fonts}
 \par OK, now that we’ve learned how to typeset Greek letters, what do we do if we want to typeset a latin letter, but with some special font? One of the common cases is the typesetting of the number sets \(\mathbb{N}, \mathbb{Z}, \mathbb{Q}, \mathbb{R}\)\index{blackboard bold mathematical font=\mathbb}. Or, for instance, roman “non-italic” font for probability measure operator \(\mathrm{P}\) or for operators \(\mathrm{diam}, \mathrm{argmin}\)\index{math roman font=math straight font=math non-italic font=\mathrm}, etc. Sometimes we need the following “calligraphic”, “hand-written” letters: \(\mathcal{A}\)\index{\mathcal=calligraphic mathematical font=hand-written mathematical font} or, perhaps, an even more resembling the hand-writing \(\mathscr{A}\)\index{\mathscr=calligraphic mathematical font=hand-written mathematical font}. Somewhat more rare, but still used, is the gothic font: \( \mathfrak{B} \)\index{\mathfrak=gothic font}. Well, if you have looked into the \LaTeX-code of the current section, you now know how to make \LaTeX typeset that: with commands \verb"\mathbb", \verb"\mathrm", \verb"\mathcal", \verb"\mathscr" and others. A more comprehensive list of font commands can be found \href{https://tex.stackexchange.com/a/58124}{here}. Oh, boy, that’s a lot of commands just for setting the font! But don’t worry, it is all memorized when actually being used. For now, I recommend having the printed list of commands that you believe to be useful to you in front of you when you typeset your first texts. In a month of actively using \LaTeX you are likely to no longer need this list;)
 
-\section{Exercise}
+\section{Exercise: indices, powers and Greek letters}
 \begin{staticpart}
 Typeset the following:\htmlblockquote{\par If one takes two rational numbers \(\showSourceOnClick \alpha\) and \(\showSourceOnClick \beta\) from the set of rationals \(\showSourceOnClick \mathbb{Q} \), then the number \(\showSourceOnClick (\alpha+\beta)^2\) is also going to be rational. By the way, one can find a number in \(\showSourceOnClick \mathbb{R}\), say \(\showSourceOnClick \gamma\), such that \(\showSourceOnClick \gamma^2\) is rational, but the \(\showSourceOnClick \gamma\) is not. Think of how to find two \emph{irrational} numbers \(\showSourceOnClick \alpha_1\) and \(\showSourceOnClick \alpha_2\), such that the number \(\showSourceOnClick \alpha_1^{\alpha_2}\) is \emph{rational}.}
 \end{staticpart}
@@ -45,7 +45,7 @@ the second one looks better.
 \section{More on delimiters}
 \par Besides the most common delimiters like parentheses, brackets and braces there are many, there are some other commonly used paired delimiters, for example: \( \lvert x \rvert \) (or just \( |x| \)), \( \lVert x \rVert \) (or like this: \( \| x \| \)), \( \lfloor x \rfloor \), \( \lceil x \rceil\). Of course, \verb"\left" and \verb"\right" can be used with all there paired delimiters as well.\index{norm=double vertical bar=\lVert=\rVert,ceiling function=\lceil=\rceil,floor function=\lfloor=\rfloor,absolute value=vertical bar=\lvert=\rvert=\|}
 
-\section{Exercise}
+\section{Exercise: roots, fractions, and delimiters}
 \begin{staticpart}
 Typeset the following: \[\showSourceOnClick \sqrt[4]{\left\lvert\frac{a}{b}+\frac{c}{d}\right\rvert}=\frac{|ad+bc|^{1/4}}{|bd|^{1/4}}\]
 \end{staticpart}
@@ -65,7 +65,7 @@ The following is about how arrows are typed using commands \verb"\rightarrow", \
 
 \par To put an arrow above an expression, you can use the command \verb"\overrightarrow"\index{\overrightarrow=arrow above expression}: \(\overrightarrow{abc}\). I think, you can guess what, for example, the command \verb"\underleftarrow" does ;)\index{\overleftarrow,\underleftarrow=arrow under expression,\underrightarrow=arrow under expression}
 
-\section{Exercise}
+\section{Exercise: logical symbols and arrows}
 \begin{staticpart}
 Type the formulas: \[\showSourceOnClick  \forall x\forall y(\lnot (x\land y)=\lnot x\lor \lnot y) \] \[\showSourceOnClick  x^2 = y^2 \iff x=y \lor x+y=0 \]
 \end{staticpart}
@@ -89,7 +89,7 @@ We created spaces with the commands \verb"\quad" (inserts quadruple space), \ver
 \[\int_{-\pi}^\pi\sin x\,\mathrm{d}x.\]\index{\int=integral}
 You can also experiment with the operators \verb"\bigcap", \verb"\bigcup", \verb"\bigsqcup", important for set-theoretical formulas.\index{intersection of sets=\bigcap,union of sets=\bigcup,disjoint union of sets=\bigsqcup}
 
-\section{Exercise}
+\section{Exercise: mathematical operators}
 \begin{staticpart}
 Type the text: \htmlblockquote{\par There exists a finite limit \[\showSourceOnClick \lim_{n\to\infty}\left(-\ln n + \sum_{k=1}^n \frac{1}{k}\right),\] named \emph{the Euler–Mascheroni constant} and enclosed within the range \(\showSourceOnClick [0.5,\,0.6]\).}
 \end{staticpart}
@@ -109,7 +109,7 @@ Type the text: \htmlblockquote{\par There exists a finite limit \[\showSourceOnC
 Notice that when textual explanations are needed within formulas, they are enclosed in the command \verb"\text"\index{placing text inside formulas=\text}, which outputs what is passed to it in text, not mathematical mode. Inside the \verb"\text" command, you can temporarily switch to mathematical mode:
 \[ \underbrace{a^3=abc}_{\text{because \(a^2=bc\)}} \]
 
-\section{Exercise}
+\section{Exercise: diacritical marks and underlining}
 \begin{staticpart}
 Type the text: \htmlblockquote{\par A number, written in binary as: \[\showSourceOnClick  \underbrace{11\ldots 1}_{\text{$k$ ones}},\] equals \(2^k-1\). By definition, we assume \(\showSourceOnClick 2^k\overset{\mathrm{def}}{=} \overbrace{2\cdot 2\cdot\ldots \cdot 2}^{\text{$k$ times}}\).}
 \end{staticpart}

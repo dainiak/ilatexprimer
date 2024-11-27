@@ -1,37 +1,41 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Alex Dainiak">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Learn the crucial LaTeX basics interactively for free in an hour with bite-sized exercises. A hands-on introduction to LaTeX and MathJax mathematical notation. Exercise-based practice with instant previews. Symbol search.">
+    <meta name="keywords" content="LaTeX tutorial, MathJax, KaTeX, mathematical notation, LaTeX online, interactive LaTeX, learn LaTeX, math typesetting, LaTeX primer">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://ilatexprimer.com">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="css/darktheme.css"/>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ace-builds@1.35.4/css/ace.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 
     <link rel="stylesheet" href="css/ilatexprimer.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js" integrity="sha512-qOBWNAMfkz+vXXgbh0Wz7qYSLZp6c14R0bZeVX2TdQxWpuKr6yHjBIM69fcF8Ve4GUX6B6AKRQJqiiAmwvmUmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ace-builds@1.35.4/src-min-noconflict/ace.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.35.4/src-min-noconflict/ext-static_highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.3/ace.min.js" integrity="sha512-faieT+YRcxd+aQZbK6m2iaKhYEKkDvwbn7n2WToge2+k6+YBlxbT/Wii5bVPUWpnXm186SPynzVfc+ME8a/a3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.3/ext-static_highlight.min.js" integrity="sha512-kzKJmeEmcmuGJMAvtXoK0FNPnyrkrOIyASmEg2yNUXron9qC/Cf5rTQgTSTLr80esrTaGidX7K1iFNNG3LSaVA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha256-5r/l3uvUx8zScgVbq2O9OrLHO5B7bmoi01J0CoE4H9Q=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" integrity="sha256-B3cK+QlDod4aEBB5S8eManNG1G1I+2PjXMdrp2uCdgQ=" crossOrigin="anonymous"></script>
 
     <script type="text/javascript" src="js/mathjax-config.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml-full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml-full.min.js" integrity="sha512-PbLRl9V4qEM7j3xggKupLNdcodHT0w+x77S/JoTWxrhPEVZ0NkTPp90bzUeTyFXsBzsaApVOZdCHIzL6o51KiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script type="text/javascript" src="js/i18n.js"></script>
     
     <script type="text/javascript" charset="utf-8" src="js/ilatexprimer.js"></script>
 
-    <title>Interactive Introduction to LaTeX</title>
+    <title>Interactive Introduction to LaTeX on the Web</title>
 </head>
 
 <body>
@@ -49,10 +53,10 @@
     </div>
     <div class="social-share">
         <div class="btn-group">
-            <a class="btn btn-outline-secondary" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa-brands fa-facebook"></i></a>
-            <a class="btn btn-outline-secondary" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F&title=Interactive%20LaTeX%20Primer"><i class="fa-brands fa-linkedin"></i></a>
-            <a class="btn btn-outline-secondary" href="https://twitter.com/home?status=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa-brands fa-x-twitter"></i></a>
-            <a class="btn btn-outline-secondary" href="https://vk.com/share.php?url=https%3A%2F%2Fdainiak.github.io%2Filatexprimer%2F"><i class="fa-brands fa-vk"></i></a>
+            <a class="btn btn-outline-secondary" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.ilatexprimer.com"><i class="fa-brands fa-facebook"></i></a>
+            <a class="btn btn-outline-secondary" href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fwww.ilatexprimer.com&title=Interactive%20LaTeX%20Primer"><i class="fa-brands fa-linkedin"></i></a>
+            <a class="btn btn-outline-secondary" href="https://twitter.com/home?status=https%3A%2F%2Fwww.ilatexprimer.com"><i class="fa-brands fa-x-twitter"></i></a>
+            <a class="btn btn-outline-secondary" href="https://vk.com/share.php?url=https%3A%2F%2Fwww.ilatexprimer.com"><i class="fa-brands fa-vk"></i></a>
         </div>
         <div class="ribbon-container">
             <div class="ribbon"><a href="https://github.com/dainiak/ilatexprimer" id="githubForkLink">Fork me on GitHub</a></div>
@@ -64,7 +68,7 @@
 
         <div class="form-group">
             <form id="searchForm" class="form-inline" role="search" action="">
-                <div class="input-group"><label for="searchInput"></label><input type="text" id="searchInput" class="form-control" autocomplete="off">
+                <div data-tg-tour="Here is a search" class="input-group"><label for="searchInput"></label><input type="text" id="searchInput" class="form-control" autocomplete="off">
                     <div class="input-group-append"><button class="btn btn-outline-secondary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button></div></div>
             </form>
         </div>
@@ -87,7 +91,7 @@
 
 
 <div class="card">
-    <div class="card-header h3 manual-collapse collapsed" data-toggle="collapse" data-target="#optionsPanel"><h4 class="h4" id="headerOptions">Options</h4></div>
+    <div class="card-header h3 manual-collapse collapsed" data-toggle="collapse" data-target="#optionsPanel"><h4 class="h4" id="headerOptions">Settings</h4></div>
 
     <div id="optionsPanel" class="card-body card-text collapse manual-collapse">
         <div class="form-group">
