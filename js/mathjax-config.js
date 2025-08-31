@@ -14,10 +14,22 @@ window.MathJax = {
             "code"
         ]
     },
+    loader: {
+        load: [
+            "input/tex/extensions/autoload",
+            "input/tex/extensions/html",
+            "input/tex/extensions/newcommand",
+            "input/tex/extensions/noerrors",
+            "input/tex/extensions/noundefined",
+            "input/tex/extensions/texhtml",
+            "input/tex/extensions/unicode",
+            'output/svg'
+        ]
+    },
     startup: {
         typeset: false,
-        ready: () => {
-            MathJax.startup.defaultReady();
+        ready: async () => {
+            await MathJax.startup.defaultReady();
         }
     },
     tex: {

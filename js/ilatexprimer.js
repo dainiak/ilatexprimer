@@ -608,20 +608,41 @@ const main = () => {
                             let span = document.createElement('span');
                             container.appendChild(span);
 
+                            const attachTooltip = (span) => {
+                                const $span = $(span);
+                                const $tooltipHost = $span.find(
+                                    mathRenderer === 'KaTeX' ? '.katex-html'
+                                        : MathJax && MathJax.tex2svg ? 'svg' : 'mjx-container'
+                                );
+                                $tooltipHost.popover({
+                                    content: $('<code></code>').text(originalSource),
+                                    html: true,
+                                    placement: 'bottom',
+                                    trigger: showTooltipOnClick ? 'click' : 'hover'
+                                }).css('cursor', 'default').attr('data-has-tooltip', true);
+                            }
+
                             if(mathRenderer === 'MathJax') {
                                 let options = MathJax.getMetricsFor(document.body, displayMode);
                                 options.display = displayMode;
-                                let mjElement = (MathJax.tex2svg || MathJax.tex2chtml)(
+                                let mjElementPromise = (MathJax.tex2chtmlPromise || MathJax.tex2svgPromise)(
                                     preparedSource,
                                     options
                                 );
 
-                                let annotation = document.createElement('annotation');
-                                annotation.setAttribute('encoding', 'application/x-tex');
-                                annotation.style.display = 'none';
-                                annotation.innerText = originalSource;
-                                mjElement.appendChild(annotation);
-                                span.appendChild(mjElement);
+                                mjElementPromise.then((mjElement) => {
+                                    let annotation = document.createElement('annotation');
+                                    annotation.setAttribute('encoding', 'application/x-tex');
+                                    annotation.style.display = 'none';
+                                    annotation.innerText = originalSource;
+                                    mjElement.appendChild(annotation);
+                                    span.appendChild(mjElement);
+                                    if(displayMode) {
+                                        span.style.display = 'block';
+                                        span.style.textAlign = 'center';
+                                    }
+                                    attachTooltip(span);
+                                })
                             }
                             else{
                                 try {
@@ -634,18 +655,9 @@ const main = () => {
                                 catch (e) {
                                     $(span).css('color', 'red').text(msgKatexUnableToDisplayFormula);
                                 }
+
+                                attachTooltip(span);
                             }
-                            const $span = $(span);
-                            const $tooltipHost = $span.find(
-                                mathRenderer === 'KaTeX' ? '.katex-html'
-                                    : MathJax && MathJax.tex2svg ? 'svg' : 'mjx-container'
-                            );
-                            $tooltipHost.popover({
-                                content: $('<code></code>').text(originalSource),
-                                html: true,
-                                placement: 'bottom',
-                                trigger: showTooltipOnClick ? 'click' : 'hover'
-                            }).css('cursor', 'default').attr('data-has-tooltip', true);
                         }
                         else {
                             container.appendChild(document.createTextNode(token));
