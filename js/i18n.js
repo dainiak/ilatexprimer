@@ -68,7 +68,7 @@ const I18N_STRINGS_ALL = {
         "msg.ProcessingMathOnPage": "Processing math on page. On slow computer this may take a while…",
         "msg.ProcessingSection": "Processing section",
         "msg.UnableToLoadThisStep": "Unable to load this step",
-        "msg.UnbalancedParenthesis": "((Несбалансированные скобки!))",
+        "msg.UnbalancedParenthesis": "((Unbalanced parentheses!))",
         "optionEditorMultiple": "Separate editor per each step (more convenient)",
         "optionEditorSingle": "Single editor instance (lower memory load)",
         "optionInteractivityHigh": "On any update of the source code (more fun)",
