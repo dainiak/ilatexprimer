@@ -1,2 +1,2 @@
 # ilatexprimer
-Interactive [LaTeX primer](https://dainiak.github.io/ilatexprimer/), powered by MathJax and ACE Editor
+Interactive [LaTeX primer](https://www.dainiak.com/ilatexprimer/), powered by MathJax and ACE Editor
