@@ -45,7 +45,7 @@ const I18N_STRINGS_ALL = {
         "btnExpandAll": "Expand all",
         "btnResetLocalStorage": "Reset progress and settings",
         "collapseExpandSteps": "Collapse/expand all steps",
-        "confirmation.CtrlEnter": "It is recommended to switch to “Ctrl+Enter only” update mode. Make the switch?",
+        "confirmation.CtrlEnter": "It is recommended to switch to \u201cCtrl+Enter only\u201d update mode. Make the switch?",
         "confirmation.KaTeXLowerCompatibility": "KaTeX supports a smaller subset of LaTeX commands than MathJax. Are you sure you want to switch?",
         "confirmation.SwitchToKaTeX": "It is recommended to use KaTeX for math display in this case. Do you want to switch to KaTeX?",
         "contentAbout": "<p>Developed by <a rel=\"author\" href=\"https://www.dainiak.com\">Alex Dainiak</a>. Email: <code>dainiak@gmail.com</code></p><p>The lesson is powered by <a href=\"https://www.mathjax.org/\">MathJax</a>, <a href=\"https://khan.github.io/KaTeX/\">KaTeX</a>, <a href=\"https://ace.c9.io\">ACE Editor</a>, <a href=\"https://getbootstrap.com/\">Bootstrap</a>. While preparing this lesson, the author benefited much from <a href=\"https://stackoverflow.com/\">Stack Overflow</a> and <a href=\"https://tex.stackexchange.com/\">LaTeX Stack Exchange</a>.</p>",
@@ -60,12 +60,12 @@ const I18N_STRINGS_ALL = {
         "headerSourceResultRatio": "Result/source code window ratio",
         "headerTOC": "<a href=\"#\">Table of Contents</a>",
         "headerTheme": "Theme",
-        "loadingToastText": "Loading…",
+        "loadingToastText": "Loading\u2026",
         "mainTitle": "Interactive Introduction to \\( \\LaTeX \\)",
         "msg.FinishedLoading": "Finished loading. Have fun!",
         "msg.KatexUnableToDisplayFormula": "(KaTeX was unable to process the formula)",
         "msg.LoadingSection": "Loading section",
-        "msg.ProcessingMathOnPage": "Processing math on page. On slow computer this may take a while…",
+        "msg.ProcessingMathOnPage": "Processing math on page. On slow computer this may take a while\u2026",
         "msg.ProcessingSection": "Processing section",
         "msg.UnableToLoadThisStep": "Unable to load this step",
         "msg.UnbalancedParenthesis": "((Unbalanced parentheses!))",
@@ -83,27 +83,35 @@ const I18N_STRINGS_ALL = {
     }
 };
 
-function setUILanguage(language=null){
-    if(!language)
+export const messages = {
+    unbalancedParenthesis: "((Unbalanced parentheses))",
+    katexUnableToDisplayFormula: "",
+    processingMathOnPage: "",
+    loadingSection: "",
+    processingSection: "",
+    unableToLoadThisStep: "",
+    finishedLoading: "",
+};
+
+export function setUILanguage(language = null) {
+    if (!language)
         language = localStorage.getItem('displayLanguage') || (navigator.languages.indexOf('ru') >= 0 ? 'ru' : 'en');
 
-    window.I18N_STRINGS = I18N_STRINGS_ALL[language];
-    window.confirmationSwitchToKaTeX = I18N_STRINGS["confirmation.SwitchToKaTeX"];
-    window.confirmationCtrlEnter = I18N_STRINGS["confirmation.CtrlEnter"];
-    window.confirmationKaTeXLowerCompatibility = I18N_STRINGS["confirmation.KaTeXLowerCompatibility"];
-    window.msgUnbalancedParenthesis = I18N_STRINGS["msg.UnbalancedParenthesis"] || "((Unbalanced parentheses))";
-    window.msgKatexUnableToDisplayFormula = I18N_STRINGS["msg.KatexUnableToDisplayFormula"];
-    window.msgProcessingMathOnPage = I18N_STRINGS["msg.ProcessingMathOnPage"];
-    window.msgLoadingSection = I18N_STRINGS["msg.LoadingSection"];
-    window.msgProcessingSection = I18N_STRINGS["msg.ProcessingSection"];
-    window.msgUnableToLoadThisStep = I18N_STRINGS["msg.UnableToLoadThisStep"];
-    window.msgFinishedLoading = I18N_STRINGS["msg.FinishedLoading"];
+    const strings = I18N_STRINGS_ALL[language];
 
-    document.title = I18N_STRINGS['document.title'] ? I18N_STRINGS['document.title'] : document.title;
-    
-    for(let paramId in I18N_STRINGS){
-        if(!paramId.includes('.')){
-            (document.getElementById(paramId) || {}).innerHTML = I18N_STRINGS[paramId];
+    messages.unbalancedParenthesis = strings["msg.UnbalancedParenthesis"] || "((Unbalanced parentheses))";
+    messages.katexUnableToDisplayFormula = strings["msg.KatexUnableToDisplayFormula"];
+    messages.processingMathOnPage = strings["msg.ProcessingMathOnPage"];
+    messages.loadingSection = strings["msg.LoadingSection"];
+    messages.processingSection = strings["msg.ProcessingSection"];
+    messages.unableToLoadThisStep = strings["msg.UnableToLoadThisStep"];
+    messages.finishedLoading = strings["msg.FinishedLoading"];
+
+    document.title = strings['document.title'] ? strings['document.title'] : document.title;
+
+    for (let paramId in strings) {
+        if (!paramId.includes('.')) {
+            (document.getElementById(paramId) || {}).innerHTML = strings[paramId];
         }
     }
     (document.querySelector(`input[type=radio][name=displayLanguage][value=${language}]`) || {}).checked = true;

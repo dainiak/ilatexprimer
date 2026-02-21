@@ -220,3 +220,5 @@ class Typeahead {
     this.activeIndex = -1;
   }
 }
+
+export default Typeahead;

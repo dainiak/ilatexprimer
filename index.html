@@ -25,13 +25,53 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" integrity="sha256-a5CUQ+bI9uXSTMSHL+kJpUdwdiBHrpXj809V7C5vbDo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/copy-tex.min.js" integrity="sha256-B3cK+QlDod4aEBB5S8eManNG1G1I+2PjXMdrp2uCdgQ=" crossorigin="anonymous"></script>
 
-    <script type="text/javascript" src="js/mathjax-config.js"></script>
+    <script>
+    window.MathJax = {
+        options: {
+            enableMenu: false,
+            renderActions: {
+                addMenu: [0, '', '']
+            },
+            skipHtmlTags: [
+                "svg", "script", "noscript", "style", "textarea", "pre", "code"
+            ]
+        },
+        loader: {
+            load: [
+                "input/tex/extensions/autoload",
+                "input/tex/extensions/html",
+                "input/tex/extensions/newcommand",
+                "input/tex/extensions/noerrors",
+                "input/tex/extensions/noundefined",
+                "input/tex/extensions/texhtml",
+                "input/tex/extensions/unicode",
+                'output/svg'
+            ]
+        },
+        startup: {
+            typeset: false,
+            ready: async () => {
+                await MathJax.startup.defaultReady();
+            }
+        },
+        tex: {
+            processEnvironments: true,
+            processRefs: true,
+            tags: 'ams',
+            tagSide: 'right',
+            useLabelIds: true,
+            macros: {
+                par: '',
+                showSourceOnClick: '',
+                hrf: ['{\\href{#1}{#2}}', 2],
+                ttp: ['{\\href{[tooltip]#1}{#2}}', 2]
+            }
+        }
+    };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@4.1.1/tex-svg.js"></script>
 
-    <script type="text/javascript" src="js/i18n.js"></script>
-    <script type="text/javascript" src="js/typeahead.js"></script>
-
-    <script type="text/javascript" charset="utf-8" src="js/ilatexprimer.js"></script>
+    <script type="module" src="/js/main.js"></script>
 
     <title>Interactive Introduction to LaTeX on the Web</title>
 </head>
