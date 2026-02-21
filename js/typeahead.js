@@ -13,13 +13,17 @@ class Typeahead {
       delay: 300,          // Debounce delay in ms
       limit: 5,            // Maximum number of results to show
       displayKey: 'name',  // Object key to display in the input upon selection
-      renderItem: (item) => `<button class="dropdown-item" type="button">${item[this.options.displayKey] || item}</button>`,
+      renderItem: (item) => {
+        const text = typeof item === 'object' ? item[this.options.displayKey] : String(item);
+        return `<button class="dropdown-item" type="button">${this.highlightMatches(text)}</button>`;
+      },
       onSelect: (item) => {} // Callback when an item is chosen
     }, options);
 
     this.debounceTimeout = null;
     this.currentItems = [];
     this.activeIndex = -1;
+    this.queryTokens = [];
 
     this.initUI();
     this.bindEvents();
@@ -82,14 +86,14 @@ class Typeahead {
     }
     // Handle static Array (Local Data)
     else if (Array.isArray(this.options.source)) {
-      const queryTokens = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
-      if (queryTokens.length === 0) {
+      this.queryTokens = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+      if (this.queryTokens.length === 0) {
         this.closeMenu();
         return;
       }
       results = this.options.source.filter(item => {
         const text = (typeof item === 'object' ? item[this.options.displayKey] : String(item)).toLowerCase();
-        return queryTokens.every(token => text.includes(token));
+        return this.queryTokens.every(token => text.includes(token));
       });
     }
 
@@ -164,6 +168,47 @@ class Typeahead {
     if (this.activeIndex > -1) {
       items[this.activeIndex].classList.add('active');
     }
+  }
+
+  escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  highlightMatches(text) {
+    if (!this.queryTokens.length) return this.escapeHtml(text);
+
+    const lower = text.toLowerCase();
+    const ranges = [];
+    for (const token of this.queryTokens) {
+      let pos = 0;
+      while ((pos = lower.indexOf(token, pos)) !== -1) {
+        ranges.push([pos, pos + token.length]);
+        pos += 1;
+      }
+    }
+    if (ranges.length === 0) return this.escapeHtml(text);
+
+    // Sort and merge overlapping ranges
+    ranges.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+    const merged = [ranges[0].slice()];
+    for (let i = 1; i < ranges.length; i++) {
+      const last = merged[merged.length - 1];
+      if (ranges[i][0] <= last[1]) {
+        last[1] = Math.max(last[1], ranges[i][1]);
+      } else {
+        merged.push(ranges[i].slice());
+      }
+    }
+
+    let result = '';
+    let prev = 0;
+    for (const [start, end] of merged) {
+      result += this.escapeHtml(text.slice(prev, start));
+      result += '<strong>' + this.escapeHtml(text.slice(start, end)) + '</strong>';
+      prev = end;
+    }
+    result += this.escapeHtml(text.slice(prev));
+    return result;
   }
 
   openMenu() {
