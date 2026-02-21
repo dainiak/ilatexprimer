@@ -64,7 +64,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         container.appendChild(span);
 
                         const attachTooltip = (span) => {
-                            const tooltipHost = span.querySelector(MathJax?.tex2svg ? 'svg' : 'mjx-container');
+                            const tooltipHost = span.querySelector('mjx-container') || span.querySelector('svg');
                             if (!tooltipHost) return;
                             const codeEl = document.createElement('code');
                             codeEl.textContent = originalSource;
@@ -73,8 +73,9 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                                 html: true,
                                 placement: 'bottom',
                                 trigger: showTooltipOnClick ? 'click' : 'hover',
+                                container: 'body',
                             });
-                            tooltipHost.style.cursor = 'default';
+                            tooltipHost.style.cursor = showTooltipOnClick ? 'pointer' : 'default';
                             tooltipHost.setAttribute('data-has-tooltip', 'true');
                         };
 
