@@ -16,32 +16,42 @@ export function processLessonContainer(container, containerFootprint) {
     container.parentNode.removeChild(container);
 
     for (let i = 1; i < lessonSteps.length; i += 2) {
-        const stepIdString = containerFootprint + '-' + ((i + 1) / 2).toString();
+        const stepIdString = `${containerFootprint}-${(i + 1) / 2}`;
         let headerText = lessonSteps[i].trim();
         headerText = headerText.substring('\\section{'.length, headerText.length - 1);
-        let bodyText = lessonSteps[i + 1].trim().replace(/\\index{([^}]+)}/g, ($0, $1) => {
-            $1.split(',').forEach((keywordGroup) => {
-                keywordGroup = keywordGroup.trim().split('=').map((s) => s.trim());
-                keywordGroup.forEach((keyword) => {
-                    if (!(keyword in state.keywordIndex)) {
-                        state.keywordIndex[keyword] = {
-                            steps: []
-                        };
-                    }
-                    state.keywordIndex[keyword].steps.includes(stepIdString) || state.keywordIndex[keyword].steps.push(stepIdString);
-
-                    if (keywordGroup.length > 1) {
-                        if (state.keywordIndex[keyword].synonyms === undefined) {
-                            state.keywordIndex[keyword].synonyms = [];
+        let bodyText = lessonSteps[i + 1]
+            .trim()
+            .replace(/\\index{([^}]+)}/g, ($0, $1) => {
+                $1.split(',').forEach((keywordGroup) => {
+                    keywordGroup = keywordGroup
+                        .trim()
+                        .split('=')
+                        .map((s) => s.trim());
+                    keywordGroup.forEach((keyword) => {
+                        if (!(keyword in state.keywordIndex)) {
+                            state.keywordIndex[keyword] = {
+                                steps: [],
+                            };
                         }
-                        keywordGroup.forEach(
-                            (synonym) => state.keywordIndex[keyword].synonyms.includes(synonym) || state.keywordIndex[keyword].synonyms.push(synonym)
-                        );
-                    }
+                        state.keywordIndex[keyword].steps.includes(stepIdString) ||
+                            state.keywordIndex[keyword].steps.push(stepIdString);
+
+                        if (keywordGroup.length > 1) {
+                            if (state.keywordIndex[keyword].synonyms === undefined) {
+                                state.keywordIndex[keyword].synonyms = [];
+                            }
+                            keywordGroup.forEach(
+                                (synonym) =>
+                                    state.keywordIndex[keyword].synonyms.includes(synonym) ||
+                                    state.keywordIndex[keyword].synonyms.push(synonym),
+                            );
+                        }
+                    });
                 });
-            });
-            return '';
-        }).trim().replace(/^\\par\s+/, '');
+                return '';
+            })
+            .trim()
+            .replace(/^\\par\s+/, '');
 
         const staticPartMatch = bodyText.match(/^\\begin{staticpart}([\s\S]+?)\\end{staticpart}([\s\S]*)$/);
         let staticPart = '';
@@ -56,14 +66,25 @@ export function processLessonContainer(container, containerFootprint) {
         stepHeader.id = `stepheading${stepIdString}`;
         stepHeader.setAttribute('data-bs-toggle', 'collapse');
         stepHeader.setAttribute('data-bs-target', `#step${stepIdString}`);
+        stepHeader.setAttribute('aria-expanded', state.startCollapsed ? 'false' : 'true');
+        stepHeader.setAttribute('aria-controls', `step${stepIdString}`);
         if (state.startCollapsed) stepHeader.classList.add('collapsed');
-        const h4 = createElement('h4', 'h4', headerText);
-        stepHeader.appendChild(h4);
+        const h3 = createElement('h3', 'h4', headerText);
+        stepHeader.appendChild(h3);
         stepCard.appendChild(stepHeader);
 
         const stepCardBody = createElement('div', 'card-body step-body collapse');
         stepCardBody.id = `step${stepIdString}`;
+        stepCardBody.setAttribute('role', 'region');
+        stepCardBody.setAttribute('aria-labelledby', `stepheading${stepIdString}`);
         if (!state.startCollapsed) stepCardBody.classList.add('show');
+
+        stepCardBody.addEventListener('show.bs.collapse', () => {
+            stepHeader.setAttribute('aria-expanded', 'true');
+        });
+        stepCardBody.addEventListener('hide.bs.collapse', () => {
+            stepHeader.setAttribute('aria-expanded', 'false');
+        });
 
         if (staticPart) {
             const staticPartArea = createElement('div', 'card-text static-part-area');
@@ -75,8 +96,7 @@ export function processLessonContainer(container, containerFootprint) {
         }
 
         const savedSource = localStorage.getItem(`${state.displayLanguage}-${stepIdString}`);
-        if (savedSource)
-            bodyText = savedSource;
+        if (savedSource) bodyText = savedSource;
 
         const sourceArea = createElement('div', 'card-text latex-source-area col-md-5');
         sourceArea.id = `lsa${stepIdString}`;
@@ -99,8 +119,7 @@ export function processLessonContainer(container, containerFootprint) {
             const editor = e.target;
             if (editor.editorInstance) {
                 editor.editorInstance.resize();
-            }
-            else {
+            } else {
                 const div = document.createElement('div');
                 div.textContent = editor.originalText;
                 editor.innerHTML = '';
@@ -110,44 +129,40 @@ export function processLessonContainer(container, containerFootprint) {
         });
 
         sourceArea.addEventListener('click', () => {
-            const newEditor = attachAce(sourceArea);
-            newEditor && newEditor.focus();
+            attachAce(sourceArea)?.focus();
         });
 
         sourceArea.originalText = sourceArea.textContent;
         sourceArea.rda = resultDisplayArea;
-        if (state.singleAceInstance)
-            state.aceHighlighter(sourceArea, state.aceEditorOptions);
-        else
-            attachAce(sourceArea);
+        if (state.singleAceInstance) state.aceHighlighter(sourceArea, state.aceEditorOptions);
+        else attachAce(sourceArea);
     }
 }
 
-export function loadExternalScriptsAndFinalize(finalizer) {
-    const externalScript = document.querySelector(`section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src][toload]`);
-    if (!externalScript) {
-        return finalizer.call();
-    }
+export async function loadExternalScriptsAndFinalize(finalizer) {
+    let externalScript;
+    while (
+        (externalScript = document.querySelector(
+            `section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src][toload]`,
+        ))
+    ) {
+        const src = `content/${state.displayLanguage}/tex/${externalScript.dataset['src']}`;
+        externalScript.removeAttribute('data-src');
+        externalScript.removeAttribute('toload');
+        externalScript.setAttribute('toprocess', 'true');
 
-    const src = `content/${state.displayLanguage}/tex/${externalScript.dataset['src']}`;
-    externalScript.removeAttribute('data-src');
-    externalScript.removeAttribute('toload');
-    externalScript.setAttribute('toprocess', 'true');
+        setLoadingStatus(`${messages.loadingSection} "${src}"\u2026`);
 
-    setLoadingStatus(`${messages.loadingSection} "${src}"\u2026`);
-
-    fetch(src)
-        .then(response => {
-            return response.ok ? response.text() : `\\section((${messages.unableToLoadThisStep}))}`;
-        })
-        .then(text => {
-            externalScript.textContent = text;
-            loadExternalScriptsAndFinalize(finalizer);
-        })
-        .catch(() => {
+        try {
+            const response = await fetch(src);
+            externalScript.textContent = response.ok
+                ? await response.text()
+                : `\\section{(${messages.unableToLoadThisStep})}`;
+        } catch {
             if (!externalScript.textContent.trim()) {
-                externalScript.textContent = `\\section((${messages.unableToLoadThisStep}))}`;
+                externalScript.textContent = `\\section{(${messages.unableToLoadThisStep})}`;
             }
-            loadExternalScriptsAndFinalize(finalizer);
-        });
+        }
+    }
+    finalizer.call();
 }

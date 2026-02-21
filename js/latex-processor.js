@@ -1,20 +1,9 @@
-import { state } from './state.js';
-
 export function removeLaTeXComments(text) {
     return text
-        .replace(
-            /\\verb".*?"/gm,
-            ($0) => $0.replace(/%/g, '\\%')
-        ).replace(
-            /(\\)?%/gm,
-            ($0, $1) => $1 ? $0 : '\ufeff'
-        ).replace(
-            /\\verb".*?"/gm,
-            ($0) => $0.replace(/\\%/g, '%')
-        ).replace(
-            /\ufeff.*$/um,
-            ''
-        );
+        .replace(/\\verb".*?"/gm, ($0) => $0.replace(/%/g, '\\%'))
+        .replace(/(\\)?%/gm, ($0, $1) => ($1 ? $0 : '\ufeff'))
+        .replace(/\\verb".*?"/gm, ($0) => $0.replace(/\\%/g, '%'))
+        .replace(/\ufeff.*$/mu, '');
 }
 
 export function processLaTeXText(text) {
@@ -33,57 +22,41 @@ export function processLaTeXText(text) {
                 '`': '\u0300',
                 '^': '\u0302',
                 '"': '\u0308',
-                'H': '\u030B',
+                H: '\u030B',
                 '~': '\u0303',
-                'c': '\u0327',
-                'k': '\u0328',
+                c: '\u0327',
+                k: '\u0328',
                 '=': '\u0304',
-                'b': '\u0331',
+                b: '\u0331',
                 '.': '\u0307',
-                'd': '\u0323',
-                'r': '\u030A',
-                'u': '\u0306',
-                'v': '\u030C'
+                d: '\u0323',
+                r: '\u030A',
+                u: '\u0306',
+                v: '\u030C',
             };
 
             return $3 + (accentMap[$2] || '');
         })
-        .replace(
-            /(\\)?\\t{(..)}/g,
-            ($0, $1, $2) => $1 ? $0 : $2 + '\u0361'
-        ).replace(
-            /(\\)?\\l{}/,
-            ($0, $1) => $1 ? $0 : '\u0142'
-        ).replace(
-            /(\\)?\\o(?=[^a-zA-Z])/,
-            ($0, $1) => $1 ? $0 : '\u00f8'
-        ).replace(
-            /(\\)?\\,/g,
-            ($0, $1) => $1 ? $0 : ' '
-        ).replace(
-            /(\\)?\\ /g,
-            ($0, $1) => $1 ? $0 : ' '
-        ).replace(
-            /(\\)?~/g,
-            ($0, $1) => $1 ? $0 : ' '
-        ).replace(
-            /(\\)?\\textbackslash/g,
-            ($0, $1) => $1 ? $0 : '\\'
-        ).replace(
-            /(\\)?\\textasciitilde/g,
-            ($0, $1) => $1 ? $0 : '~'
-        ).replace(
-            /\\%/g,
-            '%'
-        );
+        .replace(/(\\)?\\t{(..)}/g, ($0, $1, $2) => ($1 ? $0 : $2 + '\u0361'))
+        .replace(/(\\)?\\l{}/, ($0, $1) => ($1 ? $0 : '\u0142'))
+        .replace(/(\\)?\\o(?=[^a-zA-Z])/, ($0, $1) => ($1 ? $0 : '\u00f8'))
+        .replace(/(\\)?\\,/g, ($0, $1) => ($1 ? $0 : ' '))
+        .replace(/(\\)?\\ /g, ($0, $1) => ($1 ? $0 : ' '))
+        .replace(/(\\)?~/g, ($0, $1) => ($1 ? $0 : ' '))
+        .replace(/(\\)?\\textbackslash/g, ($0, $1) => ($1 ? $0 : '\\'))
+        .replace(/(\\)?\\textasciitilde/g, ($0, $1) => ($1 ? $0 : '~'))
+        .replace(/\\%/g, '%');
 }
 
 export function processLaTeXTextInElement(element) {
     element.childNodes.forEach((node) => {
         if (node.nodeType === 3) {
             element.replaceChild(document.createTextNode(processLaTeXText(node.textContent)), node);
-        }
-        else if (node.nodeType === 1 && !node.classList.contains('latex-source-area') && !['script', 'noscript', 'style', 'textarea', 'pre', 'code'].includes(node.nodeName.toLowerCase())) {
+        } else if (
+            node.nodeType === 1 &&
+            !node.classList.contains('latex-source-area') &&
+            !['script', 'noscript', 'style', 'textarea', 'pre', 'code'].includes(node.nodeName.toLowerCase())
+        ) {
             processLaTeXTextInElement(node);
         }
     });
@@ -108,8 +81,7 @@ export function parseCommandArgs(text) {
                 remainder = text.substring(i);
                 break;
             }
-        }
-        else if (i === 0 && currentSymbol === '{') {
+        } else if (i === 0 && currentSymbol === '{') {
             command = '';
             valuePos = 1;
         }
@@ -135,13 +107,12 @@ export function parseCommandArgs(text) {
     return {
         command: command,
         value: value,
-        remainder: remainder
+        remainder: remainder,
     };
 }
 
 export function flattenElement(element) {
-    if (element.tagName.toLowerCase() !== 'span' || element.classList.length !== 0)
-        return;
+    if (element.tagName.toLowerCase() !== 'span' || element.classList.length !== 0) return;
     let children = [];
     element.childNodes.forEach((node) => children.push(node));
     children.forEach((node) => {
@@ -183,13 +154,13 @@ export function preprocessLaTeX(element) {
         const tagEl = document.createElement(tag);
         tagEl.appendChild(document.createTextNode(tokens.value));
         element.appendChild(tagEl);
-        element.querySelectorAll(`:scope > ${tag}`).forEach(e => preprocessLaTeX(e));
+        element.querySelectorAll(`:scope > ${tag}`).forEach((e) => preprocessLaTeX(e));
         if (tokens.remainder) {
             const span = document.createElement('span');
             span.appendChild(document.createTextNode(tokens.remainder));
             element.appendChild(span);
         }
-        element.querySelectorAll(':scope > span').forEach(e => preprocessLaTeX(e));
+        element.querySelectorAll(':scope > span').forEach((e) => preprocessLaTeX(e));
         flattenElement(element);
         return;
     }
@@ -205,8 +176,7 @@ export function preprocessLaTeX(element) {
         let remainderNoBrake = postfix.charAt(0);
         if (['.', ','].includes(remainderNoBrake)) {
             postfix = postfix.substring(1);
-        }
-        else {
+        } else {
             remainderNoBrake = '';
         }
         element.textContent = '';
@@ -226,7 +196,7 @@ export function preprocessLaTeX(element) {
         const postfixSpan = document.createElement('span');
         postfixSpan.appendChild(document.createTextNode(postfix));
         element.appendChild(postfixSpan);
-        element.querySelectorAll(':scope > span').forEach(e => preprocessLaTeX(e));
+        element.querySelectorAll(':scope > span').forEach((e) => preprocessLaTeX(e));
         flattenElement(element);
         return;
     }
@@ -240,20 +210,18 @@ export function preprocessLaTeX(element) {
         prefixSpan.appendChild(document.createTextNode(prefix));
         element.appendChild(prefixSpan);
 
-        if (['\\textbf', "\\textit", "\\emph"].includes(tokens.command)) {
+        if (['\\textbf', '\\textit', '\\emph'].includes(tokens.command)) {
             let tag = tokens.command === '\\textbf' ? 'strong' : 'em';
             const tagEl = document.createElement(tag);
             tagEl.appendChild(document.createTextNode(tokens.value));
             element.appendChild(tagEl);
-            element.querySelectorAll(`:scope > ${tag}`).forEach(e => preprocessLaTeX(e));
-        }
-        else if (tokens.command === '\\subsection') {
-            const h5 = createElement('h5', 'mt-4');
-            h5.appendChild(document.createTextNode(tokens.value));
-            element.appendChild(h5);
-            element.querySelectorAll(':scope > h5').forEach(e => preprocessLaTeX(e));
-        }
-        else if (tokens.command === '\\href') {
+            element.querySelectorAll(`:scope > ${tag}`).forEach((e) => preprocessLaTeX(e));
+        } else if (tokens.command === '\\subsection') {
+            const h4 = createElement('h4', 'mt-4');
+            h4.appendChild(document.createTextNode(tokens.value));
+            element.appendChild(h4);
+            element.querySelectorAll(':scope > h4').forEach((e) => preprocessLaTeX(e));
+        } else if (tokens.command === '\\href') {
             const href = tokens.value;
             tokens = parseCommandArgs(tokens.remainder);
             const a = document.createElement('a');
@@ -261,42 +229,39 @@ export function preprocessLaTeX(element) {
             a.href = href;
             a.appendChild(document.createTextNode(tokens.value));
             element.appendChild(a);
-            element.querySelectorAll(':scope > a').forEach(e => preprocessLaTeX(e));
-        }
-        else if (tokens.command === '\\par') {
+            element.querySelectorAll(':scope > a').forEach((e) => preprocessLaTeX(e));
+        } else if (tokens.command === '\\par') {
             element.appendChild(document.createElement('p'));
         }
 
         const remainderSpan = document.createElement('span');
         remainderSpan.appendChild(document.createTextNode(tokens.remainder));
         element.appendChild(remainderSpan);
-        element.querySelectorAll(':scope > span').forEach(e => preprocessLaTeX(e));
+        element.querySelectorAll(':scope > span').forEach((e) => preprocessLaTeX(e));
         flattenElement(element);
         return;
     }
 
-    text = text.replace(
-        /\\TeX(?!\$)/g,
-        state.mathRenderer === 'MathJax' ? '\\(\\TeX\\)' : 'TeX'
-    ).replace(
-        /\\LaTeX(?!\$)/g,
-        state.mathRenderer === 'MathJax' ? '\\(\\LaTeX\\)' : 'LaTeX'
-    )
+    text = text.replace(/\\TeX(?!\$)/g, '\\(\\TeX\\)').replace(/\\LaTeX(?!\$)/g, '\\(\\LaTeX\\)');
 
     const environments = [
-        'equation', 'equation*', 'gather', 'gather*',
-        'align', 'align*', 'alignat', 'alignat*',
-        'multline', 'multline*'
+        'equation',
+        'equation*',
+        'gather',
+        'gather*',
+        'align',
+        'align*',
+        'alignat',
+        'alignat*',
+        'multline',
+        'multline*',
     ];
 
-    environments.forEach(env => {
+    environments.forEach((env) => {
         text = text.replace(`\\begin{${env}}`, `\\[\\begin{${env}}`).replace(`\\end{${env}}`, `\\end{${env}}\\]`);
     });
 
-    text = text.replace(
-        /\\(ref|eqref)\{([^}]+)}(?!\$)/g,
-        '\\(\\$1{$2}\\)'
-    )
+    text = text.replace(/\\(ref|eqref)\{([^}]+)}(?!\$)/g, '\\(\\$1{$2}\\)');
 
     element.textContent = text;
 }

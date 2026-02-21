@@ -1,10 +1,9 @@
 export const state = {
     displayLanguage: localStorage.getItem('displayLanguage') || (navigator.languages.includes('ru') ? 'ru' : 'en'),
-    displayTheme: localStorage.getItem('theme') || (
-        window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    ),
-    mathRenderer: localStorage.getItem('mathRenderer') !== 'KaTeX' ? 'MathJax' : 'KaTeX',
-    typesetOnChange: localStorage.getItem('typesetOnChange') !== null ? localStorage.getItem('typesetOnChange') === 'true' : true,
+    displayTheme:
+        localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+    typesetOnChange:
+        localStorage.getItem('typesetOnChange') !== null ? localStorage.getItem('typesetOnChange') === 'true' : true,
     singleAceInstance: localStorage.getItem('singleAceInstance') === 'true' || false,
     startCollapsed: true,
     highlightIntro: false,
@@ -20,9 +19,9 @@ export const state = {
         showGutter: true,
         fadeFoldWidgets: false,
         showFoldWidgets: false,
-        showPrintMargin: false
+        showPrintMargin: false,
     },
     aceHighlighter: null,
     searchInput: null,
-    loadingToastText: null
+    loadingToastText: null,
 };

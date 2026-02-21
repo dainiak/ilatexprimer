@@ -1,9 +1,9 @@
-import { state } from './state.js';
+import { Popover } from 'bootstrap';
 import { processLaTeXTextInElement } from './latex-processor.js';
 import { messages } from './i18n.js';
 
 export function mathRendererFactory(element, performPostprocessing, callback) {
-    performPostprocessing = (performPostprocessing !== false);
+    performPostprocessing = performPostprocessing !== false;
 
     function findClosingToken(tokens, start) {
         let stack = [];
@@ -13,20 +13,16 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                 stack.push(token);
                 continue;
             } else if (token === '\\)' || token === '\\]') {
-                if (stack.length === 0)
-                    return null;
+                if (stack.length === 0) return null;
 
                 let prevToken = stack.pop();
-                if (!(prevToken === '\\(' && token === '\\)' || prevToken === '\\[' && token === '\\]'))
+                if (!((prevToken === '\\(' && token === '\\)') || (prevToken === '\\[' && token === '\\]')))
                     return null;
             } else if (token === '$' || token === '$$') {
-                if (stack.length === 0 || stack[stack.length - 1] !== token)
-                    stack.push(token);
-                else
-                    stack.pop();
+                if (stack.length === 0 || stack[stack.length - 1] !== token) stack.push(token);
+                else stack.pop();
             }
-            if (stack.length === 0)
-                return i;
+            if (stack.length === 0) return i;
         }
         return null;
     }
@@ -68,29 +64,26 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         container.appendChild(span);
 
                         const attachTooltip = (span) => {
-                            const tooltipHost = span.querySelector(
-                                state.mathRenderer === 'KaTeX' ? '.katex-html'
-                                    : MathJax && MathJax.tex2svg ? 'svg' : 'mjx-container'
-                            );
+                            const tooltipHost = span.querySelector(MathJax?.tex2svg ? 'svg' : 'mjx-container');
                             if (!tooltipHost) return;
                             const codeEl = document.createElement('code');
                             codeEl.textContent = originalSource;
-                            new bootstrap.Popover(tooltipHost, {
+                            new Popover(tooltipHost, {
                                 content: codeEl.outerHTML,
                                 html: true,
                                 placement: 'bottom',
-                                trigger: showTooltipOnClick ? 'click' : 'hover'
+                                trigger: showTooltipOnClick ? 'click' : 'hover',
                             });
                             tooltipHost.style.cursor = 'default';
                             tooltipHost.setAttribute('data-has-tooltip', 'true');
-                        }
+                        };
 
-                        if (state.mathRenderer === 'MathJax') {
+                        {
                             let options = MathJax.getMetricsFor(document.body, displayMode);
                             options.display = displayMode;
                             let mjElementPromise = (MathJax.tex2chtmlPromise || MathJax.tex2svgPromise)(
                                 preparedSource,
-                                options
+                                options,
                             );
 
                             mjElementPromise.then((mjElement) => {
@@ -105,45 +98,27 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                                     span.style.textAlign = 'center';
                                 }
                                 attachTooltip(span);
-                            })
+                            });
                         }
-                        else {
-                            try {
-                                katex.render(preparedSource, span, {
-                                    displayMode: displayMode,
-                                    throwOnError: false
-                                });
-                                const annotation = span.querySelector('annotation[encoding="application/x-tex"]');
-                                if (annotation) annotation.textContent = originalSource;
-                            }
-                            catch (e) {
-                                span.style.color = 'red';
-                                span.textContent = messages.katexUnableToDisplayFormula;
-                            }
-
-                            attachTooltip(span);
-                        }
-                    }
-                    else {
+                    } else {
                         container.appendChild(document.createTextNode(token));
                     }
                 }
-            }
-            else if (node.nodeType === 1 && !['code', 'pre'].includes(node.nodeName.toLowerCase())) {
+            } else if (node.nodeType === 1 && !['code', 'pre'].includes(node.nodeName.toLowerCase())) {
                 processWithRenderer(node);
             }
         }
     }
 
     return () => {
-        (state.mathRenderer === 'MathJax') && MathJax.texReset();
+        MathJax.texReset();
         processWithRenderer(element);
         performPostprocessing && processLaTeXTextInElement(element);
 
-        if (state.mathRenderer === 'MathJax' && MathJax.tex2chtml) {
+        if (MathJax.tex2chtml) {
             MathJax.startup.document.clear();
             MathJax.startup.document.updateDocument();
         }
-        callback && callback.call();
-    }
+        callback?.call();
+    };
 }

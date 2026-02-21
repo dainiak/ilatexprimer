@@ -26,7 +26,7 @@
     width: 200px;
     text-align: center;
     position: absolute;
-    background: gray;
+    background: #555;
     border-top: black dashed 2px;
     border-bottom: black dashed 2px;
     color: whitesmoke;
@@ -60,20 +60,23 @@ ul.virtual {
     cursor: default;
 }
 
-.card-header h4::before {
-    content: "\25bc";
+.card-header h2::before,
+.card-header h3::before {
+    content: '\25bc';
     margin-right: 0.2em;
     float: left;
     color: grey;
     transition: transform 0.4s ease-in-out;
 }
 
-.card-header.collapsed h4::before {
+.card-header.collapsed h2::before,
+.card-header.collapsed h3::before {
     transform: rotate(-90deg);
     transition: transform 0.4s ease-in-out;
 }
 
-.card-header.step-header, .card-header.manual-collapse {
+.card-header.step-header,
+.card-header.manual-collapse {
     cursor: pointer;
 }
 
@@ -83,7 +86,10 @@ blockquote {
     padding-left: 1em;
 }
 
-div.card-body a, div.card-body a:visited, div.card-body a:active, div.card-body a:hover {
+div.card-body a,
+div.card-body a:visited,
+div.card-body a:active,
+div.card-body a:hover {
     color: inherit;
     border-bottom: 2px cadetblue dotted;
     text-decoration: inherit;
@@ -94,13 +100,17 @@ div.card-body a:hover {
     cursor: pointer;
 }
 
-[data-bs-theme=dark] div.card-body a:hover {
+[data-bs-theme='dark'] div.card-body a:hover {
     background-color: #333;
 }
 
 @keyframes blinking {
-    0%   {opacity: 0.3}
-    100% {opacity: 1.0}
+    0% {
+        opacity: 0.3;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .highlighted-blinking {
@@ -133,7 +143,6 @@ div.card-body a:hover {
     margin-left: 0.25em;
 }
 
-
 /* CSS for displaying latex-generated lists */
 div > ol {
     list-style-type: none;
@@ -152,17 +161,17 @@ div > ol > li > ol > li > ol {
 
 div > ol > li:before {
     counter-increment: enumeratei;
-    content: counter(enumeratei) ". ";
+    content: counter(enumeratei) '. ';
 }
 
 div > ol > li > ol > li:before {
     counter-increment: enumerateii;
-    content: counter(enumeratei) "." counter(enumerateii) ". ";
+    content: counter(enumeratei) '.' counter(enumerateii) '. ';
 }
 
 div > ol > li > ol > li > ol > li:before {
     counter-increment: enumerateiii;
-    content: counter(enumeratei) "." counter(enumerateii) "." counter(enumerateiii) ". ";
+    content: counter(enumeratei) '.' counter(enumerateii) '.' counter(enumerateiii) '. ';
 }
 
 #scrollToTop {
@@ -197,7 +206,7 @@ div > ol > li > ol > li > ol > li:before {
     animation: lds-spinner 1.2s linear infinite;
 }
 .lds-spinner div:after {
-    content: " ";
+    content: ' ';
     display: block;
     position: absolute;
     top: 2px;
@@ -262,4 +271,28 @@ div > ol > li > ol > li > ol > li:before {
     100% {
         opacity: 0;
     }
+}
+
+.language-flag-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline;
+}
+
+:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+fieldset > legend {
+    float: none;
+    width: auto;
 }

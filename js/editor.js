@@ -1,3 +1,5 @@
+import ace from 'ace-builds';
+import { Popover } from 'bootstrap';
 import { state } from './state.js';
 import { preprocessLaTeX } from './latex-processor.js';
 import { mathRendererFactory } from './math-renderer.js';
@@ -5,12 +7,11 @@ import { mathRendererFactory } from './math-renderer.js';
 let aceStaticStyle = null;
 
 export function attachAce(sourceArea) {
-    if (sourceArea.editorInstance)
-        return;
+    if (sourceArea.editorInstance) return;
 
     const div = document.createElement('div');
 
-    if (typeof sourceArea.originalText != 'string') {
+    if (typeof sourceArea.originalText !== 'string') {
         sourceArea.originalText = sourceArea.textContent;
     }
     div.textContent = sourceArea.textContent.trim();
@@ -22,28 +23,27 @@ export function attachAce(sourceArea) {
 
     editor.$blockScrolling = Infinity;
     editor.setOptions(state.aceEditorOptions);
-    editor.commands.removeCommands(["gotoline", "find"]);
+    editor.commands.removeCommands(['gotoline', 'find']);
     editor.resize();
     editor.gotoLine(1);
 
     function typesetEditorContent() {
         const rda = editor.container.parentNode.rda;
-        rda.querySelectorAll('[data-has-tooltip]').forEach(el => {
-            const popover = bootstrap.Popover.getInstance(el);
-            popover && popover.dispose();
+        rda.querySelectorAll('[data-has-tooltip]').forEach((el) => {
+            Popover.getInstance(el)?.dispose();
         });
         const value = editor.getValue().trim();
         localStorage.setItem(`${state.displayLanguage}-${rda.id.replace('rda', '')}`, value);
         rda.textContent = value.replace(/^\\par\s+/, '');
         preprocessLaTeX(rda);
-        state.mathRenderer === 'MathJax' && MathJax.texReset();
+        MathJax.texReset();
         mathRendererFactory(rda)();
     }
 
     editor.commands.addCommand({
         name: 'typeset',
         bindKey: 'Ctrl-Enter',
-        exec: typesetEditorContent
+        exec: typesetEditorContent,
     });
 
     editor.on('change', () => state.typesetOnChange && typesetEditorContent());
@@ -67,16 +67,13 @@ export function attachAce(sourceArea) {
             state.aceHighlighter(sourceArea, state.aceEditorOptions);
             if (!aceStaticStyle) {
                 aceStaticStyle = document.querySelector('style#ace_highlight');
-                aceStaticStyle.innerHTML = aceStaticStyle.innerHTML.replace(
-                    /\bfont-size:[^;]+;/, 'font-size: 90%;'
-                ).replace(
-                    /\bfont-family:[^;]+;/,
-                    'font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;'
-                )
-                .replace(
-                    '.ace_line {',
-                    '.ace_line { line-height: 1.2em;'
-                );
+                aceStaticStyle.innerHTML = aceStaticStyle.innerHTML
+                    .replace(/\bfont-size:[^;]+;/, 'font-size: 90%;')
+                    .replace(
+                        /\bfont-family:[^;]+;/,
+                        'font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;',
+                    )
+                    .replace('.ace_line {', '.ace_line { line-height: 1.2em;');
             }
         }
     };
