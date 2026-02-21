@@ -1,6 +1,4 @@
 const main = () => {
-    const $ = window.$;
-
     let displayLanguage = localStorage.getItem('displayLanguage') || (navigator.languages.includes('ru') ? 'ru' : 'en');
     let displayTheme = localStorage.getItem('theme') || (
         window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -12,11 +10,11 @@ const main = () => {
     let singleAceInstance = localStorage.getItem('singleAceInstance') === 'true' || false;
     let keywordIndex = {};
     const aceHighlighter = ace.require('ace/ext/static_highlight');
-    const $searchInput = $('#searchInput');
-    const $loadingToastText = $('#loadingToastText');
+    const searchInput = document.getElementById('searchInput');
+    const loadingToastText = document.getElementById('loadingToastText');
 
     function setLoadingStatus(text) {
-        $loadingToastText.text(text);
+        loadingToastText.textContent = text;
     }
 
     const aceEditorOptions = {
@@ -24,8 +22,8 @@ const main = () => {
         mode: 'ace/mode/latex',
         minLines: 3,
         maxLines: Infinity,
-        fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace', // mimic Bootstrap
-        fontSize: '90%', // mimic Bootstrap
+        fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+        fontSize: '90%',
         wrap: true,
         showGutter: true,
         fadeFoldWidgets: false,
@@ -57,7 +55,10 @@ const main = () => {
 
         function typesetEditorContent() {
             const rda = editor.container.parentNode.rda;
-            $(rda).find('[data-has-tooltip]').popover('dispose');
+            rda.querySelectorAll('[data-has-tooltip]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                popover && popover.dispose();
+            });
             const value = editor.getValue().trim();
             localStorage.setItem(`${displayLanguage}-${rda.id.replace('rda', '')}`, value);
             rda.textContent = value.replace(/^\\par\s+/, '');
@@ -111,26 +112,43 @@ const main = () => {
         return editor;
     }
 
-    $(`input[type=radio][name=mathRenderer][value="${mathRenderer}"]`)[0].checked = true;
-    $(`input[type=radio][name=typesetOnChange][value="${typesetOnChange.toString()}"]`)[0].checked = true;
-    $(`input[type=radio][name=singleAceInstance][value="${singleAceInstance.toString()}"]`)[0].checked = true;
+    const checkedRadio = (name, value) => {
+        const el = document.querySelector(`input[type=radio][name="${name}"][value="${value}"]`);
+        if (el) el.checked = true;
+    };
+
+    checkedRadio('mathRenderer', mathRenderer);
+    checkedRadio('typesetOnChange', typesetOnChange.toString());
+    checkedRadio('singleAceInstance', singleAceInstance.toString());
 
     if (localStorage.getItem('areaWidthRatio') !== null){
-        $(`input[type=radio][name=areaWidthRatio][value="${localStorage.getItem('areaWidthRatio')}"]`)[0].checked = true;
+        checkedRadio('areaWidthRatio', localStorage.getItem('areaWidthRatio'));
     }
 
     function setAreaWidthRatio(ratioCode) {
-        ['.latex-source-area', '.result-display-area'].forEach(selector => {
-            $(selector).removeClass((_, className) => (className.match(/(^|\s)col-md-\d+/g) || []).join(' '));
+        document.querySelectorAll('.latex-source-area, .result-display-area').forEach(el => {
+            const toRemove = [];
+            el.classList.forEach(cls => { if (/^col-md-\d+$/.test(cls)) toRemove.push(cls); });
+            toRemove.forEach(cls => el.classList.remove(cls));
         });
 
         if (ratioCode !== '0') {
-            $('.latex-source-area').addClass(`col-md-${ratioCode}`).show().trigger('resize');
-            $('.result-display-area').addClass(`col-md-${12 - parseInt(ratioCode)}`);
+            document.querySelectorAll('.latex-source-area').forEach(el => {
+                el.classList.add(`col-md-${ratioCode}`);
+                el.style.display = '';
+                el.dispatchEvent(new Event('resize'));
+            });
+            document.querySelectorAll('.result-display-area').forEach(el => {
+                el.classList.add(`col-md-${12 - parseInt(ratioCode)}`);
+            });
         }
         else {
-            $('.latex-source-area').not('.force-source-visibility .latex-source-area').hide();
-            $('.result-display-area').not('.force-source-visibility .result-display-area').addClass('col-md-12');
+            document.querySelectorAll('.latex-source-area').forEach(el => {
+                if (!el.closest('.force-source-visibility')) el.style.display = 'none';
+            });
+            document.querySelectorAll('.result-display-area').forEach(el => {
+                if (!el.closest('.force-source-visibility')) el.classList.add('col-md-12');
+            });
         }
     }
 
@@ -144,53 +162,79 @@ const main = () => {
         masterReload();
     }
 
+    function onRadioChange(name, handler) {
+        document.querySelectorAll(`input[type=radio][name="${name}"]`).forEach(el => {
+            el.addEventListener('change', handler);
+        });
+    }
+
     function setUIEventHandlers() {
-        $('input[type=radio][name=singleAceInstance]').on('change', (e) => {
+        onRadioChange('singleAceInstance', (e) => {
             singleAceInstance = (e.target.value === 'true');
             localStorage.setItem('singleAceInstance', singleAceInstance);
             if(singleAceInstance)
-                $('.latex-source-area').each((_, element) => element.editorInstance.customDestroyer.call());
+                document.querySelectorAll('.latex-source-area').forEach(el => el.editorInstance && el.editorInstance.customDestroyer.call());
             else
-                $('.latex-source-area').each((_, element) => attachAce(element));
+                document.querySelectorAll('.latex-source-area').forEach(el => attachAce(el));
         });
 
-        $('input[type=radio][name=typesetOnChange]').on('change', (e) => {
+        onRadioChange('typesetOnChange', (e) => {
             typesetOnChange = (e.target.value === 'true');
             localStorage.setItem('typesetOnChange', typesetOnChange);
         });
 
-        $('input[type=radio][name=mathRenderer]').on('change', (e) => {
+        onRadioChange('mathRenderer', (e) => {
             mathRenderer = e.target.value;
             localStorage.setItem('mathRenderer', mathRenderer);
         });
 
-        $('input[type=radio][name=areaWidthRatio]').on('change', (e) => {
+        onRadioChange('areaWidthRatio', (e) => {
             localStorage.setItem('areaWidthRatio', e.target.value.toString());
             setAreaWidthRatio(e.target.value.toString());
         });
 
-        $('input[type=radio][name=displayLanguage]').on('change', (e) => reloadWithLanguage((e.target.value).toString()));
-        $('.language-flag').on('click', (e)=> {reloadWithLanguage(e.target.dataset['language'])});
+        onRadioChange('displayLanguage', (e) => reloadWithLanguage(e.target.value.toString()));
 
-        $('#btnCollapseAll').on('click', ()=> {
-            $(document.body).find('[data-has-tooltip]').popover('hide');
-            $('[data-toggle="collapse"]').not('.manual-collapse').addClass('collapsed');
-            $('.step-body.collapse').not('.manual-collapse').removeClass('show');
-        });
-        $('#btnExpandAll').on('click', () => {
-            $('[data-toggle="collapse"]').not('.manual-collapse').removeClass('collapsed');
-            $('.step-body.collapse').not('.manual-collapse').addClass('show');
+        document.querySelectorAll('.language-flag').forEach(el => {
+            el.addEventListener('click', (e) => reloadWithLanguage(e.target.dataset['language']));
         });
 
-        $('#btnResetLocalStorage').on('click', () => {localStorage.clear(); location.reload();});
+        document.getElementById('btnCollapseAll').addEventListener('click', () => {
+            document.body.querySelectorAll('[data-has-tooltip]').forEach(el => {
+                const popover = bootstrap.Popover.getInstance(el);
+                popover && popover.hide();
+            });
+            document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
+                if (!el.classList.contains('manual-collapse')) el.classList.add('collapsed');
+            });
+            document.querySelectorAll('.step-body.collapse').forEach(el => {
+                if (!el.classList.contains('manual-collapse')) el.classList.remove('show');
+            });
+        });
 
-        $('.social-share a').on('click', (e) => {
-            window.open(
-                e.target.href,
-                '',
-                'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'
-            );
-            return false;
+        document.getElementById('btnExpandAll').addEventListener('click', () => {
+            document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(el => {
+                if (!el.classList.contains('manual-collapse')) el.classList.remove('collapsed');
+            });
+            document.querySelectorAll('.step-body.collapse').forEach(el => {
+                if (!el.classList.contains('manual-collapse')) el.classList.add('show');
+            });
+        });
+
+        document.getElementById('btnResetLocalStorage').addEventListener('click', () => {
+            localStorage.clear();
+            location.reload();
+        });
+
+        document.querySelectorAll('.social-share a').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open(
+                    el.href,
+                    '',
+                    'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'
+                );
+            });
         });
     }
 
@@ -200,37 +244,41 @@ const main = () => {
 
         function highlightKeywordInFormulas(element, keyword) {
             if(mathRenderer === 'MathJax'){
-                $(element).find('annotation[encoding="application/x-tex"]').each((_, e) => {
-                    let $e = $(e);
-                    $e.text().includes(keyword) && $e.parent().addClass('highlighted-blinking');
+                element.querySelectorAll('annotation[encoding="application/x-tex"]').forEach(e => {
+                    if (e.textContent.includes(keyword)) e.parentElement.classList.add('highlighted-blinking');
                 });
             }
             else {
-                $(element).find('.katex-html').each((_, e)=> {
-                    let $e = $(e);
-                    if ($e.closest('.katex').find('annotation[encoding="application/x-tex"]').text().includes(keyword)) {
-                        $e.addClass('highlighted-blinking');
+                element.querySelectorAll('.katex-html').forEach(e => {
+                    if (e.closest('.katex').querySelector('annotation[encoding="application/x-tex"]').textContent.includes(keyword)) {
+                        e.classList.add('highlighted-blinking');
                     }
                 });
             }
         }
 
         let stepList = keywordIndex[keyword].steps;
-        $('.collapse').each((_, element) => {
-            $(element).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(0, 1);
+        document.querySelectorAll('.collapse').forEach(element => {
+            element.querySelectorAll('.highlighted-blinking').forEach(el => {
+                el.classList.remove('highlighted-blinking');
+                el.style.opacity = 1;
+            });
             if (element.id && element.id.toString().match(/^step\d/) && !stepList.includes(element.id.toString().replace(/^step/, ''))) {
-                $(element).find('[data-has-tooltip]').popover('hide');
-                $(element).collapse('hide');
+                element.querySelectorAll('[data-has-tooltip]').forEach(el => {
+                    const popover = bootstrap.Popover.getInstance(el);
+                    popover && popover.hide();
+                });
+                bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide();
             }
         });
 
         for (let i = 0; i < stepList.length; ++i) {
             let stepSelector = `#step${stepList[i]}`;
             let stepDOMnode = document.querySelector(stepSelector);
-            $(stepDOMnode).collapse('show');
+            bootstrap.Collapse.getOrCreateInstance(stepDOMnode, {toggle: false}).show();
             highlightKeywordInFormulas(stepDOMnode, keyword);
 
-            let editorInstance = $(`${stepSelector} .latex-source-area`)[0].editorInstance || {findAll: () => {}};
+            let editorInstance = document.querySelector(`${stepSelector} .latex-source-area`).editorInstance || {findAll: () => {}};
 
             if (keywordIndex[keyword].synonyms) {
                 keywordIndex[keyword].synonyms.forEach(synonym => highlightKeywordInFormulas(stepDOMnode, synonym));
@@ -251,11 +299,10 @@ const main = () => {
                 });
             }
         }
-        let offset = $(`#step${stepList[0]}`).offset();
-        $('html, body').animate({
-            scrollTop: offset.top,
-            scrollLeft: offset.left
-        });
+        const firstStep = document.getElementById(`step${stepList[0]}`);
+        if (firstStep) {
+            firstStep.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
     }
 
 
@@ -282,8 +329,8 @@ const main = () => {
             .replace(/--/g, '–')
             .replace(/<</g, '«')
             .replace(/>>/g, '»')
-            .replace(/``/g, '“')
-            .replace(/''/g, '”')
+            .replace(/``/g, '\u201c')
+            .replace(/''/g, '\u201d')
             .replace(/(\\)?\\('|`|^|"|H|~|c|k|=|b|.|d|r|u|v){(.)}/g, ($0, $1, $2, $3) => {
                 if ($1) return $0;
 
@@ -312,19 +359,19 @@ const main = () => {
                 ($0, $1, $2) => $1 ? $0 : $2 + '\u0361'
             ).replace(
                 /(\\)?\\l{}/,
-                ($0, $1) => $1 ? $0 : 'ł'
+                ($0, $1) => $1 ? $0 : '\u0142'
             ).replace(
                 /(\\)?\\o(?=[^a-zA-Z])/,
-                ($0, $1) => $1 ? $0 : 'ø'
+                ($0, $1) => $1 ? $0 : '\u00f8'
             ).replace(
                 /(\\)?\\,/g,
-                ($0, $1) => $1 ? $0 : ' '
+                ($0, $1) => $1 ? $0 : ' '
             ).replace(
                 /(\\)?\\ /g,
                 ($0, $1) => $1 ? $0 : ' '
             ).replace(
                 /(\\)?~/g,
-                ($0, $1) => $1 ? $0 : ' '
+                ($0, $1) => $1 ? $0 : ' '
             ).replace(
                 /(\\)?\\textbackslash/g,
                 ($0, $1) => $1 ? $0 : '\\'
@@ -410,9 +457,15 @@ const main = () => {
         element.parentNode.removeChild(element);
     }
 
+    function createElement(tag, className, textContent) {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        if (textContent !== undefined) el.textContent = textContent;
+        return el;
+    }
+
     function preprocessLaTeX(element) {
-        const $element = $(element);
-        let text = $element.text();
+        let text = element.textContent;
         text = removeLaTeXComments(text);
 
         text = text
@@ -426,19 +479,23 @@ const main = () => {
         if (pos >= 0) {
             const prefix = text.substring(0, pos);
             const tokens = parseCommandArgs(text.substring(pos));
-            $element.text('');
+            element.textContent = '';
             if (prefix) {
-                $element.append($('<span></span>').append(document.createTextNode(prefix)));
+                const span = document.createElement('span');
+                span.appendChild(document.createTextNode(prefix));
+                element.appendChild(span);
             }
             let tag = tokens.command.substring(5);
-            $element
-                .append($(`<${tag}></${tag}>`)
-                    .append(document.createTextNode(tokens.value)));
-            $element.find(`> ${tag}`).each((i, e) => preprocessLaTeX(e));
+            const tagEl = document.createElement(tag);
+            tagEl.appendChild(document.createTextNode(tokens.value));
+            element.appendChild(tagEl);
+            element.querySelectorAll(`:scope > ${tag}`).forEach(e => preprocessLaTeX(e));
             if (tokens.remainder) {
-                $element.append($('<span></span>').append(document.createTextNode(tokens.remainder)));
+                const span = document.createElement('span');
+                span.appendChild(document.createTextNode(tokens.remainder));
+                element.appendChild(span);
             }
-            $element.find('> span').each((i, e) => preprocessLaTeX(e));
+            element.querySelectorAll(':scope > span').forEach(e => preprocessLaTeX(e));
             flattenElement(element);
             return;
         }
@@ -458,23 +515,24 @@ const main = () => {
             else {
                 remainderNoBrake = '';
             }
-            $element.text('');
-            $element.append($('<span></span>').append(document.createTextNode(prefix)));
-            if (remainderNoBrake) {
-                $element.append(
-                    $('<nobr></nobr>').append(
-                        $('<code></code>').append(document.createTextNode(verbText))
-                    ).append(
-                        document.createTextNode(remainderNoBrake)
-                    )
-                );
-            }
-            else {
-                $element.append($('<nobr></nobr>').append($('<code></code>').append(document.createTextNode(verbText))));
-            }
+            element.textContent = '';
+            const prefixSpan = document.createElement('span');
+            prefixSpan.appendChild(document.createTextNode(prefix));
+            element.appendChild(prefixSpan);
 
-            $element.append($('<span></span>').append(document.createTextNode(postfix)));
-            $element.find('> span').each((i, e)=> preprocessLaTeX(e));
+            const nobr = document.createElement('nobr');
+            const code = document.createElement('code');
+            code.appendChild(document.createTextNode(verbText));
+            nobr.appendChild(code);
+            if (remainderNoBrake) {
+                nobr.appendChild(document.createTextNode(remainderNoBrake));
+            }
+            element.appendChild(nobr);
+
+            const postfixSpan = document.createElement('span');
+            postfixSpan.appendChild(document.createTextNode(postfix));
+            element.appendChild(postfixSpan);
+            element.querySelectorAll(':scope > span').forEach(e => preprocessLaTeX(e));
             flattenElement(element);
             return;
         }
@@ -483,35 +541,42 @@ const main = () => {
         if (pos >= 0) {
             let prefix = text.substring(0, pos);
             let tokens = parseCommandArgs(text.substring(pos));
-            $element.text('');
-            $element.append($('<span></span>').append(document.createTextNode(prefix)));
+            element.textContent = '';
+            const prefixSpan = document.createElement('span');
+            prefixSpan.appendChild(document.createTextNode(prefix));
+            element.appendChild(prefixSpan);
 
             if (['\\textbf', "\\textit", "\\emph"].includes(tokens.command)) {
                 let tag = tokens.command === '\\textbf' ? 'strong' : 'em';
-                $element
-                    .append($(`<${tag}></${tag}>`)
-                        .append(document.createTextNode(tokens.value)));
-                $element.find(`> ${tag}`).each((_, e) => preprocessLaTeX(e));
+                const tagEl = document.createElement(tag);
+                tagEl.appendChild(document.createTextNode(tokens.value));
+                element.appendChild(tagEl);
+                element.querySelectorAll(`:scope > ${tag}`).forEach(e => preprocessLaTeX(e));
             }
             else if (tokens.command === '\\subsection') {
-                $element.append($('<h5 class="mt-4"></h5>').append(document.createTextNode(tokens.value)));
-                $element.find('> h5').each((i, e) => preprocessLaTeX(e));
+                const h5 = createElement('h5', 'mt-4');
+                h5.appendChild(document.createTextNode(tokens.value));
+                element.appendChild(h5);
+                element.querySelectorAll(':scope > h5').forEach(e => preprocessLaTeX(e));
             }
             else if (tokens.command === '\\href') {
                 const href = tokens.value;
                 tokens = parseCommandArgs(tokens.remainder);
-                $element
-                    .append($(`<a rel="external" href="${href}"></a>`)
-                        .append(document.createTextNode(tokens.value)));
-                $element.find('> a').each((i, e) => preprocessLaTeX(e));
+                const a = document.createElement('a');
+                a.rel = 'external';
+                a.href = href;
+                a.appendChild(document.createTextNode(tokens.value));
+                element.appendChild(a);
+                element.querySelectorAll(':scope > a').forEach(e => preprocessLaTeX(e));
             }
             else if (tokens.command === '\\par') {
-                $element.append($('<p>'));
+                element.appendChild(document.createElement('p'));
             }
 
-
-            $element.append($('<span></span>').append(document.createTextNode(tokens.remainder)));
-            $element.find('> span').each((i, e) => preprocessLaTeX(e));
+            const remainderSpan = document.createElement('span');
+            remainderSpan.appendChild(document.createTextNode(tokens.remainder));
+            element.appendChild(remainderSpan);
+            element.querySelectorAll(':scope > span').forEach(e => preprocessLaTeX(e));
             flattenElement(element);
             return;
         }
@@ -527,10 +592,9 @@ const main = () => {
         const environments = [
             'equation', 'equation*', 'gather', 'gather*',
             'align', 'align*', 'alignat', 'alignat*',
-            'multline', 'multline*' // Add more environments if needed
+            'multline', 'multline*'
         ];
 
-        // multline is not supported by KaTeX yet
         environments.forEach(env => {
             text = text.replace(`\\begin{${env}}`, `\\[\\begin{${env}}`).replace(`\\end{${env}}`, `\\end{${env}}\\]`);
         });
@@ -540,7 +604,7 @@ const main = () => {
             '\\(\\$1{$2}\\)'
         )
 
-        $element.text(text);
+        element.textContent = text;
     }
 
     function mathRendererFactory(element, performPostprocessing, callback) {
@@ -609,17 +673,21 @@ const main = () => {
                             container.appendChild(span);
 
                             const attachTooltip = (span) => {
-                                const $span = $(span);
-                                const $tooltipHost = $span.find(
+                                const tooltipHost = span.querySelector(
                                     mathRenderer === 'KaTeX' ? '.katex-html'
                                         : MathJax && MathJax.tex2svg ? 'svg' : 'mjx-container'
                                 );
-                                $tooltipHost.popover({
-                                    content: $('<code></code>').text(originalSource),
+                                if (!tooltipHost) return;
+                                const codeEl = document.createElement('code');
+                                codeEl.textContent = originalSource;
+                                new bootstrap.Popover(tooltipHost, {
+                                    content: codeEl.outerHTML,
                                     html: true,
                                     placement: 'bottom',
                                     trigger: showTooltipOnClick ? 'click' : 'hover'
-                                }).css('cursor', 'default').attr('data-has-tooltip', true);
+                                });
+                                tooltipHost.style.cursor = 'default';
+                                tooltipHost.setAttribute('data-has-tooltip', 'true');
                             }
 
                             if(mathRenderer === 'MathJax') {
@@ -650,10 +718,12 @@ const main = () => {
                                         displayMode: displayMode,
                                         throwOnError: false
                                     });
-                                    $(span).find('annotation[encoding="application/x-tex"]').text(originalSource);
+                                    const annotation = span.querySelector('annotation[encoding="application/x-tex"]');
+                                    if (annotation) annotation.textContent = originalSource;
                                 }
                                 catch (e) {
-                                    $(span).css('color', 'red').text(msgKatexUnableToDisplayFormula);
+                                    span.style.color = 'red';
+                                    span.textContent = msgKatexUnableToDisplayFormula;
                                 }
 
                                 attachTooltip(span);
@@ -685,11 +755,10 @@ const main = () => {
 
     function processLessonContainer(container, containerFootprint) {
         containerFootprint = containerFootprint || '';
-        const $container = $(container);
-        const lessonString = $container.text().trim();
+        const lessonString = container.textContent.trim();
         const lessonSteps = lessonString.split(/(^\s*\\section{.*}\s*$)/m);
-        const $lessonContainer = $('<div class="lesson-container"></div>');
-        $container.after($lessonContainer);
+        const lessonContainer = createElement('div', 'lesson-container');
+        container.after(lessonContainer);
         container.parentNode.removeChild(container);
 
         for (let i = 1; i < lessonSteps.length; i += 2) {
@@ -727,56 +796,52 @@ const main = () => {
                 bodyText = staticPartMatch[2].trim().replace(/^\\par\s+/, '');
             }
 
-            const $stepCard = $('<div class="card step-card mt-2"></div>');
+            const stepCard = createElement('div', 'card step-card mt-2');
 
-            $stepCard.append(
-                $('<div class="card-header step-header"></div>')
-                    .attr('id', `stepheading${stepIdString}`)
-                    .attr('data-toggle', 'collapse')
-                    .attr('data-target', `#step${stepIdString}`)
-                    .addClass(startCollapsed ? 'collapsed' : '')
-                    .append($('<h4 class="h4"></h4>').text(headerText))
-            );
+            const stepHeader = createElement('div', 'card-header step-header');
+            stepHeader.id = `stepheading${stepIdString}`;
+            stepHeader.setAttribute('data-bs-toggle', 'collapse');
+            stepHeader.setAttribute('data-bs-target', `#step${stepIdString}`);
+            if (startCollapsed) stepHeader.classList.add('collapsed');
+            const h4 = createElement('h4', 'h4', headerText);
+            stepHeader.appendChild(h4);
+            stepCard.appendChild(stepHeader);
 
-            const $stepCardBody = $('<div class="card-body step-body collapse"></div>')
-                .attr('id', `step${stepIdString}`)
-                .addClass(startCollapsed ? '' : 'show');
+            const stepCardBody = createElement('div', 'card-body step-body collapse');
+            stepCardBody.id = `step${stepIdString}`;
+            if (!startCollapsed) stepCardBody.classList.add('show');
 
             if (staticPart) {
-                const $staticPartArea = $('<div class="card-text static-part-area"></div>')
-                    .attr('id', `spa${stepIdString}`)
-                    .text(staticPart);
-                preprocessLaTeX($staticPartArea[0]);
-                $stepCardBody
-                    .addClass('force-source-visibility')
-                    .append($staticPartArea);
+                const staticPartArea = createElement('div', 'card-text static-part-area');
+                staticPartArea.id = `spa${stepIdString}`;
+                staticPartArea.textContent = staticPart;
+                preprocessLaTeX(staticPartArea);
+                stepCardBody.classList.add('force-source-visibility');
+                stepCardBody.appendChild(staticPartArea);
             }
 
             const savedSource = localStorage.getItem(`${displayLanguage}-${stepIdString}`);
             if(savedSource)
                 bodyText = savedSource;
 
-            const $sourceArea = $('<div class="card-text latex-source-area col-md-5"></div>')
-                .attr('id', `lsa${stepIdString}`)
-                .text(bodyText);
+            const sourceArea = createElement('div', 'card-text latex-source-area col-md-5');
+            sourceArea.id = `lsa${stepIdString}`;
+            sourceArea.textContent = bodyText;
 
-            const $resultDisplayArea = $('<div class="card-text result-display-area col-md-7"></div>')
-                .attr('id', `rda${stepIdString}`)
-                .text(bodyText);
+            const resultDisplayArea = createElement('div', 'card-text result-display-area col-md-7');
+            resultDisplayArea.id = `rda${stepIdString}`;
+            resultDisplayArea.textContent = bodyText;
 
-            preprocessLaTeX($resultDisplayArea[0]);
+            preprocessLaTeX(resultDisplayArea);
 
-            $stepCard.append(
-                $stepCardBody.append(
-                    $('<div class="row"></div>')
-                        .append($resultDisplayArea)
-                        .append($sourceArea)
-                )
-            );
+            const row = createElement('div', 'row');
+            row.appendChild(resultDisplayArea);
+            row.appendChild(sourceArea);
+            stepCardBody.appendChild(row);
+            stepCard.appendChild(stepCardBody);
+            lessonContainer.appendChild(stepCard);
 
-            $lessonContainer.append($stepCard);
-
-            $sourceArea.on('resize', (e) => {
+            sourceArea.addEventListener('resize', (e) => {
                 const editor = e.target;
                 if(editor.editorInstance) {
                     editor.editorInstance.resize();
@@ -790,17 +855,17 @@ const main = () => {
                 }
             });
 
-            $sourceArea.off('click').on('click', () => {
-                const newEditor = attachAce($sourceArea[0]);
+            sourceArea.addEventListener('click', () => {
+                const newEditor = attachAce(sourceArea);
                 newEditor && newEditor.focus();
             });
 
-            $sourceArea[0].originalText = $sourceArea[0].textContent;
-            $sourceArea[0].rda = $resultDisplayArea[0];
+            sourceArea.originalText = sourceArea.textContent;
+            sourceArea.rda = resultDisplayArea;
             if(singleAceInstance)
-                aceHighlighter($sourceArea[0], aceEditorOptions);
+                aceHighlighter(sourceArea, aceEditorOptions);
             else
-                attachAce($sourceArea[0]);
+                attachAce(sourceArea);
         }
     }
 
@@ -815,7 +880,7 @@ const main = () => {
         externalScript.removeAttribute('toload');
         externalScript.setAttribute('toprocess', 'true');
 
-        setLoadingStatus(`${msgLoadingSection} “${src}”…`);
+        setLoadingStatus(`${msgLoadingSection} "${src}"…`);
 
         fetch(src)
             .then(response => {
@@ -838,7 +903,8 @@ const main = () => {
             return;
         let stepId = window.location.hash.replace(/^#(step|stepheading)?(?=\d)/, '');
         if (document.getElementById(`stepheading${stepId}`)) {
-            $(`#step${stepId}.collapse`).collapse('show');
+            const stepEl = document.querySelector(`#step${stepId}.collapse`);
+            bootstrap.Collapse.getOrCreateInstance(stepEl, {toggle: false}).show();
             window.location.hash = '';
             window.location.hash = `#stepheading${stepId}`;
             document.getElementById(`step${stepId}`).scrollIntoView();
@@ -849,7 +915,7 @@ const main = () => {
                 if (!(kw in keywordIndex)) {
                     kw = `\\${kw}`;
                 }
-                $searchInput.val(kw);
+                searchInput.value = kw;
                 highlightKeywordEverywhere(kw);
             }
         }
@@ -858,9 +924,11 @@ const main = () => {
     function buildTableOfContents(){
         let tocHtml = '<ul>';
         let prevLevel = -1;
-        $('section.main-content[style*="block"] h2, section.main-content[style*="block"] div.card-header').each((_, e) => {
+        const visibleSection = document.querySelector('section.main-content[style*="block"]');
+        if (!visibleSection) return;
+        visibleSection.querySelectorAll('h2, div.card-header').forEach(e => {
             if(e.tagName.toLowerCase() === 'div'){
-                let target = e.getAttribute('data-target').replace('#step', '');
+                let target = e.getAttribute('data-bs-target').replace('#step', '');
                 let heading = e.querySelector('h4').innerHTML;
                 if(prevLevel === 0)
                     tocHtml += '<ul>';
@@ -881,24 +949,127 @@ const main = () => {
         if(prevLevel === 1)
             tocHtml += '</ul></li>';
         tocHtml += '</ul>';
-        $('#tableofcontents').html(tocHtml);
+        document.getElementById('tableofcontents').innerHTML = tocHtml;
         document.querySelectorAll('a.toc-link').forEach((element) => {
             const stepId = element.getAttribute('data-target');
             element.addEventListener('click', () => {
-                $(`#step${stepId}.collapse`).collapse('show');
+                const stepEl = document.querySelector(`#step${stepId}.collapse`);
+                bootstrap.Collapse.getOrCreateInstance(stepEl, {toggle: false}).show();
                 window.location.hash = '';
                 window.location.hash = `#stepheading${stepId}`;
-                let offset = $(`#stepheading${stepId}`).offset();
-                $('html, body').animate({
-                    scrollTop: offset.top,
-                    scrollLeft: offset.left
-                });
+                const heading = document.getElementById(`stepheading${stepId}`);
+                if (heading) {
+                    heading.scrollIntoView({behavior: 'smooth', block: 'start'});
+                }
             })
         });
     }
 
+    // Vanilla JS autocomplete replacing typeahead + Bloodhound
+    function initAutocomplete(inputElement, keywordList) {
+        let menu = null;
+        let activeIndex = -1;
+
+        function createMenu() {
+            if (menu) return menu;
+            menu = createElement('div', 'list-group');
+            menu.style.position = 'absolute';
+            menu.style.zIndex = '1050';
+            menu.style.width = inputElement.offsetWidth + 'px';
+            menu.style.maxHeight = '300px';
+            menu.style.overflowY = 'auto';
+            menu.style.display = 'none';
+            inputElement.parentNode.style.position = 'relative';
+            inputElement.parentNode.appendChild(menu);
+            return menu;
+        }
+
+        function hideMenu() {
+            if (menu) menu.style.display = 'none';
+            activeIndex = -1;
+        }
+
+        function tokenize(str) {
+            return str ? str.toLowerCase().split(/[^a-z\u0430-\u044f\u0451]/i).filter(Boolean) : [];
+        }
+
+        function filterKeywords(query) {
+            if (!query || query.length < 2) return [];
+            const queryTokens = tokenize(query);
+            return keywordList.filter(kw => {
+                const kwLower = kw.toLowerCase();
+                return queryTokens.some(qt => kwLower.includes(qt));
+            }).slice(0, 10);
+        }
+
+        function renderSuggestions(matches) {
+            const m = createMenu();
+            m.innerHTML = '';
+            activeIndex = -1;
+            if (matches.length === 0) {
+                m.style.display = 'none';
+                return;
+            }
+            matches.forEach((kw, idx) => {
+                const item = createElement('a', 'list-group-item list-group-item-action');
+                item.href = '#';
+                item.textContent = kw;
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    inputElement.value = kw;
+                    hideMenu();
+                    highlightKeywordEverywhere(kw);
+                });
+                item.addEventListener('mouseenter', () => {
+                    setActive(idx);
+                });
+                m.appendChild(item);
+            });
+            m.style.display = 'block';
+        }
+
+        function setActive(idx) {
+            if (!menu) return;
+            const items = menu.querySelectorAll('.list-group-item');
+            items.forEach(el => el.classList.remove('active'));
+            activeIndex = idx;
+            if (idx >= 0 && idx < items.length) {
+                items[idx].classList.add('active');
+            }
+        }
+
+        inputElement.addEventListener('input', () => {
+            const val = inputElement.value.trim();
+            renderSuggestions(filterKeywords(val));
+        });
+
+        inputElement.addEventListener('keydown', (e) => {
+            if (!menu || menu.style.display === 'none') return;
+            const items = menu.querySelectorAll('.list-group-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setActive(Math.min(activeIndex + 1, items.length - 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActive(Math.max(activeIndex - 1, 0));
+            } else if (e.key === 'Enter' && activeIndex >= 0) {
+                e.preventDefault();
+                const selected = items[activeIndex].textContent;
+                inputElement.value = selected;
+                hideMenu();
+                highlightKeywordEverywhere(selected);
+            } else if (e.key === 'Escape') {
+                hideMenu();
+            }
+        });
+
+        inputElement.addEventListener('blur', () => {
+            setTimeout(hideMenu, 200);
+        });
+    }
+
     function finalizer() {
-        $('script[type="text/latexlesson"][toprocess]').each((index, element) => {
+        document.querySelectorAll('script[type="text/latexlesson"][toprocess]').forEach((element, index) => {
             element.removeAttribute('toprocess');
             setLoadingStatus(`${msgProcessingSection} ${index}…`);
             processLessonContainer(element, (index + 1).toString());
@@ -908,95 +1079,87 @@ const main = () => {
 
         mathRendererFactory(document.body, true, () => {
             setLoadingStatus(msgFinishedLoading);
-            $('#loadingToast').fadeOut(1000);
+            const loadingToast = document.getElementById('loadingToast');
+            loadingToast.style.transition = 'opacity 1s';
+            loadingToast.style.opacity = '0';
+            setTimeout(() => { loadingToast.style.display = 'none'; }, 1000);
         })();
 
         if (!window.location.hash && startCollapsed) {
-            const $intro = $('.step-header[data-target="#step1-1"]');
-            if(highlightIntro)
-                $intro.addClass('highlighted-blinking');
+            const intro = document.querySelector('.step-header[data-bs-target="#step1-1"]');
+            if(highlightIntro && intro)
+                intro.classList.add('highlighted-blinking');
 
-            $(document.body).off('click').on('click', () => {
-                $intro.removeClass('highlighted-blinking').fadeTo(0, 1);
-                $('.fa.fa-search').removeClass('highlighted-blinking').fadeTo(0, 1);
-            });
-            const $searchIcon = $('.fa.fa-search');
-            $searchInput.off('click').on('click', () => {$searchIcon.removeClass('highlighted-blinking').fadeTo(0, 1)});
-            $searchIcon.addClass('highlighted-blinking');
-        }
-
-        let keywordIndexList = [];
-        for (let kwd in keywordIndex) {
-            keywordIndexList.push(kwd);
-        }
-
-        function typeaheadEventHandler() {
-            const kw = $searchInput.typeahead('val');
-            if ($searchInput.val() === kw) {
-                highlightKeywordEverywhere(kw);
-            }
-        }
-
-        function typeaheadTokenizer(str) {
-            return str ? str.split(/[^a-zабвгдеёжзиклмнопрстуфхцчшщьыъэюя]/i) : []
-        }
-
-        $searchInput.typeahead(
-            {
-                highlight: true,
-                hint: false,
-                minLength: 2,
-                classNames: {
-                    input: 'form-control',
-                    hint: 'form-control',
-                    menu: 'list-group',
-                    suggestion: 'list-group-item',
-                    cursor: 'active'
+            const bodyClickHandler = () => {
+                if (intro) {
+                    intro.classList.remove('highlighted-blinking');
+                    intro.style.opacity = 1;
                 }
-            },
-            {
-                name: 'keywords',
-                source: new Bloodhound({
-                    datumTokenizer: typeaheadTokenizer,
-                    queryTokenizer: typeaheadTokenizer,
-                    local: keywordIndexList
-                })
-            }
-        ).on('typeahead:select', typeaheadEventHandler);
+            };
+            document.body.addEventListener('click', bodyClickHandler, {once: true});
+        }
+
+        let keywordIndexList = Object.keys(keywordIndex);
+
+        initAutocomplete(searchInput, keywordIndexList);
 
         buildTableOfContents();
 
-        $('#searchForm').off('submit').on('submit', () => {typeaheadEventHandler(); return false});
-
-        $('.highlighted-blinking').off('focus').on('focus', (e) => {
-            $(e.target).removeClass('highlighted-blinking').fadeTo(0, 1);
+        document.getElementById('searchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const kw = searchInput.value.trim();
+            if (kw) highlightKeywordEverywhere(kw);
         });
-        $('.step-body').off('click').on('click', (e) => {$(e.target).find('.highlighted-blinking').removeClass('highlighted-blinking').fadeTo(400, 1)});
-        $('.collapse').on('hide.bs.collapse', (e) => {$(e.target).find('[data-has-tooltip]').popover('hide')});
+
+        document.querySelectorAll('.highlighted-blinking').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.classList.remove('highlighted-blinking');
+                el.style.opacity = 1;
+            });
+        });
+
+        document.querySelectorAll('.step-body').forEach(el => {
+            el.addEventListener('click', () => {
+                el.querySelectorAll('.highlighted-blinking').forEach(child => {
+                    child.classList.remove('highlighted-blinking');
+                    child.style.transition = 'opacity 0.4s';
+                    child.style.opacity = 1;
+                });
+            });
+        });
+
+        document.querySelectorAll('.collapse').forEach(el => {
+            el.addEventListener('hide.bs.collapse', () => {
+                el.querySelectorAll('[data-has-tooltip]').forEach(tooltipEl => {
+                    const popover = bootstrap.Popover.getInstance(tooltipEl);
+                    popover && popover.hide();
+                });
+            });
+        });
 
         handleLocationHash();
     }
 
     function masterReload(){
-        $('section.main-content').css('display', 'none');
-        $(`section.main-content[lang="${displayLanguage}"]`).css('display', 'block');
-        for(let s of document.querySelectorAll(`section[lang="${displayLanguage}"] > script[type="text/latexlesson"][data-src]`)){
+        document.querySelectorAll('section.main-content').forEach(el => el.style.display = 'none');
+        const activeSection = document.querySelector(`section.main-content[lang="${displayLanguage}"]`);
+        if (activeSection) activeSection.style.display = 'block';
+        document.querySelectorAll(`section[lang="${displayLanguage}"] > script[type="text/latexlesson"][data-src]`).forEach(s => {
             s.setAttribute('toload', 'true');
-        }
+        });
         keywordIndex = {};
         loadExternalScriptsAndFinalize(finalizer);
     }
 
     function initializeDarkThemeSwitch(){
-        // Adapted from https://www.cssscript.com/dark-mode-switcher-bootstrap/
         const darkSwitch = document.getElementById('darkSwitch');
         darkSwitch.checked = (displayTheme === 'dark');
 
         function applyTheme(theme){
-            document.body.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme);
             darkSwitch.checked = (theme === 'dark');
             aceEditorOptions.theme = theme === 'dark' ? 'ace/theme/clouds_midnight' : 'ace/theme/chrome';
-            $('.latex-source-area').each((_, element) =>
+            document.querySelectorAll('.latex-source-area').forEach(element =>
                 element.editorInstance && element.editorInstance.setTheme(aceEditorOptions.theme)
             );
         }
@@ -1004,13 +1167,13 @@ const main = () => {
         function setTheme(theme){
             displayTheme = theme;
             localStorage.setItem('theme', displayTheme);
-            $(`input[type=radio][name=theme][value="${displayTheme}"]`)[0].checked = true;
+            checkedRadio('theme', displayTheme);
             applyTheme(theme);
         }
 
         setTheme(displayTheme);
         darkSwitch.onchange = () => {setTheme(darkSwitch.checked ? 'dark' : 'light');};
-        $('input[type=radio][name=theme]').on('change', (e) => setTheme(e.target.value.toString()));
+        onRadioChange('theme', (e) => setTheme(e.target.value.toString()));
     }
 
     function setScrollToTopButton(){

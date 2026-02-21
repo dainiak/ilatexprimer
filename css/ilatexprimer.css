@@ -94,7 +94,7 @@ div.card-body a:hover {
     cursor: pointer;
 }
 
-[data-theme=dark] div.card-body a:hover {
+[data-bs-theme=dark] div.card-body a:hover {
     background-color: #333;
 }
 
