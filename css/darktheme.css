@@ -1,4 +1,0 @@
-/* Custom dark theme overrides for elements not covered by Bootstrap 5.3 native dark mode */
-[data-bs-theme=dark] pre{color:#bebebe}
-[data-bs-theme=dark] img.icon,[data-bs-theme=dark] svg.icon{filter:invert(1)}
-[data-bs-theme=dark] #loadingToast{background-color:black;color:lightgray;border-color:#007bff}

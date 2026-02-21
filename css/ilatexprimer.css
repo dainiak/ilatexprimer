@@ -117,18 +117,20 @@ div.card-body a:hover {
     width: 20px;
     height: 1.5em;
     margin-right: 0.5em;
-    margin-top: -5px;
+    margin-top: 4px;
     cursor: pointer;
 }
 
 .dark-switch-container {
-    display: inline
+    display: inline-flex !important;
+    align-items: center;
+    vertical-align: middle;
+    margin-bottom: 0;
+    padding-top: 0;
 }
 
-.dark-switch-container i {
-    position: absolute;
-    top: 4px;
-    left: -2px;
+.dark-switch-container .form-check-label {
+    margin-left: 0.25em;
 }
 
 

@@ -965,108 +965,7 @@ const main = () => {
         });
     }
 
-    // Vanilla JS autocomplete replacing typeahead + Bloodhound
-    function initAutocomplete(inputElement, keywordList) {
-        let menu = null;
-        let activeIndex = -1;
-
-        function createMenu() {
-            if (menu) return menu;
-            menu = createElement('div', 'list-group');
-            menu.style.position = 'absolute';
-            menu.style.zIndex = '1050';
-            menu.style.width = inputElement.offsetWidth + 'px';
-            menu.style.maxHeight = '300px';
-            menu.style.overflowY = 'auto';
-            menu.style.display = 'none';
-            inputElement.parentNode.style.position = 'relative';
-            inputElement.parentNode.appendChild(menu);
-            return menu;
-        }
-
-        function hideMenu() {
-            if (menu) menu.style.display = 'none';
-            activeIndex = -1;
-        }
-
-        function tokenize(str) {
-            return str ? str.toLowerCase().split(/[^a-z\u0430-\u044f\u0451]/i).filter(Boolean) : [];
-        }
-
-        function filterKeywords(query) {
-            if (!query || query.length < 2) return [];
-            const queryTokens = tokenize(query);
-            return keywordList.filter(kw => {
-                const kwLower = kw.toLowerCase();
-                return queryTokens.some(qt => kwLower.includes(qt));
-            }).slice(0, 10);
-        }
-
-        function renderSuggestions(matches) {
-            const m = createMenu();
-            m.innerHTML = '';
-            activeIndex = -1;
-            if (matches.length === 0) {
-                m.style.display = 'none';
-                return;
-            }
-            matches.forEach((kw, idx) => {
-                const item = createElement('a', 'list-group-item list-group-item-action');
-                item.href = '#';
-                item.textContent = kw;
-                item.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    inputElement.value = kw;
-                    hideMenu();
-                    highlightKeywordEverywhere(kw);
-                });
-                item.addEventListener('mouseenter', () => {
-                    setActive(idx);
-                });
-                m.appendChild(item);
-            });
-            m.style.display = 'block';
-        }
-
-        function setActive(idx) {
-            if (!menu) return;
-            const items = menu.querySelectorAll('.list-group-item');
-            items.forEach(el => el.classList.remove('active'));
-            activeIndex = idx;
-            if (idx >= 0 && idx < items.length) {
-                items[idx].classList.add('active');
-            }
-        }
-
-        inputElement.addEventListener('input', () => {
-            const val = inputElement.value.trim();
-            renderSuggestions(filterKeywords(val));
-        });
-
-        inputElement.addEventListener('keydown', (e) => {
-            if (!menu || menu.style.display === 'none') return;
-            const items = menu.querySelectorAll('.list-group-item');
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setActive(Math.min(activeIndex + 1, items.length - 1));
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setActive(Math.max(activeIndex - 1, 0));
-            } else if (e.key === 'Enter' && activeIndex >= 0) {
-                e.preventDefault();
-                const selected = items[activeIndex].textContent;
-                inputElement.value = selected;
-                hideMenu();
-                highlightKeywordEverywhere(selected);
-            } else if (e.key === 'Escape') {
-                hideMenu();
-            }
-        });
-
-        inputElement.addEventListener('blur', () => {
-            setTimeout(hideMenu, 200);
-        });
-    }
+    // Typeahead is loaded from js/typeahead.js
 
     function finalizer() {
         document.querySelectorAll('script[type="text/latexlesson"][toprocess]').forEach((element, index) => {
@@ -1101,7 +1000,13 @@ const main = () => {
 
         let keywordIndexList = Object.keys(keywordIndex);
 
-        initAutocomplete(searchInput, keywordIndexList);
+        new Typeahead(searchInput, {
+            source: keywordIndexList,
+            minLength: 2,
+            limit: 10,
+            delay: 150,
+            onSelect: (keyword) => highlightKeywordEverywhere(keyword)
+        });
 
         buildTableOfContents();
 
