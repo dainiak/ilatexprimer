@@ -82,10 +82,14 @@ class Typeahead {
     }
     // Handle static Array (Local Data)
     else if (Array.isArray(this.options.source)) {
-      const lowerQuery = query.toLowerCase();
+      const queryTokens = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+      if (queryTokens.length === 0) {
+        this.closeMenu();
+        return;
+      }
       results = this.options.source.filter(item => {
-        const text = typeof item === 'object' ? item[this.options.displayKey] : item;
-        return text.toLowerCase().includes(lowerQuery);
+        const text = (typeof item === 'object' ? item[this.options.displayKey] : String(item)).toLowerCase();
+        return queryTokens.every(token => text.includes(token));
       });
     }
 
@@ -109,6 +113,7 @@ class Typeahead {
       div.innerHTML = this.options.renderItem(item).trim();
       const element = div.firstChild;
 
+      element.addEventListener('mousedown', (e) => e.preventDefault());
       element.addEventListener('click', () => this.selectItem(item));
       element.setAttribute('data-index', index);
       this.menu.appendChild(element);
@@ -118,6 +123,7 @@ class Typeahead {
   }
 
   selectItem(item) {
+    clearTimeout(this.debounceTimeout);
     const val = typeof item === 'object' ? item[this.options.displayKey] : item;
     this.input.value = val;
     this.closeMenu();

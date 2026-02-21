@@ -275,6 +275,7 @@ const main = () => {
         for (let i = 0; i < stepList.length; ++i) {
             let stepSelector = `#step${stepList[i]}`;
             let stepDOMnode = document.querySelector(stepSelector);
+            if (!stepDOMnode) continue;
             bootstrap.Collapse.getOrCreateInstance(stepDOMnode, {toggle: false}).show();
             highlightKeywordInFormulas(stepDOMnode, keyword);
 
