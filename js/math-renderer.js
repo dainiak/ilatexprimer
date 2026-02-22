@@ -60,7 +60,11 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         }
 
                         let preparedSource = originalSource;
-                        let span = document.createElement('span');
+                        let span = document.createElement(displayMode ? 'div' : 'span');
+                        if (displayMode) {
+                            span.style.overflowX = 'auto';
+                            span.style.width="100%";
+                        }
                         container.appendChild(span);
 
                         const attachTooltip = (span) => {
@@ -95,10 +99,6 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                                     annotation.innerText = originalSource;
                                     mjElement.appendChild(annotation);
                                     span.appendChild(mjElement);
-                                    if (displayMode) {
-                                        span.style.display = 'block';
-                                        span.style.textAlign = 'center';
-                                    }
                                     attachTooltip(span);
                                 })
                                 .catch((err) => {
