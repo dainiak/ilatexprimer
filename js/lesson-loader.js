@@ -1,7 +1,7 @@
-import { state } from './state.js';
-import { preprocessLaTeX, createElement } from './latex-processor.js';
 import { attachAce } from './editor.js';
 import { messages } from './i18n.js';
+import { createElement, preprocessLaTeX } from './latex-processor.js';
+import { state } from './state.js';
 
 const sourceToResult = new WeakMap();
 

@@ -62,7 +62,7 @@ ul.virtual {
 
 .card-header h2::before,
 .card-header h3::before {
-    content: '\25bc';
+    content: "\25bc";
     margin-right: 0.2em;
     float: left;
     color: grey;
@@ -100,7 +100,7 @@ div.card-body a:hover {
     cursor: pointer;
 }
 
-[data-bs-theme='dark'] div.card-body a:hover {
+[data-bs-theme="dark"] div.card-body a:hover {
     background-color: #333;
 }
 
@@ -169,17 +169,17 @@ div > ol > li > ol > li > ol {
 
 div > ol > li:before {
     counter-increment: enumeratei;
-    content: counter(enumeratei) '. ';
+    content: counter(enumeratei) ". ";
 }
 
 div > ol > li > ol > li:before {
     counter-increment: enumerateii;
-    content: counter(enumeratei) '.' counter(enumerateii) '. ';
+    content: counter(enumeratei) "." counter(enumerateii) ". ";
 }
 
 div > ol > li > ol > li > ol > li:before {
     counter-increment: enumerateiii;
-    content: counter(enumeratei) '.' counter(enumerateii) '.' counter(enumerateiii) '. ';
+    content: counter(enumeratei) "." counter(enumerateii) "." counter(enumerateiii) ". ";
 }
 
 #scrollToTop {
@@ -213,7 +213,7 @@ div > ol > li > ol > li > ol > li:before {
     animation: lds-spinner 1.2s linear infinite;
 }
 .lds-spinner div:after {
-    content: ' ';
+    content: " ";
     display: block;
     position: absolute;
     top: 2px;

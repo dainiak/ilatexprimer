@@ -263,7 +263,7 @@ class Typeahead {
         let prev = 0;
         for (const [start, end] of merged) {
             result += this.escapeHtml(text.slice(prev, start));
-            result += '<strong>' + this.escapeHtml(text.slice(start, end)) + '</strong>';
+            result += `<strong>${this.escapeHtml(text.slice(start, end))}</strong>`;
             prev = end;
         }
         result += this.escapeHtml(text.slice(prev));

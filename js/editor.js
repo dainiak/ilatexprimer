@@ -1,9 +1,9 @@
 import ace from 'ace-builds';
 import { Popover } from 'bootstrap';
-import { state, MONOSPACE_FONT_FAMILY } from './state.js';
 import { preprocessLaTeX } from './latex-processor.js';
-import { mathRendererFactory } from './math-renderer.js';
 import { getResultDisplayArea } from './lesson-loader.js';
+import { mathRendererFactory } from './math-renderer.js';
+import { MONOSPACE_FONT_FAMILY, state } from './state.js';
 
 let aceStaticStyle = null;
 

@@ -1,8 +1,8 @@
-import { Popover, Collapse } from 'bootstrap';
-import { state } from './state.js';
+import { Collapse, Popover } from 'bootstrap';
 import { attachAce } from './editor.js';
 import { setUILanguage } from './i18n.js';
 import { highlightKeywordEverywhere } from './search.js';
+import { state } from './state.js';
 
 export function checkedRadio(name, value) {
     const el = document.querySelector(`input[type=radio][name="${name}"][value="${value}"]`);
@@ -34,7 +34,7 @@ export function setAreaWidthRatio(ratioCode) {
             el.dispatchEvent(new Event('resize'));
         });
         resultAreas.forEach((el) => {
-            el.classList.add(`col-md-${12 - parseInt(ratioCode)}`);
+            el.classList.add(`col-md-${12 - parseInt(ratioCode, 10)}`);
         });
     } else {
         sourceAreas.forEach((el) => {
@@ -74,7 +74,7 @@ export function initializeDarkThemeSwitch() {
 }
 
 export function setScrollToTopButton() {
-    let btn = document.getElementById('scrollToTop');
+    const btn = document.getElementById('scrollToTop');
     window.addEventListener('scroll', () => {
         btn.style.display = document.body.scrollTop > 20 || document.documentElement.scrollTop > 20 ? 'block' : 'none';
     });
@@ -110,7 +110,7 @@ export function setUIEventHandlers(masterReload) {
     onRadioChange('displayLanguage', (e) => reloadWithLanguage(e.target.value.toString()));
 
     document.querySelectorAll('.language-flag-btn').forEach((el) => {
-        el.addEventListener('click', (e) => reloadWithLanguage(e.currentTarget.dataset['language']));
+        el.addEventListener('click', (e) => reloadWithLanguage(e.currentTarget.dataset.language));
     });
 
     document.getElementById('btnCollapseAll').addEventListener('click', () => {
@@ -143,7 +143,7 @@ export function setUIEventHandlers(masterReload) {
 
 export function handleLocationHash() {
     if (!window.location.hash) return;
-    let stepId = window.location.hash.replace(/^#(step|stepheading)?(?=\d)/, '');
+    const stepId = window.location.hash.replace(/^#(step|stepheading)?(?=\d)/, '');
     if (document.getElementById(`stepheading${stepId}`)) {
         const stepEl = document.querySelector(`#step${stepId}.collapse`);
         Collapse.getOrCreateInstance(stepEl, { toggle: false }).show();

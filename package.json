@@ -6,19 +6,16 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint js/",
-    "format": "prettier --write js/ css/ index.html"
+    "lint": "biome check js/",
+    "format": "biome check --write js/ css/ index.html"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.0.1",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.8.1",
-    "vite": "^6.1.0"
+    "@biomejs/biome": "^2.0.6",
+    "vite": "^8.0.0-beta.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.2.0",
-    "ace-builds": "^1.43.6",
+    "ace-builds": "^1.5.0",
     "bootstrap": "^5.3.8"
   }
 }

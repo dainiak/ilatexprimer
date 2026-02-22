@@ -1,6 +1,6 @@
-import { Popover, Collapse } from 'bootstrap';
-import { state } from './state.js';
+import { Collapse, Popover } from 'bootstrap';
 import { messages } from './i18n.js';
+import { state } from './state.js';
 
 export function highlightKeywordEverywhere(keyword) {
     if (!(keyword in state.keywordIndex)) return;
@@ -18,11 +18,7 @@ export function highlightKeywordEverywhere(keyword) {
             el.classList.remove('highlighted-blinking');
             el.style.opacity = 1;
         });
-        if (
-            element.id &&
-            element.id.toString().match(/^step\d/) &&
-            !stepSet.has(element.id.toString().replace(/^step/, ''))
-        ) {
+        if (element.id?.toString().match(/^step\d/) && !stepSet.has(element.id.toString().replace(/^step/, ''))) {
             element.querySelectorAll('[data-has-tooltip]').forEach((el) => {
                 Popover.getInstance(el)?.hide();
             });
@@ -31,13 +27,13 @@ export function highlightKeywordEverywhere(keyword) {
     });
 
     for (let i = 0; i < stepList.length; ++i) {
-        let stepSelector = `#step${stepList[i]}`;
-        let stepDOMnode = document.querySelector(stepSelector);
+        const stepSelector = `#step${stepList[i]}`;
+        const stepDOMnode = document.querySelector(stepSelector);
         if (!stepDOMnode) continue;
         Collapse.getOrCreateInstance(stepDOMnode, { toggle: false }).show();
         highlightKeywordInFormulas(stepDOMnode, keyword);
 
-        let editorInstance = document.querySelector(`${stepSelector} .latex-source-area`).editorInstance || {
+        const editorInstance = document.querySelector(`${stepSelector} .latex-source-area`).editorInstance || {
             findAll: () => {},
         };
 
@@ -46,7 +42,7 @@ export function highlightKeywordEverywhere(keyword) {
             editorInstance.findAll(
                 RegExp(
                     [...state.keywordIndex[keyword].synonyms]
-                        .map((str) => str.replace(/[\\$^[{}()?.*+|]/g, ($0) => '\\' + $0))
+                        .map((str) => str.replace(/[\\$^[{}()?.*+|]/g, ($0) => `\\${$0}`))
                         .join('|'),
                     'gi',
                 ),

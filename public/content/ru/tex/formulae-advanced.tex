@@ -1,29 +1,139 @@
 \section{Окружения пакета amsmath}
+\par В этом разделе мы рассмотрим окружения пакета \verb"amsmath", предназначенные для вёрстки многострочных формул. Эти окружения очень важны при наборе сложных математических выражений, систем уравнений и цепочек преобразований.
+
+\subsection{Окружение equation и split}
+\par Окружение \verb"equation" используется для создания нумерованных уравнений.\index{нумерованное уравнение=equation} Внутри него можно использовать окружение \verb"split", чтобы разбить длинное выражение на несколько строк, сохраняя единый номер.\index{разбиение уравнения на строки=split} Разделителем строк служит \verb"\\", а символ \verb"&" обозначает точку выравнивания:
 \begin{equation}\label{eq:one}
-\begin{split}
-  a & = b+c-d\\
-    & \quad +e-f\\
-    & =g+h\\
-    & =i
-\end{split}
+    \begin{split}
+      a & = b+c-d\\
+        & \quad +e-f\\
+        & =g+h\\
+        & =i
+    \end{split}
 \end{equation}
 
+\subsection{Окружение multline}
+\par Окружение \verb"multline" предназначено для уравнений, не помещающихся в одну строку.\index{многострочное уравнение=multline} Отличие от \verb"split" в том, что выравнивание происходит автоматически: первая строка прижимается влево, последняя --- вправо, а промежуточные строки центрируются:
 \begin{multline}
-a+b+c+d+e+f\\
-+i+j+k+l+m+n
+    a+b+c+d+e+f\\
+    +i+j+k+l+m+n
 \end{multline}
 
+\subsection{Окружение gather}
+\par Окружение \verb"gather" центрирует несколько формул по вертикали, не выравнивая их горизонтально друг относительно друга.\index{группировка уравнений=gather} Каждая формула получает свой номер:
 \begin{gather}
-a_1=b_1+c_1\\
-a_2=b_2+c_2-d_2+e_2
+    a_1=b_1+c_1\\
+    a_2=b_2+c_2-d_2+e_2
 \end{gather}
 
+\subsection{Окружение align}
+\par Окружение \verb"align" позволяет выровнять несколько уравнений по определённой точке (обычно по знаку равенства), обозначаемой символом \verb"&".\index{выравнивание уравнений=align} Каждая строка нумеруется отдельно:
 \begin{align}
-a_1& =b_1+c_1\\
-a_2& =b_2+c_2-d_2+e_2
+    a_1& =b_1+c_1\\
+    a_2& =b_2+c_2-d_2+e_2
+\end{align}
+Можно задать и несколько точек выравнивания, чтобы создать несколько столбцов с уравнениями:
+\begin{align}
+    a_1& =b_1+c_1  & c_1 &= r_1\\
+    a_2& =b_2+c_2-d_2+e_2  & c_2 &= r_2
 \end{align}
 
-\begin{alignat}{1}
-  a_1& =b_1+c_1\\
-  a_2& =b_2+c_2-d_2+e_2
+\subsection{Окружение alignat}
+\par Окружение \verb"alignat" похоже на \verb"align", но даёт более тонкий контроль над горизонтальными отступами между столбцами.\index{выравнивание уравнений без отступов=alignat} Его обязательный аргумент --- количество <<пар столбцов>>. Сравните результат с \verb"align":
+\begin{alignat}{2}
+    a_1& =b_1+c_1  &\quad c_1 &= r_1\\
+    a_2& =b_2+c_2-d_2+e_2  &\quad c_2 &= r_2
 \end{alignat}
+
+\section{Ненумерованные варианты}
+\par Все перечисленные выше окружения автоматически нумеруют формулы. Если нумерация не нужна, используйте версии со звёздочкой: \verb"equation*", \verb"multline*", \verb"gather*", \verb"align*".\index{ненумерованные уравнения=equation*=gather*=align*=multline*}
+\par Впрочем, заметьте, что \verb"equation*" не даёт никакого преимущества перед обычной записью \verb"\[…\]".
+\par Если же нужно убрать номер лишь у одного уравнения внутри нумерованного окружения, к этой строке можно добавить команду \verb"\notag" или \verb"\nonumber":\index{подавление нумерации строки=\notag=\nonumber}
+\begin{align}
+    x &= y+z \notag\\
+    a &= b+c
+\end{align}
+
+\section{Системы уравнений}
+\par Для набора систем уравнений с фигурной скобкой слева используют окружение \verb"cases":\index{система уравнений=cases}
+\[
+    |x| = \begin{cases}
+        x,  & \text{если } x \geqslant 0,\\
+        -x, & \text{если } x < 0.
+    \end{cases}
+\]
+Обратите внимание, что пояснительный текст внутри формулы оборачивается в \verb"\text{}", а символ \verb"&" разделяет формулу и условие.
+
+\section{Упражнение: окружения amsmath}
+\begin{staticpart}
+Наберите формулы, выбирая подходящие окружения.
+\subsection{Первое}
+\htmlblockquote{
+\begin{equation}
+    e=mc^2
+\end{equation}
+}
+
+\subsection{Второе}
+\htmlblockquote{
+\begin{gather*}
+    d = \sqrt{ (x_2 - x_1)^2 + (y_2 - y_1)^2 } \\
+    \cos \alpha = \frac{b^2 + c^2 - a^2}{2bc}
+\end{gather*}
+}
+
+\subsection{Третье}
+\htmlblockquote{
+\begin{multline*}
+    P(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots + \\
+    + a_n x^n = \sum_{k=0}^n a_k x^k
+\end{multline*}
+}
+
+\subsection{Четвёртое}
+\htmlblockquote{
+\begin{align}
+    \sin 2x &= 2 \sin x \cos x \\
+    1 &= \sin ^2 x + \cos ^2 x
+\end{align}
+}
+
+\subsection{Пятое}
+\htmlblockquote{
+\[
+    f(x) = \begin{cases}
+        \sin x,  & \text{если } x \geqslant 0,\\
+        x^2 + 1, & \text{если } x < 0.
+    \end{cases}
+\]
+}
+
+\end{staticpart}
+
+Первое:
+\[
+    e=mc^2
+\]
+
+\par Второе:
+\[
+    d = \sqrt{ (x_2 - x_1)^2 + (y_2 - y_1)^2 }
+    \cos \alpha = \frac{b^2 + c^2 - a^2}{2bc}
+\]
+
+\par Третье:
+\[
+    P(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \cdots +
+    + a_n x^n = \sum_{k=0}^n a_k x^k
+\]
+
+\par Четвёртое:
+\[
+    \sin 2x = 2 \sin x \cos x
+    1 = \sin ^2 x + \cos ^2 x
+\]
+
+\par Пятое:
+\[
+    f(x) = ?
+\]

@@ -1,6 +1,6 @@
 import { Popover } from 'bootstrap';
-import { processLaTeXTextInElement } from './latex-processor.js';
 import { messages } from './i18n.js';
+import { processLaTeXTextInElement } from './latex-processor.js';
 
 let renderQueue = Promise.resolve();
 
@@ -8,7 +8,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
     performPostprocessing = performPostprocessing !== false;
 
     function findClosingToken(tokens, start) {
-        let stack = [];
+        const stack = [];
         for (let i = start; i < tokens.length; ++i) {
             const token = tokens[i];
             if (token === '\\(' || token === '\\[') {
@@ -17,7 +17,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
             } else if (token === '\\)' || token === '\\]') {
                 if (stack.length === 0) return null;
 
-                let prevToken = stack.pop();
+                const prevToken = stack.pop();
                 if (!((prevToken === '\\(' && token === '\\)') || (prevToken === '\\[' && token === '\\]')))
                     return null;
             } else if (token === '$' || token === '$$') {
@@ -38,7 +38,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                     continue;
                 }
 
-                let container = document.createElement('span');
+                const container = document.createElement('span');
                 element.replaceChild(container, node);
 
                 for (let j = 0; j < tokens.length; ++j) {
@@ -50,7 +50,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                             break;
                         }
 
-                        let displayMode = ['$$', '\\['].includes(token);
+                        const displayMode = ['$$', '\\['].includes(token);
                         let originalSource = tokens.slice(j + 1, jClosing).join('');
                         j = jClosing;
 
@@ -60,8 +60,8 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                             showTooltipOnClick = true;
                         }
 
-                        let preparedSource = originalSource;
-                        let span = document.createElement('span');
+                        const preparedSource = originalSource;
+                        const span = document.createElement('span');
                         container.appendChild(span);
 
                         const attachTooltip = (span) => {
@@ -81,9 +81,9 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         };
 
                         {
-                            let options = { ...(displayMode ? metricsCache.display : metricsCache.inline) };
+                            const options = { ...(displayMode ? metricsCache.display : metricsCache.inline) };
                             options.display = displayMode;
-                            let mjElementPromise = (MathJax.tex2chtmlPromise || MathJax.tex2svgPromise)(
+                            const mjElementPromise = (MathJax.tex2chtmlPromise || MathJax.tex2svgPromise)(
                                 preparedSource,
                                 options,
                             );
@@ -91,7 +91,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                             promises.push(
                                 mjElementPromise
                                     .then((mjElement) => {
-                                        let annotation = document.createElement('annotation');
+                                        const annotation = document.createElement('annotation');
                                         annotation.setAttribute('encoding', 'application/x-tex');
                                         annotation.style.display = 'none';
                                         annotation.innerText = originalSource;

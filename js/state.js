@@ -10,7 +10,7 @@ function getLocalStorageItem(key) {
 
 function detectLanguage() {
     try {
-        if (navigator.languages && navigator.languages.includes('ru')) return 'ru';
+        if (navigator.languages?.includes('ru')) return 'ru';
     } catch {
         // ignore
     }

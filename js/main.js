@@ -1,26 +1,33 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import ace from 'ace-builds';
-import 'ace-builds/src-noconflict/mode-latex';
-import 'ace-builds/src-noconflict/theme-chrome';
-import 'ace-builds/src-noconflict/theme-clouds_midnight';
-import 'ace-builds/src-noconflict/ext-static_highlight';
-import { Popover } from 'bootstrap';
 
-import { state } from './state.js';
-import { setUILanguage, messages } from './i18n.js';
-import Typeahead from './typeahead.js';
+// ace-builds extension files reference bare `ace` at module scope;
+// Rolldown's production bundle doesn't expose it as a global, so set it explicitly.
+window.ace = ace;
+
+await Promise.all([
+    import('ace-builds/src-noconflict/mode-latex'),
+    import('ace-builds/src-noconflict/theme-chrome'),
+    import('ace-builds/src-noconflict/theme-clouds_midnight'),
+    import('ace-builds/src-noconflict/ext-static_highlight'),
+]);
+
+import { Popover } from 'bootstrap';
+import { messages, setUILanguage } from './i18n.js';
+import { loadExternalScriptsAndFinalize, processLessonContainer, setLoadingStatus } from './lesson-loader.js';
 import { mathRendererFactory } from './math-renderer.js';
-import { setLoadingStatus, processLessonContainer, loadExternalScriptsAndFinalize } from './lesson-loader.js';
 import { highlightKeywordEverywhere } from './search.js';
+import { state } from './state.js';
+import Typeahead from './typeahead.js';
 import {
+    buildTableOfContents,
     checkedRadio,
-    setAreaWidthRatio,
+    handleLocationHash,
     initializeDarkThemeSwitch,
+    setAreaWidthRatio,
     setScrollToTopButton,
     setUIEventHandlers,
-    handleLocationHash,
-    buildTableOfContents,
 } from './ui.js';
 
 let typeaheadInstance = null;
