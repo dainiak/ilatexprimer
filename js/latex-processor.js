@@ -124,7 +124,108 @@ function readCommandName(text, pos) {
     return { name: text.substring(pos, end), endPos: end };
 }
 
+function insertParBreaks(text) {
+    const result = [];
+    let i = 0;
+
+    while (i < text.length) {
+        // \verb — copy opaquely (must precede $ checks since delimiter may be $)
+        if (text[i] === '\\' && text.startsWith('verb', i + 1)) {
+            const afterVerb = i + 5;
+            if (afterVerb < text.length && !/[a-zA-Z]/.test(text[afterVerb])) {
+                const delim = text[afterVerb];
+                const end = text.indexOf(delim, afterVerb + 1);
+                if (end >= 0) {
+                    result.push(text.slice(i, end + 1));
+                    i = end + 1;
+                    continue;
+                }
+            }
+        }
+
+        // \begin{mathenv}...\end{mathenv} — copy verbatim
+        if (text[i] === '\\' && text.startsWith('begin{', i + 1)) {
+            const closeBrace = text.indexOf('}', i + 7);
+            if (closeBrace >= 0) {
+                const envName = text.slice(i + 7, closeBrace);
+                if (MATH_ENVIRONMENTS.includes(envName)) {
+                    const endTag = `\\end{${envName}}`;
+                    const endIdx = text.indexOf(endTag, closeBrace + 1);
+                    if (endIdx >= 0) {
+                        const fullEnd = endIdx + endTag.length;
+                        result.push(text.slice(i, fullEnd));
+                        i = fullEnd;
+                        continue;
+                    }
+                }
+            }
+        }
+
+        // $$ ... $$ — copy verbatim (must precede single $ check)
+        if (text[i] === '$' && i + 1 < text.length && text[i + 1] === '$') {
+            const endIdx = text.indexOf('$$', i + 2);
+            if (endIdx >= 0) {
+                result.push(text.slice(i, endIdx + 2));
+                i = endIdx + 2;
+                continue;
+            }
+        }
+
+        // \[ ... \] — copy verbatim
+        if (text[i] === '\\' && i + 1 < text.length && text[i + 1] === '[') {
+            const endIdx = text.indexOf('\\]', i + 2);
+            if (endIdx >= 0) {
+                result.push(text.slice(i, endIdx + 2));
+                i = endIdx + 2;
+                continue;
+            }
+        }
+
+        // \( ... \) — copy verbatim
+        if (text[i] === '\\' && i + 1 < text.length && text[i + 1] === '(') {
+            const endIdx = text.indexOf('\\)', i + 2);
+            if (endIdx >= 0) {
+                result.push(text.slice(i, endIdx + 2));
+                i = endIdx + 2;
+                continue;
+            }
+        }
+
+        // $ ... $ — copy verbatim (inline math, but not $$)
+        if (
+            text[i] === '$' &&
+            (i + 1 >= text.length || text[i + 1] !== '$') &&
+            (i === 0 || text[i - 1] !== '\\')
+        ) {
+            let j = i + 1;
+            while (j < text.length && !(text[j] === '$' && text[j - 1] !== '\\')) j++;
+            if (j < text.length) {
+                result.push(text.slice(i, j + 1));
+                i = j + 1;
+                continue;
+            }
+        }
+
+        // Double newline → \par (only reached outside math regions)
+        if (text[i] === '\n') {
+            let j = i + 1;
+            while (j < text.length && (text[j] === ' ' || text[j] === '\t')) j++;
+            if (j < text.length && text[j] === '\n') {
+                result.push(' \\par ');
+                i = j + 1;
+                continue;
+            }
+        }
+
+        result.push(text[i]);
+        i++;
+    }
+
+    return result.join('');
+}
+
 function tokenize(text) {
+    text = insertParBreaks(text);
     const tokens = [];
     let textStart = 0;
     let i = 0;
