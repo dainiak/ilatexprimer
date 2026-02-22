@@ -73,6 +73,12 @@ export function processLessonContainer(container, containerFootprint) {
         stepHeader.setAttribute('aria-expanded', state.startCollapsed ? 'false' : 'true');
         stepHeader.setAttribute('aria-controls', `step${stepIdString}`);
         if (state.startCollapsed) stepHeader.classList.add('collapsed');
+        stepHeader.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                stepHeader.click();
+            }
+        });
         const h3 = createElement('h3', 'h4', headerText);
         stepHeader.appendChild(h3);
         stepCard.appendChild(stepHeader);
@@ -119,17 +125,21 @@ export function processLessonContainer(container, containerFootprint) {
         stepCard.appendChild(stepCardBody);
         lessonContainer.appendChild(stepCard);
 
+        let resizeTimer = null;
         sourceArea.addEventListener('resize', (e) => {
-            const editor = e.target;
-            if (editor.editorInstance) {
-                editor.editorInstance.resize();
-            } else {
-                const div = document.createElement('div');
-                div.textContent = editor.originalText;
-                editor.innerHTML = '';
-                editor.appendChild(div);
-                state.aceHighlighter(div, state.aceEditorOptions);
-            }
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const editor = e.target;
+                if (editor.editorInstance) {
+                    editor.editorInstance.resize();
+                } else {
+                    const div = document.createElement('div');
+                    div.textContent = editor.originalText;
+                    editor.innerHTML = '';
+                    editor.appendChild(div);
+                    state.aceHighlighter(div, state.aceEditorOptions);
+                }
+            }, 150);
         });
 
         sourceArea.addEventListener('click', () => {

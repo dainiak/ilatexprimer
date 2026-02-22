@@ -1,12 +1,29 @@
 export const MONOSPACE_FONT_FAMILY = 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
 
+function getLocalStorageItem(key) {
+    try {
+        return localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+}
+
+function detectLanguage() {
+    try {
+        if (navigator.languages && navigator.languages.includes('ru')) return 'ru';
+    } catch {
+        // ignore
+    }
+    return 'en';
+}
+
 export const state = {
-    displayLanguage: localStorage.getItem('displayLanguage') || (navigator.languages.includes('ru') ? 'ru' : 'en'),
+    displayLanguage: getLocalStorageItem('displayLanguage') || detectLanguage(),
     displayTheme:
-        localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+        getLocalStorageItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
     typesetOnChange:
-        localStorage.getItem('typesetOnChange') !== null ? localStorage.getItem('typesetOnChange') === 'true' : true,
-    singleAceInstance: localStorage.getItem('singleAceInstance') === 'true' || false,
+        getLocalStorageItem('typesetOnChange') !== null ? getLocalStorageItem('typesetOnChange') === 'true' : true,
+    singleAceInstance: getLocalStorageItem('singleAceInstance') === 'true' || false,
     startCollapsed: true,
     keywordIndex: {},
     aceEditorOptions: {

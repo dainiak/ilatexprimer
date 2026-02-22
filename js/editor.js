@@ -28,16 +28,22 @@ export function attachAce(sourceArea) {
     editor.resize();
     editor.gotoLine(1);
 
+    let debounceTimer = null;
+
     function typesetEditorContent() {
         const rda = getResultDisplayArea(editor.container.parentNode);
+        if (!rda) return;
         rda.querySelectorAll('[data-has-tooltip]').forEach((el) => {
             Popover.getInstance(el)?.dispose();
         });
         const value = editor.getValue().trim();
-        localStorage.setItem(`${state.displayLanguage}-${rda.id.replace('rda', '')}`, value);
+        try {
+            localStorage.setItem(`${state.displayLanguage}-${rda.id.replace('rda', '')}`, value);
+        } catch {
+            // localStorage quota exceeded — continue without saving
+        }
         rda.textContent = value.replace(/^\\par\s+/, '');
         preprocessLaTeX(rda);
-        MathJax.texReset();
         mathRendererFactory(rda)();
     }
 
@@ -48,10 +54,14 @@ export function attachAce(sourceArea) {
     });
 
     editor.on('change', () => {
-        if (state.typesetOnChange) typesetEditorContent();
+        if (state.typesetOnChange) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(typesetEditorContent, 200);
+        }
     });
 
     editor.customDestroyer = () => {
+        clearTimeout(debounceTimer);
         const value = editor.getValue().trim();
         sourceArea.originalText = value;
         if (state.typesetOnChange) typesetEditorContent();

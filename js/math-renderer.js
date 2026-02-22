@@ -2,6 +2,8 @@ import { Popover } from 'bootstrap';
 import { processLaTeXTextInElement } from './latex-processor.js';
 import { messages } from './i18n.js';
 
+let renderQueue = Promise.resolve();
+
 export function mathRendererFactory(element, performPostprocessing, callback) {
     performPostprocessing = performPostprocessing !== false;
 
@@ -116,19 +118,21 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
     const metricsCache = {};
 
     return () => {
-        MathJax.texReset();
-        metricsCache.inline ??= MathJax.getMetricsFor(document.body, false);
-        metricsCache.display ??= MathJax.getMetricsFor(document.body, true);
-        const promises = [];
-        processWithRenderer(element, promises);
-        if (performPostprocessing) processLaTeXTextInElement(element);
+        renderQueue = renderQueue.then(() => {
+            MathJax.texReset();
+            metricsCache.inline ??= MathJax.getMetricsFor(document.body, false);
+            metricsCache.display ??= MathJax.getMetricsFor(document.body, true);
+            const promises = [];
+            processWithRenderer(element, promises);
+            if (performPostprocessing) processLaTeXTextInElement(element);
 
-        Promise.all(promises).then(() => {
-            if (MathJax.tex2chtml) {
-                MathJax.startup.document.clear();
-                MathJax.startup.document.updateDocument();
-            }
-            callback?.();
+            return Promise.all(promises).then(() => {
+                if (MathJax.tex2chtml) {
+                    MathJax.startup.document.clear();
+                    MathJax.startup.document.updateDocument();
+                }
+                callback?.();
+            });
         });
     };
 }

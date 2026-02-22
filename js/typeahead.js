@@ -28,6 +28,7 @@ class Typeahead {
         this.activeIndex = -1;
         this.queryTokens = [];
         this.menuId = `typeahead-listbox-${Date.now()}`;
+        this._abortController = new AbortController();
 
         this.initUI();
         this.bindEvents();
@@ -58,15 +59,27 @@ class Typeahead {
     }
 
     bindEvents() {
-        this.input.addEventListener('input', (e) => this.onInput(e.target.value));
-        this.input.addEventListener('keydown', (e) => this.onKeydown(e));
+        const signal = this._abortController.signal;
+        this.input.addEventListener('input', (e) => this.onInput(e.target.value), { signal });
+        this.input.addEventListener('keydown', (e) => this.onKeydown(e), { signal });
 
         // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!this.input.contains(e.target) && !this.menu.contains(e.target)) {
-                this.closeMenu();
-            }
-        });
+        document.addEventListener(
+            'click',
+            (e) => {
+                if (!this.input.contains(e.target) && !this.menu.contains(e.target)) {
+                    this.closeMenu();
+                }
+            },
+            { signal },
+        );
+    }
+
+    destroy() {
+        this._abortController.abort();
+        clearTimeout(this.debounceTimeout);
+        this.closeMenu();
+        this.menu.remove();
     }
 
     onInput(query) {
@@ -125,10 +138,32 @@ class Typeahead {
         }
 
         this.currentItems.forEach((item, index) => {
-            // Create a temporary wrapper to parse the HTML string from renderItem
-            const div = document.createElement('div');
-            div.innerHTML = this.options.renderItem(item).trim();
-            const element = div.firstChild;
+            const rendered = this.options.renderItem(item);
+            const element = document.createElement('button');
+            element.type = 'button';
+            element.className = 'dropdown-item';
+            // renderItem may return HTML with <strong> highlights — parse safely
+            const template = document.createElement('template');
+            template.innerHTML = rendered.trim();
+            // Only allow text and <strong>/<b> elements from rendered output
+            for (const node of template.content.childNodes) {
+                if (node.nodeType === 3) {
+                    element.appendChild(document.createTextNode(node.textContent));
+                } else if (node.nodeType === 1) {
+                    if (['STRONG', 'B', 'BUTTON'].includes(node.tagName)) {
+                        if (node.tagName === 'BUTTON') {
+                            // Default renderItem returns a <button> — unwrap its children
+                            for (const child of node.childNodes) {
+                                element.appendChild(child.cloneNode(true));
+                            }
+                        } else {
+                            element.appendChild(node.cloneNode(true));
+                        }
+                    } else {
+                        element.appendChild(document.createTextNode(node.textContent));
+                    }
+                }
+            }
 
             element.addEventListener('mousedown', (e) => e.preventDefault());
             element.addEventListener('click', () => this.selectItem(item));

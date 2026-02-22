@@ -33,10 +33,14 @@ function init() {
     checkedRadio('typesetOnChange', state.typesetOnChange.toString());
     checkedRadio('singleAceInstance', state.singleAceInstance.toString());
 
-    const savedRatio = localStorage.getItem('areaWidthRatio');
-    if (savedRatio !== null) {
-        checkedRadio('areaWidthRatio', savedRatio);
-        setAreaWidthRatio(savedRatio);
+    try {
+        const savedRatio = localStorage.getItem('areaWidthRatio');
+        if (savedRatio !== null) {
+            checkedRadio('areaWidthRatio', savedRatio);
+            setAreaWidthRatio(savedRatio);
+        }
+    } catch {
+        // localStorage unavailable — use defaults
     }
 
     function finalizer() {
@@ -77,7 +81,16 @@ function init() {
         handleLocationHash();
     }
 
-    function masterReload() {
+    async function masterReload() {
+        // Destroy active editor instances to prevent orphaned ACE editors
+        document.querySelectorAll('.latex-source-area').forEach((el) => {
+            if (el.editorInstance) {
+                el.editorInstance.off('blur', el.editorInstance.customDestroyer);
+                el.editorInstance.destroy();
+                el.editorInstance = null;
+            }
+        });
+
         document.querySelectorAll('section.main-content').forEach((el) => (el.style.display = 'none'));
         const activeSection = document.querySelector(`section.main-content[lang="${state.displayLanguage}"]`);
         if (activeSection) activeSection.style.display = 'block';
@@ -87,7 +100,7 @@ function init() {
                 s.setAttribute('data-toload', 'true');
             });
         state.keywordIndex = {};
-        loadExternalScriptsAndFinalize(finalizer);
+        await loadExternalScriptsAndFinalize(finalizer);
     }
 
     initializeDarkThemeSwitch();

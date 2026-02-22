@@ -124,6 +124,8 @@ div.card-body a:hover {
 @media (prefers-reduced-motion: reduce) {
     .highlighted-blinking {
         animation: none;
+        outline: 3px solid firebrick;
+        outline-offset: 2px;
     }
 }
 

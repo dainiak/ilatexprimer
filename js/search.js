@@ -46,7 +46,7 @@ export function highlightKeywordEverywhere(keyword) {
             editorInstance.findAll(
                 RegExp(
                     [...state.keywordIndex[keyword].synonyms]
-                        .map((str) => str.replace(/[\\$^[{}()?.*|]/g, ($0) => '\\' + $0))
+                        .map((str) => str.replace(/[\\$^[{}()?.*+|]/g, ($0) => '\\' + $0))
                         .join('|'),
                     'gi',
                 ),
