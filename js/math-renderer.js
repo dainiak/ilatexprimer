@@ -27,7 +27,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
         return null;
     }
 
-    function processWithRenderer(element) {
+    function processWithRenderer(element, promises) {
         for (const node of Array.from(element.childNodes)) {
             if (node.nodeType === 3) {
                 const tokens = node.textContent.split(/(\${1,2}|\\\[|\\]|\\\(|\\\))/);
@@ -59,11 +59,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         }
 
                         let preparedSource = originalSource;
-                        let span = document.createElement(displayMode ? 'div' : 'span');
-                        if (displayMode) {
-                            span.style.overflowX = 'auto';
-                            span.style.width = '100%';
-                        }
+                        let span = document.createElement('span');
                         container.appendChild(span);
 
                         const attachTooltip = (span) => {
@@ -90,27 +86,29 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                                 options,
                             );
 
-                            mjElementPromise
-                                .then((mjElement) => {
-                                    let annotation = document.createElement('annotation');
-                                    annotation.setAttribute('encoding', 'application/x-tex');
-                                    annotation.style.display = 'none';
-                                    annotation.innerText = originalSource;
-                                    mjElement.appendChild(annotation);
-                                    span.appendChild(mjElement);
-                                    attachTooltip(span);
-                                })
-                                .catch((err) => {
-                                    span.appendChild(document.createTextNode(preparedSource));
-                                    console.warn('MathJax rendering failed:', err);
-                                });
+                            promises.push(
+                                mjElementPromise
+                                    .then((mjElement) => {
+                                        let annotation = document.createElement('annotation');
+                                        annotation.setAttribute('encoding', 'application/x-tex');
+                                        annotation.style.display = 'none';
+                                        annotation.innerText = originalSource;
+                                        mjElement.appendChild(annotation);
+                                        span.appendChild(mjElement);
+                                        attachTooltip(span);
+                                    })
+                                    .catch((err) => {
+                                        span.appendChild(document.createTextNode(preparedSource));
+                                        console.warn('MathJax rendering failed:', err);
+                                    }),
+                            );
                         }
                     } else {
                         container.appendChild(document.createTextNode(token));
                     }
                 }
             } else if (node.nodeType === 1 && !['code', 'pre'].includes(node.nodeName.toLowerCase())) {
-                processWithRenderer(node);
+                processWithRenderer(node, promises);
             }
         }
     }
@@ -121,13 +119,16 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
         MathJax.texReset();
         metricsCache.inline ??= MathJax.getMetricsFor(document.body, false);
         metricsCache.display ??= MathJax.getMetricsFor(document.body, true);
-        processWithRenderer(element);
+        const promises = [];
+        processWithRenderer(element, promises);
         if (performPostprocessing) processLaTeXTextInElement(element);
 
-        if (MathJax.tex2chtml) {
-            MathJax.startup.document.clear();
-            MathJax.startup.document.updateDocument();
-        }
-        callback?.();
+        Promise.all(promises).then(() => {
+            if (MathJax.tex2chtml) {
+                MathJax.startup.document.clear();
+                MathJax.startup.document.updateDocument();
+            }
+            callback?.();
+        });
     };
 }
