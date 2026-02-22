@@ -46,18 +46,6 @@ function init() {
             processLessonContainer(element, (index + 1).toString());
         });
 
-        setLoadingStatus(messages.processingMathOnPage);
-
-        mathRendererFactory(document.body, true, () => {
-            setLoadingStatus(messages.finishedLoading);
-            const loadingToast = document.getElementById('loadingToast');
-            loadingToast.style.transition = 'opacity 1s';
-            loadingToast.style.opacity = '0';
-            setTimeout(() => {
-                loadingToast.style.display = 'none';
-            }, 1000);
-        })();
-
         const keywordIndexList = Object.keys(state.keywordIndex);
 
         if (typeaheadInstance) {
@@ -73,6 +61,19 @@ function init() {
         }
 
         buildTableOfContents();
+
+        setLoadingStatus(messages.processingMathOnPage);
+
+        mathRendererFactory(document.body, true, () => {
+            setLoadingStatus(messages.finishedLoading);
+            const loadingToast = document.getElementById('loadingToast');
+            loadingToast.style.transition = 'opacity 1s';
+            loadingToast.style.opacity = '0';
+            setTimeout(() => {
+                loadingToast.style.display = 'none';
+            }, 1000);
+        })();
+
         handleLocationHash();
     }
 
