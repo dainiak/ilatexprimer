@@ -121,6 +121,12 @@ div.card-body a:hover {
     border-width: thick;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .highlighted-blinking {
+        animation: none;
+    }
+}
+
 .language-flag {
     top: 0;
     right: 0;
@@ -178,7 +184,6 @@ div > ol > li > ol > li > ol > li:before {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 40px;
     height: 40px;
     display: none;
 }

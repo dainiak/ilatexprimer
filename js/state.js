@@ -1,3 +1,5 @@
+export const MONOSPACE_FONT_FAMILY = 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace';
+
 export const state = {
     displayLanguage: localStorage.getItem('displayLanguage') || (navigator.languages.includes('ru') ? 'ru' : 'en'),
     displayTheme:
@@ -12,7 +14,7 @@ export const state = {
         mode: 'ace/mode/latex',
         minLines: 3,
         maxLines: Infinity,
-        fontFamily: 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+        fontFamily: MONOSPACE_FONT_FAMILY,
         fontSize: '90%',
         wrap: true,
         showGutter: true,
@@ -23,4 +25,5 @@ export const state = {
     aceHighlighter: null,
     searchInput: null,
     loadingToastText: null,
+    loadAbortController: null,
 };

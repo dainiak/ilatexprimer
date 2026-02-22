@@ -28,8 +28,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
     }
 
     function processWithRenderer(element) {
-        for (let i = 0; i < element.childNodes.length; ++i) {
-            const node = element.childNodes[i];
+        for (const node of Array.from(element.childNodes)) {
             if (node.nodeType === 3) {
                 const tokens = node.textContent.split(/(\${1,2}|\\\[|\\]|\\\(|\\\))/);
 
@@ -63,7 +62,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         let span = document.createElement(displayMode ? 'div' : 'span');
                         if (displayMode) {
                             span.style.overflowX = 'auto';
-                            span.style.width="100%";
+                            span.style.width = '100%';
                         }
                         container.appendChild(span);
 
@@ -84,7 +83,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                         };
 
                         {
-                            let options = MathJax.getMetricsFor(document.body, displayMode);
+                            let options = { ...(displayMode ? metricsCache.display : metricsCache.inline) };
                             options.display = displayMode;
                             let mjElementPromise = (MathJax.tex2chtmlPromise || MathJax.tex2svgPromise)(
                                 preparedSource,
@@ -116,8 +115,12 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
         }
     }
 
+    const metricsCache = {};
+
     return () => {
         MathJax.texReset();
+        metricsCache.inline ??= MathJax.getMetricsFor(document.body, false);
+        metricsCache.display ??= MathJax.getMetricsFor(document.body, true);
         processWithRenderer(element);
         if (performPostprocessing) processLaTeXTextInElement(element);
 
@@ -125,6 +128,6 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
             MathJax.startup.document.clear();
             MathJax.startup.document.updateDocument();
         }
-        callback?.call();
+        callback?.();
     };
 }

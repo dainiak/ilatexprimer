@@ -1,6 +1,6 @@
 import ace from 'ace-builds';
 import { Popover } from 'bootstrap';
-import { state } from './state.js';
+import { state, MONOSPACE_FONT_FAMILY } from './state.js';
 import { preprocessLaTeX } from './latex-processor.js';
 import { mathRendererFactory } from './math-renderer.js';
 import { getResultDisplayArea } from './lesson-loader.js';
@@ -66,7 +66,7 @@ export function attachAce(sourceArea) {
             editor = null;
             sourceArea.textContent = value;
             ace.config.set('fontSize', '90%');
-            ace.config.set('fontFamily', 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace');
+            ace.config.set('fontFamily', MONOSPACE_FONT_FAMILY);
             state.aceHighlighter(sourceArea, state.aceEditorOptions);
             if (!aceStaticStyle) {
                 aceStaticStyle = true;

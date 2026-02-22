@@ -1,8 +1,9 @@
 export function removeLaTeXComments(text) {
+    const verbRegex = /\\verb([^a-zA-Z]).*?\1/gm;
     return text
-        .replace(/\\verb".*?"/gm, ($0) => $0.replace(/%/g, '\\%'))
+        .replace(verbRegex, ($0) => $0.replace(/%/g, '\\%'))
         .replace(/(\\)?%/gm, ($0, $1) => ($1 ? $0 : '\ufeff'))
-        .replace(/\\verb".*?"/gm, ($0) => $0.replace(/\\%/g, '%'))
+        .replace(verbRegex, ($0) => $0.replace(/\\%/g, '%'))
         .replace(/\ufeff.*$/mu, '');
 }
 
@@ -192,11 +193,7 @@ function insertParBreaks(text) {
         }
 
         // $ ... $ — copy verbatim (inline math, but not $$)
-        if (
-            text[i] === '$' &&
-            (i + 1 >= text.length || text[i + 1] !== '$') &&
-            (i === 0 || text[i - 1] !== '\\')
-        ) {
+        if (text[i] === '$' && (i + 1 >= text.length || text[i + 1] !== '$') && (i === 0 || text[i - 1] !== '\\')) {
             let j = i + 1;
             while (j < text.length && !(text[j] === '$' && text[j - 1] !== '\\')) j++;
             if (j < text.length) {
@@ -391,14 +388,15 @@ function renderTokens(tokens, parent) {
             }
 
             case 'VERB': {
-                const nobr = document.createElement('nobr');
+                const nowrap = document.createElement('span');
+                nowrap.style.whiteSpace = 'nowrap';
                 const code = document.createElement('code');
                 code.appendChild(document.createTextNode(token.content));
-                nobr.appendChild(code);
+                nowrap.appendChild(code);
                 if (token.punctuation) {
-                    nobr.appendChild(document.createTextNode(token.punctuation));
+                    nowrap.appendChild(document.createTextNode(token.punctuation));
                 }
-                parent.appendChild(nobr);
+                parent.appendChild(nowrap);
                 i++;
                 break;
             }
@@ -407,7 +405,7 @@ function renderTokens(tokens, parent) {
                 const spec = COMMAND_REGISTRY[token.name];
                 if (spec.handler === 'href') {
                     const a = document.createElement('a');
-                    a.rel = 'external';
+                    a.rel = 'noopener noreferrer external';
                     a.href = token.args[0];
                     if (token.args[1]) {
                         renderTokens(tokenize(token.args[1]), a);

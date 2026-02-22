@@ -16,16 +16,15 @@ export function setLoadingStatus(text) {
 export function processLessonContainer(container, containerFootprint) {
     containerFootprint = containerFootprint || '';
     const lessonString = container.textContent.trim();
-    const lessonSteps = lessonString.split(/(^\s*\\section{.*}\s*$)/m);
+    const lessonSteps = lessonString.split(/(^\s*\\section{.*?}\s*$)/m);
     const lessonContainer = createElement('div', 'lesson-container');
-    container.after(lessonContainer);
-    container.parentNode.removeChild(container);
+    container.replaceWith(lessonContainer);
 
     for (let i = 1; i < lessonSteps.length; i += 2) {
         const stepIdString = `${containerFootprint}-${(i + 1) / 2}`;
         let headerText = lessonSteps[i].trim();
         headerText = headerText.substring('\\section{'.length, headerText.length - 1);
-        let bodyText = lessonSteps[i + 1]
+        let bodyText = (lessonSteps[i + 1] ?? '')
             .trim()
             .replace(/\\index{([^}]+)}/g, ($0, $1) => {
                 $1.split(',').forEach((keywordGroup) => {
@@ -67,6 +66,8 @@ export function processLessonContainer(container, containerFootprint) {
 
         const stepHeader = createElement('div', 'card-header step-header');
         stepHeader.id = `stepheading${stepIdString}`;
+        stepHeader.setAttribute('role', 'button');
+        stepHeader.setAttribute('tabindex', '0');
         stepHeader.setAttribute('data-bs-toggle', 'collapse');
         stepHeader.setAttribute('data-bs-target', `#step${stepIdString}`);
         stepHeader.setAttribute('aria-expanded', state.startCollapsed ? 'false' : 'true');
@@ -143,25 +144,30 @@ export function processLessonContainer(container, containerFootprint) {
 }
 
 export async function loadExternalScriptsAndFinalize(finalizer) {
+    state.loadAbortController?.abort();
+    const controller = new AbortController();
+    state.loadAbortController = controller;
+
     const scripts = document.querySelectorAll(
-        `section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src][toload]`,
+        `section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src][data-toload]`,
     );
 
     await Promise.all(
         [...scripts].map(async (externalScript) => {
             const src = `content/${state.displayLanguage}/tex/${externalScript.dataset.src}`;
             externalScript.removeAttribute('data-src');
-            externalScript.removeAttribute('toload');
-            externalScript.setAttribute('toprocess', 'true');
+            externalScript.removeAttribute('data-toload');
+            externalScript.setAttribute('data-toprocess', 'true');
 
             setLoadingStatus(`${messages.loadingSection} "${src}"\u2026`);
 
             try {
-                const response = await fetch(src, { signal: AbortSignal.timeout(10000) });
+                const response = await fetch(src, { signal: controller.signal });
                 externalScript.textContent = response.ok
                     ? await response.text()
                     : `\\section{(${messages.unableToLoadThisStep})}`;
             } catch (err) {
+                if (err.name === 'AbortError') return;
                 console.error(`Failed to load ${src}:`, err);
                 if (!externalScript.textContent.trim()) {
                     externalScript.textContent = `\\section{(${messages.unableToLoadThisStep})}`;
@@ -170,5 +176,6 @@ export async function loadExternalScriptsAndFinalize(finalizer) {
         }),
     );
 
-    finalizer.call();
+    if (controller.signal.aborted) return;
+    finalizer();
 }

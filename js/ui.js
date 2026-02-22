@@ -86,7 +86,7 @@ export function setUIEventHandlers(masterReload) {
         state.singleAceInstance = e.target.value === 'true';
         localStorage.setItem('singleAceInstance', state.singleAceInstance);
         if (state.singleAceInstance)
-            document.querySelectorAll('.latex-source-area').forEach((el) => el.editorInstance?.customDestroyer.call());
+            document.querySelectorAll('.latex-source-area').forEach((el) => el.editorInstance?.customDestroyer());
         else document.querySelectorAll('.latex-source-area').forEach((el) => attachAce(el));
     });
 
@@ -117,20 +117,14 @@ export function setUIEventHandlers(masterReload) {
         document.body.querySelectorAll('[data-has-tooltip]').forEach((el) => {
             Popover.getInstance(el)?.hide();
         });
-        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((el) => {
-            if (!el.classList.contains('manual-collapse')) el.classList.add('collapsed');
-        });
         document.querySelectorAll('.step-body.collapse').forEach((el) => {
-            if (!el.classList.contains('manual-collapse')) el.classList.remove('show');
+            Collapse.getOrCreateInstance(el, { toggle: false }).hide();
         });
     });
 
     document.getElementById('btnExpandAll').addEventListener('click', () => {
-        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((el) => {
-            if (!el.classList.contains('manual-collapse')) el.classList.remove('collapsed');
-        });
         document.querySelectorAll('.step-body.collapse').forEach((el) => {
-            if (!el.classList.contains('manual-collapse')) el.classList.add('show');
+            Collapse.getOrCreateInstance(el, { toggle: false }).show();
         });
     });
 

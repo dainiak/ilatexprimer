@@ -40,8 +40,8 @@ function init() {
     }
 
     function finalizer() {
-        document.querySelectorAll('script[type="text/latexlesson"][toprocess]').forEach((element, index) => {
-            element.removeAttribute('toprocess');
+        document.querySelectorAll('script[type="text/latexlesson"][data-toprocess]').forEach((element, index) => {
+            element.removeAttribute('data-toprocess');
             setLoadingStatus(`${messages.processingSection} ${index}\u2026`);
             processLessonContainer(element, (index + 1).toString());
         });
@@ -84,7 +84,7 @@ function init() {
         document
             .querySelectorAll(`section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src]`)
             .forEach((s) => {
-                s.setAttribute('toload', 'true');
+                s.setAttribute('data-toload', 'true');
             });
         state.keywordIndex = {};
         loadExternalScriptsAndFinalize(finalizer);
