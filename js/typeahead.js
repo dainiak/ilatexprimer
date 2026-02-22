@@ -167,9 +167,11 @@ class Typeahead {
                 this.highlightActive(items);
                 break;
             case 'Enter':
-                e.preventDefault();
                 if (this.activeIndex > -1) {
+                    e.preventDefault();
                     items[this.activeIndex].click();
+                } else {
+                    this.closeMenu();
                 }
                 break;
             case 'Escape':
