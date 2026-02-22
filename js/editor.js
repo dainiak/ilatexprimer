@@ -3,6 +3,7 @@ import { Popover } from 'bootstrap';
 import { state } from './state.js';
 import { preprocessLaTeX } from './latex-processor.js';
 import { mathRendererFactory } from './math-renderer.js';
+import { getResultDisplayArea } from './lesson-loader.js';
 
 let aceStaticStyle = null;
 
@@ -28,7 +29,7 @@ export function attachAce(sourceArea) {
     editor.gotoLine(1);
 
     function typesetEditorContent() {
-        const rda = editor.container.parentNode.rda;
+        const rda = getResultDisplayArea(editor.container.parentNode);
         rda.querySelectorAll('[data-has-tooltip]').forEach((el) => {
             Popover.getInstance(el)?.dispose();
         });
@@ -66,14 +67,16 @@ export function attachAce(sourceArea) {
             ace.config.set('fontFamily', 'Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace');
             state.aceHighlighter(sourceArea, state.aceEditorOptions);
             if (!aceStaticStyle) {
-                aceStaticStyle = document.querySelector('style#ace_highlight');
-                aceStaticStyle.innerHTML = aceStaticStyle.innerHTML
-                    .replace(/\bfont-size:[^;]+;/, 'font-size: 90%;')
-                    .replace(
-                        /\bfont-family:[^;]+;/,
-                        'font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;',
-                    )
-                    .replace('.ace_line {', '.ace_line { line-height: 1.2em;');
+                aceStaticStyle = true;
+                const overrideStyle = document.createElement('style');
+                overrideStyle.textContent = `
+                    .ace_static_highlight .ace_line {
+                        font-size: 90%;
+                        font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+                        line-height: 1.2em;
+                    }
+                `;
+                document.head.appendChild(overrideStyle);
             }
         }
     };

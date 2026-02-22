@@ -16,28 +16,29 @@ export function onRadioChange(name, handler) {
 }
 
 export function setAreaWidthRatio(ratioCode) {
-    document.querySelectorAll('.latex-source-area, .result-display-area').forEach((el) => {
-        const toRemove = [];
+    const sourceAreas = document.querySelectorAll('.latex-source-area');
+    const resultAreas = document.querySelectorAll('.result-display-area');
+
+    [...sourceAreas, ...resultAreas].forEach((el) => {
         el.classList.forEach((cls) => {
-            if (/^col-md-\d+$/.test(cls)) toRemove.push(cls);
+            if (/^col-md-\d+$/.test(cls)) el.classList.remove(cls);
         });
-        toRemove.forEach((cls) => el.classList.remove(cls));
     });
 
     if (ratioCode !== '0') {
-        document.querySelectorAll('.latex-source-area').forEach((el) => {
+        sourceAreas.forEach((el) => {
             el.classList.add(`col-md-${ratioCode}`);
             el.style.display = '';
             el.dispatchEvent(new Event('resize'));
         });
-        document.querySelectorAll('.result-display-area').forEach((el) => {
+        resultAreas.forEach((el) => {
             el.classList.add(`col-md-${12 - parseInt(ratioCode)}`);
         });
     } else {
-        document.querySelectorAll('.latex-source-area').forEach((el) => {
+        sourceAreas.forEach((el) => {
             if (!el.closest('.force-source-visibility')) el.style.display = 'none';
         });
-        document.querySelectorAll('.result-display-area').forEach((el) => {
+        resultAreas.forEach((el) => {
             if (!el.closest('.force-source-visibility')) el.classList.add('col-md-12');
         });
     }
@@ -166,40 +167,61 @@ export function handleLocationHash() {
 }
 
 export function buildTableOfContents() {
-    let tocHtml = '<ul>';
-    let prevLevel = -1;
     const visibleSection = document.querySelector('section.main-content[style*="block"]');
     if (!visibleSection) return;
-    visibleSection.querySelectorAll('h2, div.card-header').forEach((e) => {
-        if (e.tagName.toLowerCase() === 'div') {
-            let target = e.getAttribute('data-bs-target').replace('#step', '');
-            let heading = e.querySelector('h3').innerHTML;
-            if (prevLevel === 0) tocHtml += '<ul>';
-            tocHtml += `<li><a href="#" class="toc-link" data-target="${target}">${heading}</a></li>`;
-            if (prevLevel === -1) prevLevel = 0;
-            else prevLevel = 1;
-        } else {
-            if (prevLevel === 1) tocHtml += '</ul></li>';
 
-            tocHtml += `<li><strong>${e.innerHTML}</strong>`;
-            prevLevel = 0;
-        }
-    });
-    if (prevLevel === 1) tocHtml += '</ul></li>';
-    tocHtml += '</ul>';
-    document.getElementById('tableofcontents').innerHTML = tocHtml;
-    document.querySelectorAll('a.toc-link').forEach((element) => {
-        const stepId = element.getAttribute('data-target');
-        element.addEventListener('click', (e) => {
+    const tocContainer = document.getElementById('tableofcontents');
+    tocContainer.textContent = '';
+
+    const rootUl = document.createElement('ul');
+    let currentSectionLi = null;
+    let subUl = null;
+
+    function addTocLink(target, headingContent) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'toc-link';
+        a.innerHTML = headingContent;
+        a.addEventListener('click', (e) => {
             e.preventDefault();
-            const stepEl = document.querySelector(`#step${stepId}.collapse`);
+            const stepEl = document.querySelector(`#step${target}.collapse`);
             if (!stepEl) return;
             Collapse.getOrCreateInstance(stepEl, { toggle: false }).show();
-            history.replaceState(null, '', `#stepheading${stepId}`);
-            const heading = document.getElementById(`stepheading${stepId}`);
+            history.replaceState(null, '', `#stepheading${target}`);
+            const heading = document.getElementById(`stepheading${target}`);
             if (heading) {
                 heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
+        li.appendChild(a);
+        return li;
+    }
+
+    visibleSection.querySelectorAll('h2, div.card-header').forEach((e) => {
+        if (e.tagName.toLowerCase() === 'div') {
+            const target = e.getAttribute('data-bs-target').replace('#step', '');
+            const headingContent = e.querySelector('h3').innerHTML;
+            const li = addTocLink(target, headingContent);
+
+            if (currentSectionLi) {
+                if (!subUl) {
+                    subUl = document.createElement('ul');
+                    currentSectionLi.appendChild(subUl);
+                }
+                subUl.appendChild(li);
+            } else {
+                rootUl.appendChild(li);
+            }
+        } else {
+            currentSectionLi = document.createElement('li');
+            const strong = document.createElement('strong');
+            strong.innerHTML = e.innerHTML;
+            currentSectionLi.appendChild(strong);
+            rootUl.appendChild(currentSectionLi);
+            subUl = null;
+        }
     });
+
+    tocContainer.appendChild(rootUl);
 }

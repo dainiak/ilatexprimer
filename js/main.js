@@ -28,15 +28,14 @@ function init() {
     state.searchInput = document.getElementById('searchInput');
     state.loadingToastText = document.getElementById('loadingToastText');
 
-    localStorage.removeItem('mathRenderer');
     checkedRadio('typesetOnChange', state.typesetOnChange.toString());
     checkedRadio('singleAceInstance', state.singleAceInstance.toString());
 
-    if (localStorage.getItem('areaWidthRatio') !== null) {
-        checkedRadio('areaWidthRatio', localStorage.getItem('areaWidthRatio'));
+    const savedRatio = localStorage.getItem('areaWidthRatio');
+    if (savedRatio !== null) {
+        checkedRadio('areaWidthRatio', savedRatio);
+        setAreaWidthRatio(savedRatio);
     }
-
-    if (localStorage.getItem('areaWidthRatio') !== null) setAreaWidthRatio(localStorage.getItem('areaWidthRatio'));
 
     function finalizer() {
         document.querySelectorAll('script[type="text/latexlesson"][toprocess]').forEach((element, index) => {
@@ -57,19 +56,6 @@ function init() {
             }, 1000);
         })();
 
-        if (!window.location.hash && state.startCollapsed) {
-            const intro = document.querySelector('.step-header[data-bs-target="#step1-1"]');
-            if (state.highlightIntro && intro) intro.classList.add('highlighted-blinking');
-
-            const bodyClickHandler = () => {
-                if (intro) {
-                    intro.classList.remove('highlighted-blinking');
-                    intro.style.opacity = 1;
-                }
-            };
-            document.body.addEventListener('click', bodyClickHandler, { once: true });
-        }
-
         let keywordIndexList = Object.keys(state.keywordIndex);
 
         new Typeahead(state.searchInput, {
@@ -81,12 +67,6 @@ function init() {
         });
 
         buildTableOfContents();
-
-        document.getElementById('searchForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const kw = state.searchInput.value.trim();
-            if (kw) highlightKeywordEverywhere(kw);
-        });
 
         document.querySelectorAll('.highlighted-blinking').forEach((el) => {
             el.addEventListener('focus', () => {
@@ -135,6 +115,12 @@ function init() {
     setUIEventHandlers(masterReload);
 
     masterReload();
+
+    document.getElementById('searchForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const kw = state.searchInput.value.trim();
+        if (kw) highlightKeywordEverywhere(kw);
+    });
 }
 
 if (document.readyState === 'complete') {

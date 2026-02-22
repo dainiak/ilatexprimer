@@ -1,3 +1,5 @@
+import { state } from './state.js';
+
 const I18N_STRINGS_ALL = {
     ru: {
         btnCollapseAll: 'Свернуть все шаги',
@@ -90,8 +92,7 @@ export const messages = {
 };
 
 export function setUILanguage(language = null) {
-    if (!language)
-        language = localStorage.getItem('displayLanguage') || (navigator.languages.includes('ru') ? 'ru' : 'en');
+    if (!language) language = state.displayLanguage;
 
     const strings = I18N_STRINGS_ALL[language];
 

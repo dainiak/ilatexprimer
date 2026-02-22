@@ -3,6 +3,12 @@ import { preprocessLaTeX, createElement } from './latex-processor.js';
 import { attachAce } from './editor.js';
 import { messages } from './i18n.js';
 
+const sourceToResult = new WeakMap();
+
+export function getResultDisplayArea(sourceArea) {
+    return sourceToResult.get(sourceArea);
+}
+
 export function setLoadingStatus(text) {
     state.loadingToastText.textContent = text;
 }
@@ -133,7 +139,7 @@ export function processLessonContainer(container, containerFootprint) {
         });
 
         sourceArea.originalText = sourceArea.textContent;
-        sourceArea.rda = resultDisplayArea;
+        sourceToResult.set(sourceArea, resultDisplayArea);
         if (state.singleAceInstance) state.aceHighlighter(sourceArea, state.aceEditorOptions);
         else attachAce(sourceArea);
     }
@@ -154,7 +160,7 @@ export async function loadExternalScriptsAndFinalize(finalizer) {
         setLoadingStatus(`${messages.loadingSection} "${src}"\u2026`);
 
         try {
-            const response = await fetch(src);
+            const response = await fetch(src, { signal: AbortSignal.timeout(10000) });
             externalScript.textContent = response.ok
                 ? await response.text()
                 : `\\section{(${messages.unableToLoadThisStep})}`;

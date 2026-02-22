@@ -87,19 +87,24 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
                                 options,
                             );
 
-                            mjElementPromise.then((mjElement) => {
-                                let annotation = document.createElement('annotation');
-                                annotation.setAttribute('encoding', 'application/x-tex');
-                                annotation.style.display = 'none';
-                                annotation.innerText = originalSource;
-                                mjElement.appendChild(annotation);
-                                span.appendChild(mjElement);
-                                if (displayMode) {
-                                    span.style.display = 'block';
-                                    span.style.textAlign = 'center';
-                                }
-                                attachTooltip(span);
-                            });
+                            mjElementPromise
+                                .then((mjElement) => {
+                                    let annotation = document.createElement('annotation');
+                                    annotation.setAttribute('encoding', 'application/x-tex');
+                                    annotation.style.display = 'none';
+                                    annotation.innerText = originalSource;
+                                    mjElement.appendChild(annotation);
+                                    span.appendChild(mjElement);
+                                    if (displayMode) {
+                                        span.style.display = 'block';
+                                        span.style.textAlign = 'center';
+                                    }
+                                    attachTooltip(span);
+                                })
+                                .catch((err) => {
+                                    span.appendChild(document.createTextNode(preparedSource));
+                                    console.warn('MathJax rendering failed:', err);
+                                });
                         }
                     } else {
                         container.appendChild(document.createTextNode(token));

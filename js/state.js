@@ -6,7 +6,6 @@ export const state = {
         localStorage.getItem('typesetOnChange') !== null ? localStorage.getItem('typesetOnChange') === 'true' : true,
     singleAceInstance: localStorage.getItem('singleAceInstance') === 'true' || false,
     startCollapsed: true,
-    highlightIntro: false,
     keywordIndex: {},
     aceEditorOptions: {
         theme: 'ace/theme/chrome',
