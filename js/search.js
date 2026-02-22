@@ -11,7 +11,8 @@ export function highlightKeywordEverywhere(keyword) {
         });
     }
 
-    let stepList = state.keywordIndex[keyword].steps;
+    const stepSet = state.keywordIndex[keyword].steps;
+    const stepList = [...stepSet];
     document.querySelectorAll('.collapse').forEach((element) => {
         element.querySelectorAll('.highlighted-blinking').forEach((el) => {
             el.classList.remove('highlighted-blinking');
@@ -20,7 +21,7 @@ export function highlightKeywordEverywhere(keyword) {
         if (
             element.id &&
             element.id.toString().match(/^step\d/) &&
-            !stepList.includes(element.id.toString().replace(/^step/, ''))
+            !stepSet.has(element.id.toString().replace(/^step/, ''))
         ) {
             element.querySelectorAll('[data-has-tooltip]').forEach((el) => {
                 Popover.getInstance(el)?.hide();
@@ -44,7 +45,7 @@ export function highlightKeywordEverywhere(keyword) {
             state.keywordIndex[keyword].synonyms.forEach((synonym) => highlightKeywordInFormulas(stepDOMnode, synonym));
             editorInstance.findAll(
                 RegExp(
-                    state.keywordIndex[keyword].synonyms
+                    [...state.keywordIndex[keyword].synonyms]
                         .map((str) => str.replace(/[\\$^[{}()?.*|]/g, ($0) => '\\' + $0))
                         .join('|'),
                     'gi',
@@ -62,9 +63,11 @@ export function highlightKeywordEverywhere(keyword) {
             });
         }
     }
-    const firstStep = document.getElementById(`step${stepList[0]}`);
-    if (firstStep) {
-        firstStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (stepList.length > 0) {
+        const firstStep = document.getElementById(`step${stepList[0]}`);
+        if (firstStep) {
+            firstStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
     const announcement = document.getElementById('searchAnnouncement');

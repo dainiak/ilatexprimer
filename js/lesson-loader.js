@@ -36,21 +36,18 @@ export function processLessonContainer(container, containerFootprint) {
                     keywordGroup.forEach((keyword) => {
                         if (!(keyword in state.keywordIndex)) {
                             state.keywordIndex[keyword] = {
-                                steps: [],
+                                steps: new Set(),
                             };
                         }
-                        state.keywordIndex[keyword].steps.includes(stepIdString) ||
-                            state.keywordIndex[keyword].steps.push(stepIdString);
+                        state.keywordIndex[keyword].steps.add(stepIdString);
 
                         if (keywordGroup.length > 1) {
-                            if (state.keywordIndex[keyword].synonyms === undefined) {
-                                state.keywordIndex[keyword].synonyms = [];
+                            if (!state.keywordIndex[keyword].synonyms) {
+                                state.keywordIndex[keyword].synonyms = new Set();
                             }
-                            keywordGroup.forEach(
-                                (synonym) =>
-                                    state.keywordIndex[keyword].synonyms.includes(synonym) ||
-                                    state.keywordIndex[keyword].synonyms.push(synonym),
-                            );
+                            keywordGroup.forEach((synonym) => {
+                                state.keywordIndex[keyword].synonyms.add(synonym);
+                            });
                         }
                     });
                 });
@@ -146,29 +143,32 @@ export function processLessonContainer(container, containerFootprint) {
 }
 
 export async function loadExternalScriptsAndFinalize(finalizer) {
-    let externalScript;
-    while (
-        (externalScript = document.querySelector(
-            `section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src][toload]`,
-        ))
-    ) {
-        const src = `content/${state.displayLanguage}/tex/${externalScript.dataset['src']}`;
-        externalScript.removeAttribute('data-src');
-        externalScript.removeAttribute('toload');
-        externalScript.setAttribute('toprocess', 'true');
+    const scripts = document.querySelectorAll(
+        `section[lang="${state.displayLanguage}"] > script[type="text/latexlesson"][data-src][toload]`,
+    );
 
-        setLoadingStatus(`${messages.loadingSection} "${src}"\u2026`);
+    await Promise.all(
+        [...scripts].map(async (externalScript) => {
+            const src = `content/${state.displayLanguage}/tex/${externalScript.dataset.src}`;
+            externalScript.removeAttribute('data-src');
+            externalScript.removeAttribute('toload');
+            externalScript.setAttribute('toprocess', 'true');
 
-        try {
-            const response = await fetch(src, { signal: AbortSignal.timeout(10000) });
-            externalScript.textContent = response.ok
-                ? await response.text()
-                : `\\section{(${messages.unableToLoadThisStep})}`;
-        } catch {
-            if (!externalScript.textContent.trim()) {
-                externalScript.textContent = `\\section{(${messages.unableToLoadThisStep})}`;
+            setLoadingStatus(`${messages.loadingSection} "${src}"\u2026`);
+
+            try {
+                const response = await fetch(src, { signal: AbortSignal.timeout(10000) });
+                externalScript.textContent = response.ok
+                    ? await response.text()
+                    : `\\section{(${messages.unableToLoadThisStep})}`;
+            } catch (err) {
+                console.error(`Failed to load ${src}:`, err);
+                if (!externalScript.textContent.trim()) {
+                    externalScript.textContent = `\\section{(${messages.unableToLoadThisStep})}`;
+                }
             }
-        }
-    }
+        }),
+    );
+
     finalizer.call();
 }

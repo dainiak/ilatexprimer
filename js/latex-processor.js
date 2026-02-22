@@ -6,7 +6,7 @@ export function removeLaTeXComments(text) {
         .replace(/\ufeff.*$/mu, '');
 }
 
-export function processLaTeXText(text) {
+function processLaTeXText(text) {
     return text
         .replace(/---/g, '\u2014')
         .replace(/--/g, '\u2013')

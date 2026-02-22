@@ -119,7 +119,7 @@ export function mathRendererFactory(element, performPostprocessing, callback) {
     return () => {
         MathJax.texReset();
         processWithRenderer(element);
-        performPostprocessing && processLaTeXTextInElement(element);
+        if (performPostprocessing) processLaTeXTextInElement(element);
 
         if (MathJax.tex2chtml) {
             MathJax.startup.document.clear();

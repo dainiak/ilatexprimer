@@ -47,12 +47,14 @@ export function attachAce(sourceArea) {
         exec: typesetEditorContent,
     });
 
-    editor.on('change', () => state.typesetOnChange && typesetEditorContent());
+    editor.on('change', () => {
+        if (state.typesetOnChange) typesetEditorContent();
+    });
 
     editor.customDestroyer = () => {
         const value = editor.getValue().trim();
         sourceArea.originalText = value;
-        state.typesetOnChange && typesetEditorContent();
+        if (state.typesetOnChange) typesetEditorContent();
 
         if (state.singleAceInstance) {
             sourceArea.editorInstance = null;

@@ -20,9 +20,11 @@ export function setAreaWidthRatio(ratioCode) {
     const resultAreas = document.querySelectorAll('.result-display-area');
 
     [...sourceAreas, ...resultAreas].forEach((el) => {
+        const toRemove = [];
         el.classList.forEach((cls) => {
-            if (/^col-md-\d+$/.test(cls)) el.classList.remove(cls);
+            if (/^col-md-\d+$/.test(cls)) toRemove.push(cls);
         });
+        toRemove.forEach((cls) => el.classList.remove(cls));
     });
 
     if (ratioCode !== '0') {
@@ -65,9 +67,9 @@ export function initializeDarkThemeSwitch() {
     }
 
     setTheme(state.displayTheme);
-    darkSwitch.onchange = () => {
+    darkSwitch.addEventListener('change', () => {
         setTheme(darkSwitch.checked ? 'dark' : 'light');
-    };
+    });
     onRadioChange('theme', (e) => setTheme(e.target.value.toString()));
 }
 
@@ -177,12 +179,14 @@ export function buildTableOfContents() {
     let currentSectionLi = null;
     let subUl = null;
 
-    function addTocLink(target, headingContent) {
+    function addTocLink(target, headingSourceEl) {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
         a.className = 'toc-link';
-        a.innerHTML = headingContent;
+        for (const child of headingSourceEl.childNodes) {
+            a.appendChild(child.cloneNode(true));
+        }
         a.addEventListener('click', (e) => {
             e.preventDefault();
             const stepEl = document.querySelector(`#step${target}.collapse`);
@@ -201,8 +205,7 @@ export function buildTableOfContents() {
     visibleSection.querySelectorAll('h2, div.card-header').forEach((e) => {
         if (e.tagName.toLowerCase() === 'div') {
             const target = e.getAttribute('data-bs-target').replace('#step', '');
-            const headingContent = e.querySelector('h3').innerHTML;
-            const li = addTocLink(target, headingContent);
+            const li = addTocLink(target, e.querySelector('h3'));
 
             if (currentSectionLi) {
                 if (!subUl) {
@@ -216,7 +219,9 @@ export function buildTableOfContents() {
         } else {
             currentSectionLi = document.createElement('li');
             const strong = document.createElement('strong');
-            strong.innerHTML = e.innerHTML;
+            for (const child of e.childNodes) {
+                strong.appendChild(child.cloneNode(true));
+            }
             currentSectionLi.appendChild(strong);
             rootUl.appendChild(currentSectionLi);
             subUl = null;

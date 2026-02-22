@@ -23,6 +23,8 @@ import {
     buildTableOfContents,
 } from './ui.js';
 
+let typeaheadInstance = null;
+
 function init() {
     state.aceHighlighter = ace.require('ace/ext/static_highlight');
     state.searchInput = document.getElementById('searchInput');
@@ -56,43 +58,21 @@ function init() {
             }, 1000);
         })();
 
-        let keywordIndexList = Object.keys(state.keywordIndex);
+        const keywordIndexList = Object.keys(state.keywordIndex);
 
-        new Typeahead(state.searchInput, {
-            source: keywordIndexList,
-            minLength: 2,
-            limit: 10,
-            delay: 150,
-            onSelect: (keyword) => highlightKeywordEverywhere(keyword),
-        });
+        if (typeaheadInstance) {
+            typeaheadInstance.options.source = keywordIndexList;
+        } else {
+            typeaheadInstance = new Typeahead(state.searchInput, {
+                source: keywordIndexList,
+                minLength: 2,
+                limit: 10,
+                delay: 150,
+                onSelect: (keyword) => highlightKeywordEverywhere(keyword),
+            });
+        }
 
         buildTableOfContents();
-
-        document.querySelectorAll('.highlighted-blinking').forEach((el) => {
-            el.addEventListener('focus', () => {
-                el.classList.remove('highlighted-blinking');
-                el.style.opacity = 1;
-            });
-        });
-
-        document.querySelectorAll('.step-body').forEach((el) => {
-            el.addEventListener('click', () => {
-                el.querySelectorAll('.highlighted-blinking').forEach((child) => {
-                    child.classList.remove('highlighted-blinking');
-                    child.style.transition = 'opacity 0.4s';
-                    child.style.opacity = 1;
-                });
-            });
-        });
-
-        document.querySelectorAll('.collapse').forEach((el) => {
-            el.addEventListener('hide.bs.collapse', () => {
-                el.querySelectorAll('[data-has-tooltip]').forEach((tooltipEl) => {
-                    Popover.getInstance(tooltipEl)?.hide();
-                });
-            });
-        });
-
         handleLocationHash();
     }
 
@@ -113,6 +93,31 @@ function init() {
     setScrollToTopButton();
     setUILanguage();
     setUIEventHandlers(masterReload);
+
+    document.addEventListener('focusin', (e) => {
+        const el = e.target.closest('.highlighted-blinking');
+        if (el) {
+            el.classList.remove('highlighted-blinking');
+            el.style.opacity = 1;
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const stepBody = e.target.closest('.step-body');
+        if (stepBody) {
+            stepBody.querySelectorAll('.highlighted-blinking').forEach((child) => {
+                child.classList.remove('highlighted-blinking');
+                child.style.transition = 'opacity 0.4s';
+                child.style.opacity = 1;
+            });
+        }
+    });
+
+    document.addEventListener('hide.bs.collapse', (e) => {
+        e.target.querySelectorAll('[data-has-tooltip]').forEach((tooltipEl) => {
+            Popover.getInstance(tooltipEl)?.hide();
+        });
+    });
 
     masterReload();
 
