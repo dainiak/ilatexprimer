@@ -9,7 +9,7 @@ window.ace = ace;
 await Promise.all([
     import('ace-builds/src-noconflict/mode-latex'),
     import('ace-builds/src-noconflict/theme-chrome'),
-    import('ace-builds/src-noconflict/theme-clouds_midnight'),
+    import('ace-builds/src-noconflict/theme-monokai'),
     import('ace-builds/src-noconflict/ext-static_highlight'),
 ]);
 

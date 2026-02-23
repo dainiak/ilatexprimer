@@ -53,7 +53,7 @@ export function initializeDarkThemeSwitch() {
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-bs-theme', theme);
         darkSwitch.checked = theme === 'dark';
-        state.aceEditorOptions.theme = theme === 'dark' ? 'ace/theme/clouds_midnight' : 'ace/theme/chrome';
+        state.aceEditorOptions.theme = theme === 'dark' ? 'ace/theme/monokai' : 'ace/theme/chrome';
         document
             .querySelectorAll('.latex-source-area')
             .forEach((element) => element.editorInstance?.setTheme(state.aceEditorOptions.theme));
