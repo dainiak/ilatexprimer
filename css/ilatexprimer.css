@@ -42,11 +42,6 @@
     cursor: pointer;
 }
 
-.social-share .ribbon a {
-    text-decoration: none;
-    color: whitesmoke;
-}
-
 ul.virtual {
     list-style-type: none;
 }
@@ -102,6 +97,11 @@ div.card-body a:hover {
 
 [data-bs-theme="dark"] div.card-body a:hover {
     background-color: #333;
+}
+
+.social-share .ribbon a {
+    text-decoration: none;
+    color: whitesmoke;
 }
 
 @keyframes blinking {

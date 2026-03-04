@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-    removeLaTeXComments,
-    processLaTeXText,
-    extractBracedArg,
-    readCommandName,
-    insertParBreaks,
-    tokenize,
     applyFinalTextTransforms,
-    preprocessLaTeX,
     createElement,
+    extractBracedArg,
+    insertParBreaks,
+    preprocessLaTeX,
+    processLaTeXText,
+    readCommandName,
+    removeLaTeXComments,
+    tokenize,
 } from '../latex-processor.js';
 
 describe('removeLaTeXComments', () => {
@@ -45,7 +45,7 @@ describe('processLaTeXText', () => {
         expect(processLaTeXText('<<hello>>')).toBe('\u00abhello\u00bb');
     });
 
-    it('converts `` and \'\' to curly double quotes', () => {
+    it("converts `` and '' to curly double quotes", () => {
         expect(processLaTeXText("``hello''")).toBe('\u201chello\u201d');
     });
 

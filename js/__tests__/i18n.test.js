@@ -1,11 +1,9 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { messages, setUILanguage } from '../i18n.js';
 
 describe('i18n translation data', () => {
     it('en and ru locales have identical key sets', async () => {
-        const mod = await import('../i18n.js');
-        // Access I18N_STRINGS_ALL indirectly by testing that setUILanguage works for both
-        // We verify by checking messages object is populated for both languages
+        await import('../i18n.js');
         setUILanguage('en');
         const enMessages = { ...messages };
         setUILanguage('ru');

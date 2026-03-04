@@ -15,8 +15,7 @@ export function findClosingToken(tokens, start) {
             if (stack.length === 0) return null;
 
             const prevToken = stack.pop();
-            if (!((prevToken === '\\(' && token === '\\)') || (prevToken === '\\[' && token === '\\]')))
-                return null;
+            if (!((prevToken === '\\(' && token === '\\)') || (prevToken === '\\[' && token === '\\]'))) return null;
         } else if (token === '$' || token === '$$') {
             if (stack.length === 0 || stack[stack.length - 1] !== token) stack.push(token);
             else stack.pop();
