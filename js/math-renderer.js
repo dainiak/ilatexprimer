@@ -4,30 +4,30 @@ import { processLaTeXTextInElement } from './latex-processor.js';
 
 let renderQueue = Promise.resolve();
 
+export function findClosingToken(tokens, start) {
+    const stack = [];
+    for (let i = start; i < tokens.length; ++i) {
+        const token = tokens[i];
+        if (token === '\\(' || token === '\\[') {
+            stack.push(token);
+            continue;
+        } else if (token === '\\)' || token === '\\]') {
+            if (stack.length === 0) return null;
+
+            const prevToken = stack.pop();
+            if (!((prevToken === '\\(' && token === '\\)') || (prevToken === '\\[' && token === '\\]')))
+                return null;
+        } else if (token === '$' || token === '$$') {
+            if (stack.length === 0 || stack[stack.length - 1] !== token) stack.push(token);
+            else stack.pop();
+        }
+        if (stack.length === 0) return i;
+    }
+    return null;
+}
+
 export function mathRendererFactory(element, performPostprocessing, callback) {
     performPostprocessing = performPostprocessing !== false;
-
-    function findClosingToken(tokens, start) {
-        const stack = [];
-        for (let i = start; i < tokens.length; ++i) {
-            const token = tokens[i];
-            if (token === '\\(' || token === '\\[') {
-                stack.push(token);
-                continue;
-            } else if (token === '\\)' || token === '\\]') {
-                if (stack.length === 0) return null;
-
-                const prevToken = stack.pop();
-                if (!((prevToken === '\\(' && token === '\\)') || (prevToken === '\\[' && token === '\\]')))
-                    return null;
-            } else if (token === '$' || token === '$$') {
-                if (stack.length === 0 || stack[stack.length - 1] !== token) stack.push(token);
-                else stack.pop();
-            }
-            if (stack.length === 0) return i;
-        }
-        return null;
-    }
 
     function processWithRenderer(element, promises) {
         for (const node of Array.from(element.childNodes)) {

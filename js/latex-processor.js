@@ -7,7 +7,7 @@ export function removeLaTeXComments(text) {
         .replace(/\ufeff.*$/mu, '');
 }
 
-function processLaTeXText(text) {
+export function processLaTeXText(text) {
     return text
         .replace(/---/g, '\u2014')
         .replace(/--/g, '\u2013')
@@ -100,7 +100,7 @@ const COMMAND_REGISTRY = {
     htmlblockquote: { tag: 'blockquote', args: 1, recurse: true },
 };
 
-function extractBracedArg(text, pos) {
+export function extractBracedArg(text, pos) {
     if (pos >= text.length || text[pos] !== '{') {
         return null;
     }
@@ -117,7 +117,7 @@ function extractBracedArg(text, pos) {
     return { content: text.substring(pos + 1), endPos: text.length };
 }
 
-function readCommandName(text, pos) {
+export function readCommandName(text, pos) {
     let end = pos;
     while (end < text.length && /[a-zA-Z]/.test(text[end])) {
         end++;
@@ -125,7 +125,7 @@ function readCommandName(text, pos) {
     return { name: text.substring(pos, end), endPos: end };
 }
 
-function insertParBreaks(text) {
+export function insertParBreaks(text) {
     const result = [];
     let i = 0;
 
@@ -221,7 +221,7 @@ function insertParBreaks(text) {
     return result.join('');
 }
 
-function tokenize(text) {
+export function tokenize(text) {
     text = insertParBreaks(text);
     const tokens = [];
     let textStart = 0;
@@ -365,7 +365,7 @@ function tokenize(text) {
     return tokens;
 }
 
-function applyFinalTextTransforms(text) {
+export function applyFinalTextTransforms(text) {
     return text
         .replace(/\\TeX(?!\$)/g, '\\(\\TeX\\)')
         .replace(/\\LaTeX(?!\$)/g, '\\(\\LaTeX\\)')

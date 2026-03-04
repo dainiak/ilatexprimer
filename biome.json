@@ -1,0 +1,30 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "trailingCommas": "all"
+        },
+        "globals": ["MathJax"]
+    },
+    "linter": {
+        "rules": {
+            "recommended": true,
+            "suspicious": {
+                "noAssignInExpressions": "off",
+                "useIterableCallbackReturn": "off"
+            },
+            "correctness": {
+                "noUnusedFunctionParameters": "off"
+            },
+            "complexity": {
+                "noImportantStyles": "off"
+            }
+        }
+    }
+}

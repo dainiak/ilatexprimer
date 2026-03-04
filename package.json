@@ -7,10 +7,13 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "biome check js/",
-    "format": "biome check --write js/ css/ index.html"
+    "format": "biome check --write js/ css/ index.html",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.6",
+    "@biomejs/biome": "^2.4.5",
+    "jsdom": "^26.1.0",
+    "vitest": "^4.1.0-beta.5",
     "vite": "^8.0.0-beta.0"
   },
   "dependencies": {
